@@ -100,18 +100,19 @@ export async function fixLoop(session, { agent = 'codex', maxAttempts = 3, log, 
   const meta = AGENTS[agent];
   if (!meta) throw new Error(`unknown agent "${agent}"`);
   const dir = session.bumpDir;
+  const app = session.sideDir('bump');
   const startSha = git(['rev-parse', 'HEAD'], dir);
-  const headPkg = readJson(path.join(dir, 'package.json')) || {};
-  const headLockJson = readJson(path.join(dir, 'package-lock.json'));
+  const headPkg = readJson(path.join(app, 'package.json')) || {};
+  const headLockJson = readJson(path.join(app, 'package-lock.json'));
   const headLock = headLockJson ? lockVersions(headLockJson) : null;
-  const commands = resolveCommands(session.cfg, dir);
+  const commands = resolveCommands(session.cfg, app);
 
   // Major bumps first; at most three packages' notes so the task stays readable.
   const bumps = [...(session.bumps || [])].sort((a, b) => Number(b.major) - Number(a.major)).slice(0, 3);
   log?.step(`Reading release notes for ${bumps.map((b) => `${b.name} ${b.from}→${b.to}`).join(', ') || 'the bump'}`);
   const notes = [];
   for (const b of bumps) {
-    try { notes.push(await releaseNotes(b, dir)); } catch { notes.push({ ...b, empty: true }); }
+    try { notes.push(await releaseNotes(b, app)); } catch { notes.push({ ...b, empty: true }); }
   }
 
   const attempts = [];
@@ -146,8 +147,8 @@ export async function fixLoop(session, { agent = 'codex', maxAttempts = 3, log, 
       onLine: (l) => { if (process.env.BUMPGATE_DEBUG) log?.dim(l.slice(0, 200)); },
     });
     const files = changedFiles(dir);
-    const newPkg = readJson(path.join(dir, 'package.json')) || {};
-    const newLockJson = readJson(path.join(dir, 'package-lock.json'));
+    const newPkg = readJson(path.join(app, 'package.json')) || {};
+    const newLockJson = readJson(path.join(app, 'package-lock.json'));
     let rejected = guardrails({
       files,
       journeysDir: session.cfg.journeys,
@@ -172,7 +173,7 @@ export async function fixLoop(session, { agent = 'codex', maxAttempts = 3, log, 
 
     log?.ok(`${meta.name} changed ${files.length} file(s): ${files.slice(0, 6).join(', ')}`);
     onAttempt?.({ n, phase: 'kane' });
-    const pkgTouched = files.some((f) => f === 'package.json' || LOCKFILES.includes(f));
+    const pkgTouched = files.some((f) => path.basename(f) === 'package.json' || LOCKFILES.includes(path.basename(f)));
     const v = await session.reverify({ reinstall: reinstall || pkgTouched });
     reinstall = pkgTouched;
     attempt.verdict = v.verdict;

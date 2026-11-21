@@ -4,6 +4,7 @@ import path from 'node:path';
 
 export const DEFAULTS = {
   journeys: '.kane',          // folder of *_test.md journeys, always read from BASE
+  appDir: '',                 // subfolder holding the app's package.json (monorepos, /front, /web)
   install: null,              // detected from the lockfile
   build: null,                // "npm run build" when a build script exists
   serve: null,                // {type:"static", dir, spa, base} | {type:"cmd", cmd, path}

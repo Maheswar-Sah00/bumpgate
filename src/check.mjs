@@ -34,7 +34,7 @@ function humanise(s) {
 }
 
 export class Session {
-  constructor({ repoDir, base, head, title = '', cfg, outDir, log, runner = runJourney }) {
+  constructor({ repoDir, base, head, title = '', cfg, outDir, log, runner = runJourney, journeysDir = null }) {
     this.repoDir = path.resolve(repoDir);
     this.cfg = cfg;
     this.log = log;
@@ -45,6 +45,9 @@ export class Session {
     this.work = workRoot(this.repoDir);
     this.baseDir = path.join(this.work, 'base');
     this.bumpDir = path.join(this.work, 'bump');
+    // The app may live in a subfolder (monorepos, /front, /web). Journeys stay relative to the repo root.
+    this.appDir = cfg.appDir || '';
+    this.journeysOverride = journeysDir ? path.resolve(journeysDir) : null;
     this.seedDir = path.join(this.work, 'seed');
     this.runsDir = path.join(this.work, 'runs');
     this.outDir = path.resolve(outDir || path.join(this.repoDir, '.bumpgate'));
@@ -59,10 +62,10 @@ export class Session {
     checkout(this.repoDir, this.baseSha, this.baseDir);
     checkout(this.repoDir, this.headSha, this.bumpDir);
 
-    const basePkg = readJson(path.join(this.baseDir, 'package.json')) || {};
-    const headPkg = readJson(path.join(this.bumpDir, 'package.json')) || {};
-    const baseLock = readJson(path.join(this.baseDir, 'package-lock.json'));
-    const headLock = readJson(path.join(this.bumpDir, 'package-lock.json'));
+    const basePkg = readJson(path.join(this.sideDir('base'), 'package.json')) || {};
+    const headPkg = readJson(path.join(this.sideDir('bump'), 'package.json')) || {};
+    const baseLock = readJson(path.join(this.sideDir('base'), 'package-lock.json'));
+    const headLock = readJson(path.join(this.sideDir('bump'), 'package-lock.json'));
     this.bumps = summariseBump({
       title: this.title,
       basePkg,
@@ -73,7 +76,7 @@ export class Session {
     this.log.info(`Bump: ${bumpLabel(this.bumps)}`);
 
     // Journeys always come from BASE: a PR (or the fix agent) cannot weaken its own exam.
-    const journeysDir = path.join(this.baseDir, this.cfg.journeys);
+    const journeysDir = this.journeysOverride || path.join(this.baseDir, this.cfg.journeys);
     this.journeys = listJourneys(journeysDir);
     if (!this.journeys.length) {
       throw new Error(`No journeys found in ${this.cfg.journeys}/ on base. Run \`bumpgate init\` to create them.`);
@@ -88,8 +91,13 @@ export class Session {
     this.log.info(`${this.journeys.length} journeys: ${this.journeys.map((j) => j.title).join(' · ')}`);
   }
 
+  /** Where the app's package.json lives on one side. */
+  sideDir(side) {
+    return path.join(side === 'base' ? this.baseDir : this.bumpDir, this.appDir);
+  }
+
   async build(side, { skipInstall = false } = {}) {
-    const dir = side === 'base' ? this.baseDir : this.bumpDir;
+    const dir = this.sideDir(side);
     this.log.step(`Building ${side}`);
     const r = await buildSide(dir, this.cfg, { onLog: (s) => this.log.dim(s), skipInstall });
     this.builds[side] = r;
@@ -99,7 +107,7 @@ export class Session {
   }
 
   async runSide(side, rels, attempt = 1) {
-    const dir = side === 'base' ? this.baseDir : this.bumpDir;
+    const dir = this.sideDir(side);
     const port = this.cfg.port || 4319;
     const server = await serveSide(dir, this.builds[side].commands, port);
     this.log.step(`Kane on ${side} (${server.url})`);

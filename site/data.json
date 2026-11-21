@@ -1,0 +1,17 @@
+{
+  "reverts": [
+    { "repo": "earthhistoryviz/tsconline", "title": "Bump react-router-dom from 6.30.3 to 6.30.6", "ci": "9 checks passed", "merged": "2 Oct 2026", "reverted": "2 Oct 2026", "pr_url": "https://github.com/earthhistoryviz/tsconline/pull/847", "revert_url": "https://github.com/earthhistoryviz/tsconline/pull/869" },
+    { "repo": "earthhistoryviz/tsconline", "title": "Bump react-router from 6.30.3 to 7.18.2", "ci": "9 checks passed", "merged": "13 Aug 2026", "reverted": "3 Sep 2026", "pr_url": "https://github.com/earthhistoryviz/tsconline/pull/818", "revert_url": "https://github.com/earthhistoryviz/tsconline/pull/846" },
+    { "repo": "kikeelectronico/Homeware-LAN", "title": "Bump @mui/material from 7.3.11 to 9.5.0", "ci": "4 checks passed", "merged": "31 Oct 2026", "reverted": "31 Oct 2026", "pr_url": "https://github.com/kikeelectronico/Homeware-LAN/pull/1432", "revert_url": "https://github.com/kikeelectronico/Homeware-LAN/pull/1449" },
+    { "repo": "davidschlachter/lychnos", "title": "Bump @mui/material from 7.3.9 to 9.0.0", "ci": "passed", "merged": "1 May 2026", "reverted": "1 May 2026", "pr_url": "https://github.com/davidschlachter/lychnos/pull/550", "revert_url": "https://github.com/davidschlachter/lychnos/commit/5bde9391eb" }
+  ],
+  "backtest": null,
+  "stats": [
+    { "v": "…", "l": "Backtest on real reverted bot bumps: running now; every number will link to a Kane evidence pack" }
+  ],
+  "proofIntro": "Real library upgrades, real Kane runs. Each case links to the PR and to Kane's own sealed evidence pack.",
+  "cases": [
+    { "title": "Checkout errors vanish", "source": "bumpgate-demo · Dependabot PR", "bump": "zod 3.25.76 → 4.6.7", "ci": "build passes", "kane": "Kane run pending", "kaneClass": "y" },
+    { "title": "The whole shop goes blank", "source": "bumpgate-demo · Dependabot PR", "bump": "@tanstack/react-query 4.44.0 → 5.108.2", "ci": "build passes", "kane": "Kane run pending", "kaneClass": "y" }
+  ]
+}
