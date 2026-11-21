@@ -1,0 +1,5 @@
+node_modules
+.bumpgate
+.testmuai/evidence
+*.log
+.DS_Store

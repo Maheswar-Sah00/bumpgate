@@ -1,0 +1,31 @@
+{
+  "name": "bumpgate",
+  "version": "0.1.0",
+  "description": "Dependabot says CI is green. Kane CLI checks the app still works. The bump merges only if it does.",
+  "type": "module",
+  "bin": {
+    "bumpgate": "bin/bumpgate.mjs"
+  },
+  "files": [
+    "bin",
+    "src",
+    "action.yml",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "dependabot",
+    "renovate",
+    "kane-cli",
+    "testmu",
+    "e2e",
+    "merge-gate",
+    "github-action"
+  ],
+  "license": "MIT"
+}

@@ -1,0 +1,103 @@
+name: Bumpgate
+description: Dependabot says CI is green. Kane CLI checks the app still works, and the bump merges only if it does.
+author: Maheswar-Sah00
+branding:
+  icon: shield
+  color: orange
+
+inputs:
+  lt-username:
+    description: TestMu AI username for Kane CLI (store it as a secret; for Dependabot PRs, as a Dependabot secret)
+    required: true
+  lt-access-key:
+    description: TestMu AI access key for Kane CLI
+    required: true
+  agent:
+    description: The agent that migrates code when a journey breaks: codex, claude or none
+    required: false
+    default: codex
+  openai-api-key:
+    description: OpenAI API key for Codex (agent = codex)
+    required: false
+    default: ''
+  anthropic-api-key:
+    description: Anthropic API key for Claude Code (agent = claude)
+    required: false
+    default: ''
+  github-token:
+    description: Token used to comment, label, push the migration and merge
+    required: false
+    default: ${{ github.token }}
+  kane-cli-version:
+    description: Kane CLI version to install
+    required: false
+    default: 0.10.7
+  amber:
+    description: What a yellow light does (review, merge or block). Overrides bumpgate.config.json.
+    required: false
+    default: ''
+  force:
+    description: Run on any PR, not only Dependabot and Renovate ones
+    required: false
+    default: 'false'
+
+outputs:
+  verdict:
+    description: green, amber, red or inconclusive (after any fix)
+    value: ${{ steps.gate.outputs.verdict }}
+  state:
+    description: green, amber, red, fixed, needs-human or inconclusive
+    value: ${{ steps.gate.outputs.state }}
+
+runs:
+  using: composite
+  steps:
+    - name: Install Kane CLI
+      shell: bash
+      run: npm install -g "@testmuai/kane-cli@${{ inputs.kane-cli-version }}" --no-audit --no-fund
+
+    - name: Install Codex
+      if: inputs.agent == 'codex' && inputs.openai-api-key != ''
+      shell: bash
+      env:
+        OPENAI_API_KEY: ${{ inputs.openai-api-key }}
+      run: |
+        npm install -g @openai/codex --no-audit --no-fund
+        printenv OPENAI_API_KEY | codex login --with-api-key >/dev/null 2>&1 || true
+
+    - name: Install Claude Code
+      if: inputs.agent == 'claude' && inputs.anthropic-api-key != ''
+      shell: bash
+      run: npm install -g @anthropic-ai/claude-code --no-audit --no-fund
+
+    - name: Bumpgate
+      id: gate
+      shell: bash
+      env:
+        LT_USERNAME: ${{ inputs.lt-username }}
+        LT_ACCESS_KEY: ${{ inputs.lt-access-key }}
+        OPENAI_API_KEY: ${{ inputs.openai-api-key }}
+        CODEX_API_KEY: ${{ inputs.openai-api-key }}
+        ANTHROPIC_API_KEY: ${{ inputs.anthropic-api-key }}
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        BUMPGATE_FORCE: ${{ inputs.force }}
+        BUMPGATE_WORK: ${{ runner.temp }}/bumpgate-work
+      run: |
+        if [ -x /usr/bin/google-chrome ] && [ -z "$KANE_CLI_CHROME_PATH" ]; then export KANE_CLI_CHROME_PATH=/usr/bin/google-chrome; fi
+        args=(ci --agent "${{ inputs.agent }}")
+        if [ -n "${{ inputs.amber }}" ]; then args+=(--amber "${{ inputs.amber }}"); fi
+        if [ "${{ inputs.agent }}" = "codex" ] && [ -z "$OPENAI_API_KEY" ]; then args=(ci --agent none); fi
+        if [ "${{ inputs.agent }}" = "claude" ] && [ -z "$ANTHROPIC_API_KEY" ]; then args=(ci --agent none); fi
+        node "$GITHUB_ACTION_PATH/bin/bumpgate.mjs" "${args[@]}"
+
+    - name: Keep Kane's evidence
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: bumpgate-evidence-${{ github.event.pull_request.number }}
+        path: |
+          ${{ runner.temp }}/bumpgate-out
+          ${{ runner.temp }}/bumpgate-work/**/runs/**/*.evidence
+          ${{ runner.temp }}/bumpgate-work/**/runs/**/kane.ndjson
+        if-no-files-found: ignore
+        retention-days: 30
