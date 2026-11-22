@@ -41,7 +41,7 @@ name: Bumpgate
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-permissions: { contents: write, pull-requests: write, issues: write }
+permissions: { contents: write, pull-requests: write, issues: write, statuses: write }
 concurrency: { group: "bumpgate-${{ github.event.pull_request.number }}", cancel-in-progress: true }
 jobs:
   gate:

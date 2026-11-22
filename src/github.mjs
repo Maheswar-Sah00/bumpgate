@@ -32,6 +32,34 @@ export async function gh(method, route, body) {
   return data;
 }
 
+/**
+ * A commit status on the commit Kane verified. A fix commit pushed with GITHUB_TOKEN triggers no
+ * other workflow, so without this the PR's last commit would show no checks at all.
+ */
+export async function setStatus(repo, sha, { state, description, targetUrl, context = 'Bumpgate / Kane CLI' }) {
+  return gh('POST', `/repos/${repo}/statuses/${sha}`, {
+    state, context, description: String(description || '').slice(0, 140), ...(targetUrl ? { target_url: targetUrl } : {}),
+  });
+}
+
+/** Status state + one-line description for a final Bumpgate state. */
+export function statusFor(state, result, action) {
+  const n = result?.rows?.length ?? 0;
+  const ok = result?.rule?.comparable ?? n;
+  if (state === 'fixed') return { state: 'success', description: `Agent migrated the code; Kane CLI re-verified ${ok}/${ok} journeys` };
+  if (state === 'green') return { state: 'success', description: `Kane CLI: ${ok}/${ok} journeys still pass on this bump` };
+  if (state === 'amber') {
+    return action === 'merge' ? { state: 'success', description: 'Kane CLI: journeys pass; the UI changed' }
+      : action === 'block' ? { state: 'failure', description: 'Kane CLI: journeys pass but the UI changed (amber = block)' }
+        : { state: 'pending', description: 'Kane CLI: journeys pass but the UI changed; a maintainer should look' };
+  }
+  if (state === 'red' || state === 'needs-human') {
+    const broke = result?.counts?.red ?? 0;
+    return { state: 'failure', description: `Kane CLI: ${broke} of ${n} journeys broke on this bump${state === 'needs-human' ? '; needs a human' : ''}` };
+  }
+  return { state: 'error', description: 'Kane CLI could not prove this bump either way' };
+}
+
 /** Create or update the single Bumpgate comment on a PR. */
 export async function upsertComment(repo, pr, body) {
   const comments = await gh('GET', `/repos/${repo}/issues/${pr}/comments?per_page=100`);

@@ -5,7 +5,7 @@ import { Session } from './check.mjs';
 import { loadConfig } from './config.mjs';
 import { fixLoop } from './fix.mjs';
 import { renderComment, renderRunning, oneLine } from './comment.mjs';
-import { upsertComment, setLabels, mergeWhenGreen, uploadEvidence, viewerUrl } from './github.mjs';
+import { upsertComment, setLabels, mergeWhenGreen, uploadEvidence, viewerUrl, setStatus, statusFor } from './github.mjs';
 import { isBotAuthor } from './deps.mjs';
 import { git, gitOk, run } from './sh.mjs';
 import { stemOf } from './kane.mjs';
@@ -127,6 +127,9 @@ export async function ci({ log, overrides = {} }) {
 
   const label = { green: 'bumpgate: green', amber: 'bumpgate: amber', red: 'bumpgate: red', fixed: 'bumpgate: fixed', 'needs-human': 'needs-human' }[state];
   await safe('labels', () => setLabels(repo, pr.number, label ? [label] : []));
+
+  const verifiedSha = fix?.ok && fix.commit ? fix.commit : pr.head.sha;
+  await safe('status', () => setStatus(repo, verifiedSha, { ...statusFor(state, final, action), targetUrl: runUrl }));
 
   if (action === 'merge' && cfg.autoMerge !== false) {
     const how = await safe('merge', () => mergeWhenGreen(repo, pr.number));

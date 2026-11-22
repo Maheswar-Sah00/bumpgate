@@ -224,7 +224,9 @@ export class Session {
   /** Pull the base/bump screenshot pair for each red or amber journey out of the packs. */
   collectShots(result) {
     const shotsDir = path.join(this.outDir, 'shots');
-    rmSync(shotsDir, { recursive: true, force: true }); // never attach a previous run's screenshot
+    // Clear a previous session's screenshots once. Not on every verdict: after a fix, the green
+    // re-verify must not delete the red run's screenshots before they are uploaded.
+    if (!this.shotsCleared) { rmSync(shotsDir, { recursive: true, force: true }); this.shotsCleared = true; }
     for (const row of result.rows) {
       if (!['red', 'amber'].includes(row.decision.light)) continue;
       const stem = stemOf(row.journey.rel);

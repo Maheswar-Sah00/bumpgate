@@ -15,7 +15,7 @@ const VERDICT_TITLE = {
 };
 
 const ACTION_TEXT = {
-  merge: 'Auto-merge enabled.',
+  merge: 'Merging automatically.',
   review: 'Not auto-merged: one look from a maintainer, then merge.',
   block: 'Merge blocked.',
   hold: 'Not merged. Re-run the check, or look at the evidence below.',
@@ -84,9 +84,18 @@ export function renderComment(result, ctx = {}) {
     for (const n of result.notes) lines.push(`> ${esc(n)}`);
   }
 
+  // The base-vs-bump screenshots are the proof a reviewer reads first, so they sit outside the fold.
+  for (const row of result.rows) {
+    const urls = ctx.shotUrls?.[row.journey.rel];
+    if (!['red', 'amber'].includes(row.decision.light) || !(urls?.base || urls?.bump)) continue;
+    const step = pickFailure(row.bump)?.failedStep?.heading;
+    lines.push('', `**${esc(row.journey.title)}**${step ? ` · step "${esc(step)}"` : ''}`, '', '| Base (main) | This bump |', '|---|---|',
+      `| ${urls.base ? `<img src="${urls.base}" width="400">` : '–'} | ${urls.bump ? `<img src="${urls.bump}" width="400">` : '–'} |`);
+  }
+
   const evidence = renderEvidence(result, ctx);
   if (evidence.length) {
-    lines.push('', '<details><summary><b>Evidence</b>: screenshots, console, network</summary>', '', ...evidence, '', '</details>');
+    lines.push('', '<details><summary><b>Evidence</b>: what Kane saw, console, network</summary>', '', ...evidence, '', '</details>');
   }
   lines.push('');
   const runs = result.kaneRuns != null ? `${result.kaneRuns} Kane runs` : '';
@@ -129,13 +138,6 @@ function renderEvidence(result, ctx) {
   for (const row of result.rows) {
     if (!['red', 'amber'].includes(row.decision.light)) continue;
     out.push(`**${esc(row.journey.title)}**`);
-    const urls = ctx.shotUrls?.[row.journey.rel];
-    if (urls?.base || urls?.bump) {
-      out.push('');
-      out.push('| Base | This bump |');
-      out.push('|---|---|');
-      out.push(`| ${urls.base ? `<img src="${urls.base}" width="380">` : '–'} | ${urls.bump ? `<img src="${urls.bump}" width="380">` : '–'} |`);
-    }
     const d = row.decision;
     const failed = pickFailure(row.bump);
     // The deterministic fact first: the same recorded steps, replayed on both builds.

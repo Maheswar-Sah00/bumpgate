@@ -162,3 +162,16 @@ test('action.yml: no unquoted ": " inside a plain scalar (GitHub refuses to load
   });
   assert.deepEqual(bad, []);
 });
+
+test('release notes: each new major x.0.0 comes first; status mapping', async () => {
+  const { majorFirst } = await import('../src/notes.mjs');
+  const rel = ['4.6.7', '4.6.6', '4.1.0', '4.0.0', '3.26.0'].map((version) => ({ version }));
+  assert.deepEqual(majorFirst(rel).map((r) => r.version), ['4.0.0', '4.6.7', '4.6.6', '4.1.0', '3.26.0']);
+  const { statusFor } = await import('../src/github.mjs');
+  const result = { rows: [1, 2, 3], rule: { comparable: 3 }, counts: { red: 1 } };
+  assert.equal(statusFor('fixed', result, 'merge').state, 'success');
+  assert.match(statusFor('fixed', result, 'merge').description, /3\/3/);
+  assert.equal(statusFor('red', result, 'block').state, 'failure');
+  assert.equal(statusFor('amber', result, 'review').state, 'pending');
+  assert.equal(statusFor('inconclusive', result, 'block').state, 'error');
+});

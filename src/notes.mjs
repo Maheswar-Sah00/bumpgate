@@ -92,19 +92,28 @@ export async function githubReleases(slug, pkg, from, to, { pages = 3 } = {}) {
   return out.sort((a, b) => compareVersions(b.version, a.version));
 }
 
+/**
+ * Breaking changes are announced in each new major's x.0.0 release, the oldest entry in a
+ * newest-first list, so it is the first thing the size cap would drop. Put those first.
+ */
+export function majorFirst(releases) {
+  const isMajor = (r) => /^\d+\.0\.0$/.test(String(r.version));
+  return [...releases.filter(isMajor), ...releases.filter((r) => !isMajor(r))];
+}
+
 /** Everything the agent should read about one bump, capped to `maxChars`. */
 export async function releaseNotes({ name, from, to }, sideDir, { maxChars = 14000, network = true } = {}) {
   const parts = [];
   const links = [];
   const local = localChangelog(sideDir, name);
   if (local?.text) {
-    const secs = sliceChangelog(local.text, from, to);
+    const secs = majorFirst(sliceChangelog(local.text, from, to));
     if (secs.length) parts.push(...secs.map((s) => s.text));
   }
   const slug = repoOf(sideDir, name);
   if (network && slug && parts.join('').length < maxChars / 2) {
     try {
-      const rel = await githubReleases(slug, name, from, to);
+      const rel = majorFirst(await githubReleases(slug, name, from, to));
       for (const r of rel) {
         links.push(r.url);
         parts.push(r.text);
