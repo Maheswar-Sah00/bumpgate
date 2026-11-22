@@ -92,9 +92,12 @@ export async function main(argv) {
 
 async function check(args, overrides, log) {
   const repoDir = path.resolve(args.repo || '.');
-  const cfg = loadConfig(repoDir, overrides);
   const head = args.head || 'HEAD';
   const base = args.base || defaultBase(repoDir, head);
+  // Same as CI: config comes from the base commit, so a bump cannot loosen its own gate.
+  const { configAtBase } = await import('./ci.mjs');
+  const baseSha = gitOk(['rev-parse', '--verify', `${base}^{commit}`], repoDir);
+  const cfg = baseSha.ok ? configAtBase(repoDir, baseSha.out.trim(), overrides) : loadConfig(repoDir, overrides);
   const outDir = path.resolve(args.out || path.join(repoDir, '.bumpgate'));
   const title = args.title || gitOk(['log', '-1', '--format=%s', head], repoDir).out;
   const session = new Session({ repoDir, base, head, title, cfg, outDir, log });

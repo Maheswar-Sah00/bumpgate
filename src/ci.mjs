@@ -11,17 +11,22 @@ import { git, gitOk, run } from './sh.mjs';
 import { stemOf } from './kane.mjs';
 
 /** Config is read from the BASE commit, so a PR cannot loosen its own gate. */
-export function configAtBase(repoDir, sha, overrides) {
+export function configAtBase(repoDir, sha, overrides = {}) {
+  // Never read the working copy: it may be the bump, or (with --repo) a bare clone with no files at all.
+  const NONE = '/nonexistent-bumpgate-config-dir';
   for (const name of ['bumpgate.config.json', '.bumpgate.json']) {
     const r = gitOk(['show', `${sha}:${name}`], repoDir);
     if (r.ok) {
-      const cfg = loadConfig(repoDir, { ...JSON.parse(r.out), ...overrides });
+      let file;
+      try { file = JSON.parse(r.out); } catch (e) { throw new Error(`${name} on base is not valid JSON: ${e.message}`); }
+      // Only overrides that were actually given win; an unset CLI flag must not erase the base config.
+      const given = Object.fromEntries(Object.entries(overrides).filter(([k, v]) => v !== undefined && k !== 'kane'));
+      const cfg = loadConfig(NONE, { ...file, ...given, kane: { ...(file.kane || {}), ...(overrides.kane || {}) } });
       cfg.file = `${name}@${sha.slice(0, 7)}`;
       return cfg;
     }
   }
-  const cfg = loadConfig('/nonexistent-bumpgate-config-dir', overrides);
-  return cfg;
+  return loadConfig(NONE, overrides);
 }
 
 async function agentAvailable(kind) {

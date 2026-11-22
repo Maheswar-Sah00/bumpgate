@@ -44,25 +44,28 @@ export function readJson(file) {
 export async function buildSide(dir, cfg, { onLog, skipInstall = false } = {}) {
   const commands = resolveCommands(cfg, dir);
   const started = Date.now();
+  let peerConflict = null;
   const env = { CI: 'true', NODE_ENV: undefined, BROWSER: 'none', NEXT_TELEMETRY_DISABLED: '1', HUSKY: '0', COREPACK_ENABLE_DOWNLOAD_PROMPT: '0' };
   delete env.NODE_ENV;
   if (!skipInstall || !existsSync(path.join(dir, 'node_modules'))) {
     onLog?.(`install: ${commands.install}`);
     let r = await sh(commands.install, { cwd: dir, env, timeoutMs: 15 * 60 * 1000 });
     // Many repos install with legacy peer deps (an .npmrc or a habit); npm ci refuses with ERESOLVE.
+    // Force it so Kane can show what a forced install ships, but remember: the conflict itself is a finding.
     if (r.code !== 0 && /^npm (ci|install)\b/.test(commands.install) && /ERESOLVE/.test(r.stdout + r.stderr)) {
+      peerConflict = peerConflictLine(r.stdout + r.stderr);
       commands.install = `${commands.install} --legacy-peer-deps`;
-      onLog?.(`install: peer-dependency conflict, retrying: ${commands.install}`);
+      onLog?.(`install: peer-dependency conflict (${peerConflict}), retrying: ${commands.install}`);
       r = await sh(commands.install, { cwd: dir, env, timeoutMs: 15 * 60 * 1000 });
     }
-    if (r.code !== 0) return { ok: false, step: 'install', log: tail(r.stdout + r.stderr), commands, seconds: secs(started) };
+    if (r.code !== 0) return { ok: false, step: 'install', log: tail(r.stdout + r.stderr), commands, seconds: secs(started), peerConflict };
   }
   if (commands.build) {
     onLog?.(`build: ${commands.build}`);
     const r = await sh(commands.build, { cwd: dir, env, timeoutMs: 15 * 60 * 1000 });
     if (r.code !== 0) return { ok: false, step: 'build', log: tail(r.stdout + r.stderr), commands, seconds: secs(started) };
   }
-  return { ok: true, step: 'done', log: '', commands, seconds: secs(started) };
+  return { ok: true, step: 'done', log: '', commands, seconds: secs(started), peerConflict };
 }
 
 /** Serve a built side on `port`. Returns {url, stop}. */
@@ -74,6 +77,17 @@ export async function serveSide(dir, commands, port) {
   const root = path.join(dir, s.dir || 'dist');
   if (!existsSync(root)) throw new Error(`build output not found: ${path.relative(dir, root) || root}`);
   return serveStatic(root, { port, spa: s.spa !== false, base: s.base || '/' });
+}
+
+/** "react-dom@18.3.1 needs react@^18.3.1, found react@19.3.1" from npm's ERESOLVE report. */
+export function peerConflictLine(out = '') {
+  const t = String(out);
+  const who = t.match(/While resolving: (\S+)/)?.[1];
+  const found = t.match(/Found: (\S+)/)?.[1];
+  const want = t.match(/peer (\S+@"[^"]+") from (\S+)/);
+  if (who && found) return `${who} conflicts with ${found}`;
+  if (want) return `${want[2]} wants ${want[1]}`;
+  return 'npm ERESOLVE';
 }
 
 function tail(s, n = 4000) {

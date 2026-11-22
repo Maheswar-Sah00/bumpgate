@@ -213,3 +213,57 @@ test('evidence: the main run wins over heal sub-runs for failure and screenshots
   assert.equal(p.failure.screenshot, 'tests/t/steps/1-0-1/screenshot.jpg');
   assert.deepEqual(p.screenshots, ['tests/t/steps/1-0-1/screenshot.jpg', 'tests/t/steps/2-0-2/screenshot.jpg']);
 });
+
+import { viteOutput, homepageBase } from '../src/config.mjs';
+
+test('viteOutput reads outDir and a GitHub Pages base from the Vite config', () => {
+  const d = mkdtempSync(path.join(os.tmpdir(), 'vite-'));
+  writeFileSync(path.join(d, 'vite.config.ts'), [
+    'export default defineConfig({',
+    "  base: '/voxel-rpg-game/',",
+    '  plugins: [react()],',
+    "  build: { outDir: 'build' }, // not dist",
+    '})',
+  ].join('\n'));
+  assert.deepEqual(viteOutput(d), { dir: 'build', base: '/voxel-rpg-game/' });
+});
+
+test('viteOutput falls back to dist at / and ignores computed values', () => {
+  const d = mkdtempSync(path.join(os.tmpdir(), 'vite-'));
+  assert.deepEqual(viteOutput(d), { dir: 'dist', base: '/' });
+  writeFileSync(path.join(d, 'vite.config.js'), 'export default { base: process.env.BASE, build: { outDir: `${root}/out` } }');
+  assert.deepEqual(viteOutput(d), { dir: 'dist', base: '/' });
+});
+
+test('homepageBase turns a CRA homepage into a serve path', () => {
+  assert.equal(homepageBase('https://me.github.io/RestaurantPicker'), '/RestaurantPicker/');
+  assert.equal(homepageBase('.'), '/');
+  assert.equal(homepageBase(undefined), '/');
+});
+
+import { configAtBase } from '../src/ci.mjs';
+import { execFileSync as execGit } from 'node:child_process';
+
+test('configAtBase reads the base commit, and unset CLI flags do not erase it', () => {
+  const d = mkdtempSync(path.join(os.tmpdir(), 'cfgbase-'));
+  const g = (...a) => execGit('git', a, { cwd: d, encoding: 'utf8' }).trim();
+  g('init', '-q'); g('config', 'user.email', 't@t'); g('config', 'user.name', 't');
+  writeFileSync(path.join(d, 'bumpgate.config.json'), JSON.stringify({ appDir: 'frontend', agent: 'claude', kane: { timeout: 200 } }));
+  g('add', '.'); g('commit', '-qm', 'base');
+  const sha = g('rev-parse', 'HEAD');
+  writeFileSync(path.join(d, 'bumpgate.config.json'), JSON.stringify({ appDir: 'evil', agent: 'none' })); // working copy differs
+  const cfg = configAtBase(d, sha, { agent: undefined, amber: undefined, port: 4362, kane: { maxRuns: 9 } });
+  assert.equal(cfg.appDir, 'frontend');
+  assert.equal(cfg.agent, 'claude');
+  assert.equal(cfg.port, 4362);
+  assert.equal(cfg.kane.timeout, 200);
+  assert.equal(cfg.kane.maxRuns, 9);
+});
+
+import { peerConflictLine } from '../src/workspace.mjs';
+
+test('peerConflictLine names the clash from npm ERESOLVE output', () => {
+  const out = 'npm error code ERESOLVE\nnpm error ERESOLVE could not resolve\nnpm error While resolving: react-dom@18.3.1\nnpm error Found: react@19.3.1\n';
+  assert.equal(peerConflictLine(out), 'react-dom@18.3.1 conflicts with react@19.3.1');
+  assert.equal(peerConflictLine('nothing useful'), 'npm ERESOLVE');
+});

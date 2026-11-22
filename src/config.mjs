@@ -58,11 +58,11 @@ export function resolveCommands(cfg, sideDir) {
   if (!serve) {
     const deps = { ...(pkg.dependencies || {}), ...(pkg.devDependencies || {}) };
     if (deps.next) serve = { type: 'cmd', cmd: `npx next start -p $PORT`, path: '/' };
-    else if (deps['react-scripts']) serve = { type: 'static', dir: 'build', spa: true };
+    else if (deps['react-scripts']) serve = { type: 'static', dir: 'build', spa: true, base: homepageBase(pkg.homepage) };
     else if (deps['@angular/core']) serve = { type: 'static', dir: guessAngularDist(sideDir, pkg), spa: true };
     else if (deps.astro) serve = { type: 'static', dir: 'dist', spa: false };
     else if (deps['@sveltejs/kit']) serve = { type: 'cmd', cmd: `${runner} preview -- --port $PORT --strictPort`, path: '/' };
-    else serve = { type: 'static', dir: 'dist', spa: true };
+    else serve = { type: 'static', spa: true, ...viteOutput(sideDir) };
   }
   return { pm, install, build, serve };
 }
@@ -80,6 +80,31 @@ export function detectPackageManager(dir) {
   if (existsSync(path.join(dir, 'yarn.lock'))) return 'yarn';
   if (existsSync(path.join(dir, 'bun.lockb')) || existsSync(path.join(dir, 'bun.lock'))) return 'bun';
   return 'npm';
+}
+
+/**
+ * Vite apps often build to a folder other than dist and are served under a GitHub Pages sub-path
+ * (`base: '/repo/'`). Read both from the Vite config's literal values; fall back to dist at /.
+ */
+export function viteOutput(dir) {
+  const out = { dir: 'dist', base: '/' };
+  for (const name of ['vite.config.ts', 'vite.config.js', 'vite.config.mjs', 'vite.config.mts', 'vite.config.cjs']) {
+    const file = path.join(dir, name);
+    if (!existsSync(file)) continue;
+    const text = readFileSync(file, 'utf8').replace(/(^|\s)\/\/[^\n]*/g, '$1'); // drop line comments, keep URLs
+    const outDir = text.match(/\boutDir\s*:\s*['"`]([^'"`$]+)['"`]/);
+    if (outDir) out.dir = outDir[1].replace(/^\.\//, '');
+    const base = text.match(/(?:^|[,{\s])base\s*:\s*['"`](\/[^'"`$]*)['"`]/);
+    if (base) out.base = base[1];
+    break;
+  }
+  return out;
+}
+
+/** CRA serves under the path of package.json "homepage" (e.g. https://me.github.io/repo -> /repo/). */
+export function homepageBase(homepage) {
+  if (!homepage || homepage === '.') return '/';
+  try { const p = new URL(homepage, 'http://x').pathname; return p.endsWith('/') ? p : p + '/'; } catch { return '/'; }
 }
 
 function guessAngularDist(dir, pkg) {

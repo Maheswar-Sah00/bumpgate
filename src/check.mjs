@@ -158,6 +158,9 @@ export class Session {
       for (const rel of rels) this.results[rel].base.push({ status: 'error', reason: `base ${b.step} failed` });
       return this.finish();
     }
+    if (h.peerConflict && !b.peerConflict) {
+      this.notes.push(`npm refused this bump's dependency tree (${h.peerConflict}). Bumpgate forced the install with --legacy-peer-deps so Kane could show what a forced install ships.`);
+    }
     await this.runSide('base', rels);
     if (!h.ok) {
       this.notes.push(`The bump does not ${h.step}. Every journey counts as broken.`);
@@ -214,7 +217,7 @@ export class Session {
     result.head = this.headSha;
     result.notes = [...this.notes];
     result.kaneRuns = this.budget.used;
-    result.builds = Object.fromEntries(Object.entries(this.builds).map(([k, v]) => [k, { ok: v.ok, step: v.step, seconds: v.seconds, log: v.ok ? '' : v.log }]));
+    result.builds = Object.fromEntries(Object.entries(this.builds).map(([k, v]) => [k, { ok: v.ok, step: v.step, seconds: v.seconds, log: v.ok ? '' : v.log, peerConflict: v.peerConflict || null }]));
     this.collectShots(result);
     this.last = result;
     this.save(result);
