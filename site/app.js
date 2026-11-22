@@ -78,7 +78,7 @@
       $('#pr-state').className = 'state blocked'; $('#pr-state').textContent = '● Merge blocked';
       $('#rule-line').innerHTML = '<b>The rule:</b> every journey that passes on main must pass on the bump → <b style="color:var(--red)">❌ 1 broke. Merge blocked.</b>';
     });
-    at(9.0, () => { $('#fix').classList.add('on'); say('<span class="y">▸</span> Codex, attempt 1/3: Kane\'s evidence + zod 4 release notes'); });
+    at(9.0, () => { $('#fix').classList.add('on'); say('<span class="y">▸</span> Claude Code, attempt 1/3: Kane\'s evidence + zod 4 release notes'); });
     at(10.6, () => say('<span class="g">✓</span> guardrails: .kane/ untouched, zod kept at 4.6.7'));
     at(11.3, () => { say('<span class="y">▸</span> Kane re-runs all 3 journeys on the migrated code'); $('#gate-ic').className = 'ic run'; $('#gate-ic').textContent = ''; $('#gate-st').textContent = 're-verifying…'; });
     at(12.6, () => {

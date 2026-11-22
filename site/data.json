@@ -7,11 +7,11 @@
   ],
   "backtest": null,
   "stats": [
-    { "v": "…", "l": "Backtest on real reverted bot bumps: running now; every number will link to a Kane evidence pack" }
+    { "v": "…", "l": "Backtest on real reverted bot bumps: running now; every number will link to the Kane run" }
   ],
   "proofIntro": "Real library upgrades, real Kane runs. Each case links to the PR and to Kane's own sealed evidence pack.",
   "cases": [
-    { "title": "Checkout errors vanish", "source": "bumpgate-demo · Dependabot PR", "bump": "zod 3.25.76 → 4.6.7", "ci": "build passes", "kane": "Kane run pending", "kaneClass": "y" },
-    { "title": "The whole shop goes blank", "source": "bumpgate-demo · Dependabot PR", "bump": "@tanstack/react-query 4.44.0 → 5.108.2", "ci": "build passes", "kane": "Kane run pending", "kaneClass": "y" }
+    { "title": "Checkout errors vanish", "source": "bumpgatedemo · Dependabot PR", "bump": "zod 3.25.76 → 4.6.7", "ci": "build passes", "kane": "Blocked: checkout errors never appear (2/2 runs)", "kaneClass": "bad" },
+    { "title": "The whole shop goes blank", "source": "bumpgatedemo · Dependabot PR", "bump": "@tanstack/react-query 4.44.0 → 5.108.2", "ci": "build passes", "kane": "Kane run pending", "kaneClass": "y" }
   ]
 }

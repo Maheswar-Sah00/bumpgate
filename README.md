@@ -2,15 +2,15 @@
 
 **Dependabot says CI is green. Kane CLI checks the app still works, and the bump merges only if it does.**
 
-On every Dependabot or Renovate PR, Bumpgate builds `main` and the bump side by side and has [Kane CLI](https://www.testmuai.com/kane-cli/) replay your app's critical journeys (plain English, in `.kane/*_test.md`) in a real browser on both. A plain-code rule decides: **every journey that passes on main must pass on the bump.** If one breaks, Codex migrates the code from Kane's evidence and the package's release notes, code checks the diff, and Kane re-verifies. Three tries, then a human.
+On every Dependabot or Renovate PR, Bumpgate builds `main` and the bump side by side and has [Kane CLI](https://www.testmuai.com/kane-cli/) replay your app's critical journeys (plain English, in `.kane/*_test.md`) in a real browser on both. A plain-code rule decides: **every journey that passes on main must pass on the bump.** If one breaks, Claude Code migrates the code from Kane's evidence and the package's release notes, code checks the diff, and Kane re-verifies. Three tries, then a human.
 
-Built for the [Kane CLI Hackathon](https://www.kaneclihack.sh/) by TestMu AI. Agent: **Codex** (Claude Code also supported).
+Built for the [Kane CLI Hackathon](https://www.kaneclihack.sh/) by TestMu AI. Agent: **Claude Code** (Codex also supported).
 
 ## Judges: start here
 
 | What | Where | Time |
 |---|---|---|
-| Real Dependabot PRs going through the gate: one blocked, migrated by Codex and merged; one green auto-merge | [bumpgate-demo pull requests](https://github.com/Maheswar-Sah00/bumpgate-demo/pulls?q=is%3Apr) | 2 min |
+| Real Dependabot PRs going through the gate: one blocked, migrated by Claude Code and merged; one green auto-merge | [bumpgatedemo pull requests](https://github.com/Maheswar-Sah00/bumpgatedemo/pulls?q=is%3Apr) | 2 min |
 | The merge rule, in code (no prompt decides a merge) | [`src/gate.mjs`](src/gate.mjs) and its tests in [`test/gate.test.mjs`](test/gate.test.mjs) | 1 min |
 | The guardrails the fix agent cannot get past | [`src/fix.mjs`](src/fix.mjs) (`guardrails`) | 1 min |
 | Run it yourself | [below](#run-it-yourself) | 5 min |
@@ -21,7 +21,7 @@ Built for the [Kane CLI Hackathon](https://www.kaneclihack.sh/) by TestMu AI. Ag
 - **Plain-English journeys survive cosmetic churn.** A UI-kit major renames classes and wraps buttons; a recorded selector script breaks even when the shop works, so teams skip it on bot PRs. A Kane journey ("click Place order, verify the errors are shown") fails on broken behaviour, not on new markup.
 - **`testmd run --override-start-url <PR build> --local`** replays the journeys recorded on main against each PR build on localhost, and never writes back to Test Manager, so a heal on the bump can't rewrite main's recording.
 - **Kane says when it had to self-heal** (`test_md_adaptive_heal`). A bump that only passes after a heal gets the **amber** light: it works, but the UI moved. Pass/fail alone can't see that.
-- **Sealed evidence packs** give the fix agent the failed step, screenshot, console and network logs, and give reviewers a link to open the run in Kane's evidence viewer. Kane's own bug verdict (`test_md_bug_verdict`) lands in the PR comment.
+- **Sealed evidence packs** give the fix agent the failed step, screenshot, console and network logs, and give reviewers the base and bump screenshots side by side in the PR. (Raw packs include the Kane account's email, so they are published only with `publish-packs: true`.) Kane's own bug verdict (`test_md_bug_verdict`) lands in the PR comment.
 
 ## The three lights
 
@@ -29,7 +29,7 @@ Built for the [Kane CLI Hackathon](https://www.kaneclihack.sh/) by TestMu AI. Ag
 |---|---|---|
 | 🟢 green | Every journey that passes on main passes on the bump, no heal, no new console errors | auto-merge |
 | 🟡 amber | Passes, but Kane had to self-heal a step, or new console errors / failed requests appeared | one look from a maintainer |
-| 🔴 red | A journey that passes on main breaks on the bump | blocked → Codex migrates → Kane re-verifies → `needs-human` after 3 tries |
+| 🔴 red | A journey that passes on main breaks on the bump | blocked → Claude Code migrates → Kane re-verifies → `needs-human` after 3 tries |
 
 Fail-closed rules: if Kane can't run a journey, nothing merges. A journey already broken on main can't block a bump. Disagreeing runs are repeated until two of three agree. Journeys and config are always read from the **base** branch, so a PR can't edit its own exam.
 
@@ -55,15 +55,15 @@ jobs:
         with:
           lt-username: ${{ secrets.LT_USERNAME }}
           lt-access-key: ${{ secrets.LT_ACCESS_KEY }}
-          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
 ```
 
-Dependabot PRs can only read **Dependabot secrets**: add `LT_USERNAME`, `LT_ACCESS_KEY` and `OPENAI_API_KEY` under *Settings → Secrets → Dependabot* (or `gh secret set NAME --app dependabot`).
+Dependabot PRs can only read **Dependabot secrets**: add `LT_USERNAME`, `LT_ACCESS_KEY` and `ANTHROPIC_API_KEY` (or `OPENAI_API_KEY` with `agent: codex`) under *Settings → Secrets → Dependabot* (or `gh secret set NAME --app dependabot`).
 
 Then write your journeys, or let Bumpgate draft them:
 
 ```bash
-npx github:Maheswar-Sah00/bumpgate init --agent codex   # agent drafts 3 journeys; only the ones Kane passes on main are kept
+npx github:Maheswar-Sah00/bumpgate init --agent claude  # agent drafts 3 journeys; only the ones Kane passes on main are kept
 ```
 
 Optional `bumpgate.config.json` (read from the base branch):
@@ -74,7 +74,7 @@ Optional `bumpgate.config.json` (read from the base branch):
   "appDir": "",
   "serve": { "type": "static", "dir": "dist", "spa": true },
   "amber": "review",
-  "agent": "codex",
+  "agent": "claude",
   "maxFixAttempts": 3,
   "kane": { "timeout": 300, "maxSteps": 30, "maxRuns": 24 }
 }
@@ -87,10 +87,10 @@ Install and build commands are detected from the lockfile and `package.json` (Vi
 Needs Node 20+, Chrome and `kane-cli` (`npm i -g @testmuai/kane-cli`, then `kane-cli login`).
 
 ```bash
-git clone https://github.com/Maheswar-Sah00/bumpgate-demo && cd bumpgate-demo
+git clone https://github.com/Maheswar-Sah00/bumpgatedemo && cd bumpgatedemo
 git fetch origin 'refs/heads/dependabot/*:refs/remotes/origin/dependabot/*'
 npx github:Maheswar-Sah00/bumpgate check --base main --head origin/dependabot/npm_and_yarn/zod-4.6.7
-# add --fix --agent codex (or claude) to watch the migration loop
+# add --fix --agent claude (or codex) to watch the migration loop
 ```
 
 `bumpgate doctor` checks Kane, the login, git and the agents. The verdict lands in `.bumpgate/verdict.json` and the PR comment in `.bumpgate/comment.md`. Exit codes: `0` green or fixed, `10` amber, `1` red, `3` inconclusive.
@@ -102,7 +102,7 @@ bot PR ─▶ worktrees: base │ bump ─▶ npm ci + build each ─▶ serve o
       ─▶ kane-cli testmd run <journey> --override-start-url --local --agent  (base, then bump)
       ─▶ NDJSON + sealed evidence pack ─▶ gate.mjs: the rule ─▶ 🟢 merge │ 🟡 review │ 🔴 fix loop
 fix loop: task = Kane's failed step + screenshot + new console errors + release notes (CHANGELOG / GitHub releases)
-      ─▶ Codex edits ─▶ guardrails (journeys untouched, bump kept) ─▶ rebuild ─▶ Kane re-runs all journeys
+      ─▶ Claude Code edits ─▶ guardrails (journeys untouched, bump kept) ─▶ rebuild ─▶ Kane re-runs all journeys
       ─▶ green: commit + push + auto-merge │ still red after 3: label needs-human
 ```
 

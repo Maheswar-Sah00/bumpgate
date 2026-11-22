@@ -98,7 +98,7 @@ function failureInputs(row, taskDir) {
   };
 }
 
-export async function fixLoop(session, { agent = 'codex', maxAttempts = 3, log, onAttempt } = {}) {
+export async function fixLoop(session, { agent = 'claude', maxAttempts = 3, log, onAttempt } = {}) {
   const meta = AGENTS[agent];
   if (!meta) throw new Error(`unknown agent "${agent}"`);
   const dir = session.bumpDir;

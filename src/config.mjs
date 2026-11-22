@@ -11,7 +11,7 @@ export const DEFAULTS = {
   port: 4319,                 // base and bump are served on the same port, one after the other
   confirmRuns: 3,             // re-run a disagreeing journey up to this many times; majority decides
   amber: 'review',            // what a yellow light does: review | merge | block
-  agent: 'codex',             // codex | claude | none
+  agent: 'claude',            // claude | codex | none
   maxFixAttempts: 3,
   kane: { timeout: 300, maxSteps: 30, maxRuns: 30, local: true, headed: false, policies: [] },
   protect: [],                // extra paths the fix agent may never touch

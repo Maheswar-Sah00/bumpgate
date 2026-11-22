@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Bumpgate · Dependabot says CI is green. Kane checks it still works.</title>
-  <meta name="description" content="Bumpgate is the merge gate for Dependabot and Renovate PRs. Kane CLI replays your app's critical journeys in a real browser on main and on the bump; it merges only if nothing broke, and Codex migrates the code when something did.">
+  <meta name="description" content="Bumpgate is the merge gate for Dependabot and Renovate PRs. Kane CLI replays your app's critical journeys in a real browser on main and on the bump; it merges only if nothing broke, and Claude Code migrates the code when something did.">
   <meta property="og:title" content="Bumpgate: Kane CLI checks every Dependabot bump still works">
   <meta property="og:description" content="CI checks the code builds. Kane CLI checks the app still works. The bump merges only if it does.">
   <meta property="og:image" content="og.png">
@@ -47,10 +47,10 @@
         <span>bumps your deps.</span>
       </div>
       <h1 class="mega"><span class="l1">Kane checks</span> <span class="swipe">it still works.</span></h1>
-      <p class="lede">Bumpgate is the <u>merge gate for bot PRs</u>. On every Dependabot or Renovate PR, Kane CLI replays your app's critical journeys in a real browser on <b>main</b> and on <b>the bump</b>. It merges only if nothing broke. If something did, Codex migrates the code and Kane proves the fix.</p>
+      <p class="lede">Bumpgate is the <u>merge gate for bot PRs</u>. On every Dependabot or Renovate PR, Kane CLI replays your app's critical journeys in a real browser on <b>main</b> and on <b>the bump</b>. It merges only if nothing broke. If something did, Claude Code migrates the code and Kane proves the fix.</p>
       <div class="cta-row">
         <button class="btn btn-accent" id="copy-hero">Copy the workflow →</button>
-        <a class="btn" href="https://github.com/Maheswar-Sah00/bumpgate-demo/pulls?q=is%3Apr+author%3Aapp%2Fdependabot">See it on real Dependabot PRs</a>
+        <a class="btn" href="https://github.com/Maheswar-Sah00/bumpgatedemo/pulls?q=is%3Apr+author%3Aapp%2Fdependabot">See it on real Dependabot PRs</a>
       </div>
       <div class="cta-note">One file in .github/workflows. Your journeys are plain English.</div>
 
@@ -58,7 +58,7 @@
         <button class="play" id="play"><span class="orb"></span><span id="play-label">Replay demo</span></button>
         <div class="demo-bar">
           <div class="dots"><i></i><i></i><i></i></div>
-          <span class="where">bumpgate-demo · pull request #2</span>
+          <span class="where">bumpgatedemo · pull request #2</span>
           <span id="clock">00:00</span>
         </div>
         <div class="demo-body">
@@ -75,7 +75,7 @@
               <div class="check" data-at="1.2" id="gate-check"><span class="ic run" id="gate-ic"></span><span>Bumpgate / Kane CLI</span><span class="st" id="gate-st">replaying 3 journeys…</span></div>
             </div>
             <div class="fix" id="fix">
-              <div class="fix-h">🛠️ Codex · attempt 1/3 · from Kane's evidence</div>
+              <div class="fix-h">🛠️ Claude Code · attempt 1/3 · from Kane's evidence</div>
               <div class="diffline del">-  result.error.errors.forEach((issue) =&gt; {</div>
               <div class="diffline add">+  result.error.issues.forEach((issue) =&gt; {</div>
               <div class="files">src/pages/Checkout.jsx · journeys untouched ✓ · zod kept at 4.6.7 ✓</div>
@@ -126,8 +126,8 @@
           <div class="term"><span class="y">▸</span> Kane on base (localhost:4319)<br><span class="g">✓</span> base · Checkout explains what is wrong<br><span class="y">▸</span> Kane on bump (localhost:4319)<br><span class="r">✗</span> bump · failed at "See the errors"</div></div>
         <div class="step" data-name="Decide"><div class="bd"><div class="num">03</div><h3>Code decides</h3><p>One rule, in code. Disagreements re-run until two of three agree. If Kane can't run, nothing merges. A journey already broken on main can't block.</p></div>
           <div class="term"><span class="y">▸</span> Confirming 1 disagreement (round 2/3)<br><span class="r">✗</span> bump · failed at "See the errors"<br><span class="r">● red</span> Passes on base, fails on the bump.<br><span class="r">🔴 1 journey broke · merge blocked</span></div></div>
-        <div class="step" data-name="Fix"><div class="bd"><div class="num">04</div><h3>Agent fixes, Kane proves</h3><p>Codex gets Kane's failed step, screenshot, console errors and the release notes. Code checks its diff. Kane re-runs everything. Three tries, then a human.</p></div>
-          <div class="term"><span class="y">▸</span> Codex, attempt 1/3<br><span class="g">✓</span> changed src/pages/Checkout.jsx<br><span class="g">✓</span> Kane re-verified: 3/3 journeys pass<br><span class="g">🟢 auto-merge enabled</span></div></div>
+        <div class="step" data-name="Fix"><div class="bd"><div class="num">04</div><h3>Agent fixes, Kane proves</h3><p>Claude Code gets Kane's failed step, screenshot, console errors and the release notes. Code checks its diff. Kane re-runs everything. Three tries, then a human.</p></div>
+          <div class="term"><span class="y">▸</span> Claude Code, attempt 1/3<br><span class="g">✓</span> changed src/pages/Checkout.jsx<br><span class="g">✓</span> Kane re-verified: 3/3 journeys pass<br><span class="g">🟢 auto-merge enabled</span></div></div>
       </div>
     </div>
   </section>
@@ -151,7 +151,7 @@ guardrails({ files, journeysDir: <span class="s">'.kane'</span>, bumps, headPkg,
         <div class="lights">
           <div class="lt g reveal"><span class="bulb"></span><div><h4>Green · merge</h4><p>Every journey that passes on main passes on the bump, with no heal and no new console errors. Auto-merge is enabled.</p></div></div>
           <div class="lt a reveal"><span class="bulb"></span><div><h4>Amber · one look</h4><p>It works, but Kane had to self-heal a step (the UI moved), or new console errors appeared. A human glances, then merges.</p></div></div>
-          <div class="lt r reveal"><span class="bulb"></span><div><h4>Red · block, then fix</h4><p>A journey broke. Merge blocked. Codex migrates from Kane's evidence; Kane re-verifies; after 3 tries it's labelled <code>needs-human</code>.</p></div></div>
+          <div class="lt r reveal"><span class="bulb"></span><div><h4>Red · block, then fix</h4><p>A journey broke. Merge blocked. Claude Code migrates from Kane's evidence; Kane re-verifies; after 3 tries it's labelled <code>needs-human</code>.</p></div></div>
         </div>
       </div>
     </div>
@@ -182,7 +182,7 @@ guardrails({ files, journeysDir: <span class="s">'.kane'</span>, bumps, headPkg,
         <div class="flag reveal"><code>--local</code><p>CI replays never write back to Test Manager, so a heal on the bump can't rewrite main's recording.</p></div>
         <div class="flag reveal"><code>test_md_adaptive_heal</code><p>Kane tells us when a replay only passed after healing: the amber light.</p></div>
         <div class="flag reveal"><code>test_md_bug_verdict</code><p>Kane's own bug title and severity land in the PR comment.</p></div>
-        <div class="flag reveal"><code>.evidence</code><p>Screenshots, console and network for each step. Codex reads them; judges open them in Kane's viewer.</p></div>
+        <div class="flag reveal"><code>.evidence</code><p>Screenshots, console and network for each step. The fix agent reads them; the PR shows the base and bump screenshots side by side.</p></div>
       </div>
     </div>
   </section>
@@ -192,7 +192,7 @@ guardrails({ files, journeysDir: <span class="s">'.kane'</span>, bumps, headPkg,
       <div class="tag reveal"><b>06</b> Judges: start here</div>
       <h2 class="big reveal">Check it in <span class="script">five minutes.</span></h2>
       <div class="judge">
-        <a class="jcard reveal" href="https://github.com/Maheswar-Sah00/bumpgate-demo/pulls?q=is%3Apr"><div class="t">1 · two minutes</div><h4>Real Dependabot PRs</h4><p>A shop with real bot PRs: one blocked then migrated by Codex and merged, one green auto-merge. Read Bumpgate's comments.</p></a>
+        <a class="jcard reveal" href="https://github.com/Maheswar-Sah00/bumpgatedemo/pulls?q=is%3Apr"><div class="t">1 · two minutes</div><h4>Real Dependabot PRs</h4><p>A shop with real bot PRs: one blocked then migrated by Claude Code and merged, one green auto-merge. Read Bumpgate's comments.</p></a>
         <a class="jcard reveal" href="https://github.com/Maheswar-Sah00/bumpgate/blob/main/src/gate.mjs"><div class="t">2 · one minute</div><h4>Read the rule</h4><p>The merge decision is ~40 lines of plain code with 35+ unit tests. No prompt decides a merge.</p></a>
         <a class="jcard reveal" href="https://github.com/Maheswar-Sah00/bumpgate#judges-start-here"><div class="t">3 · two minutes</div><h4>Run it yourself</h4><p>Clone the demo, then <code>npx github:Maheswar-Sah00/bumpgate check</code> against a bump branch. Kane does the rest.</p></a>
       </div>
