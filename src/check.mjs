@@ -2,7 +2,7 @@
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { checkout, buildSide, serveSide, resolveRef, workRoot, readJson } from './workspace.mjs';
-import { runJourney, adoptRecording, makeBudget, stemOf, BudgetError } from './kane.mjs';
+import { runJourney, adoptRecording, makeBudget, stemOf, hasRecording, BudgetError } from './kane.mjs';
 import { decide, needsConfirmation } from './gate.mjs';
 import { summariseBump, lockVersions, bumpLabel } from './deps.mjs';
 import { readPack } from './evidence.mjs';
@@ -117,6 +117,9 @@ export class Session {
         const n = row[side].length + 1;
         const runDir = path.join(this.runsDir, `${side}-${stemOf(rel)}-${attempt}-${n}`);
         let res;
+        // A journey with no recording yet is recorded on base (Kane commits it); the bump then replays
+        // that recording. Bump runs never commit.
+        const record = side === 'base' && !hasRecording(path.join(this.seedDir, rel));
         try {
           res = await this.runner({
             journeyRel: rel,
@@ -126,6 +129,7 @@ export class Session {
             label: `${side}:${stemOf(rel)}`,
             kane: this.cfg.kane,
             budget: this.budget,
+            commit: record,
           });
         } catch (e) {
           if (e instanceof BudgetError) throw e;
@@ -220,6 +224,7 @@ export class Session {
   /** Pull the base/bump screenshot pair for each red or amber journey out of the packs. */
   collectShots(result) {
     const shotsDir = path.join(this.outDir, 'shots');
+    rmSync(shotsDir, { recursive: true, force: true }); // never attach a previous run's screenshot
     for (const row of result.rows) {
       if (!['red', 'amber'].includes(row.decision.light)) continue;
       const stem = stemOf(row.journey.rel);
@@ -231,12 +236,12 @@ export class Session {
           const pack = readPack(bumpRun.pack);
           const entry = pack.failure?.screenshot || pack.lastScreenshot;
           if (entry) {
-            row.shots.bump = pack.extract(entry, path.join(shotsDir, `${stem}-bump.png`));
+            row.shots.bump = pack.extract(entry, path.join(shotsDir, `${stem}-bump${path.extname(entry) || '.png'}`));
             const ord = (entry.match(/steps\/(\d+)-/) || [])[1];
             if (baseRun && ord) {
               const bp = readPack(baseRun.pack);
               const twin = bp.screenshots.find((s) => s.includes(`/steps/${ord}-`)) || bp.lastScreenshot;
-              if (twin) row.shots.base = bp.extract(twin, path.join(shotsDir, `${stem}-base.png`));
+              if (twin) row.shots.base = bp.extract(twin, path.join(shotsDir, `${stem}-base${path.extname(twin) || '.png'}`));
             }
           }
         }

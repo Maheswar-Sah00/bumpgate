@@ -136,6 +136,8 @@ function renderEvidence(result, ctx) {
     const d = row.decision;
     const failed = [...row.bump].reverse().find((r) => r.status === 'failed');
     if (failed?.reason) out.push('', `Kane: _${esc(trim(failed.reason, 400))}_`);
+    const diag = (failed?.diagnosis || '').split(/\r?\n/).filter((l) => l.trim() && !/^evidence:/i.test(l.trim())).slice(0, 2).join(' ');
+    if (diag) out.push('', `Kane's diagnosis: ${esc(trim(diag, 400))}`);
     const con = d.newConsole || newConsoleFromRuns(row);
     if (con.length) {
       out.push('', 'New console errors on the bump:', '```', ...con.slice(0, 6).map((c) => trim(c, 200)), '```');

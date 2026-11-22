@@ -88,7 +88,7 @@ export async function init(args, overrides, log) {
   try {
     for (const j of drafted) {
       const runDir = path.join(os.tmpdir(), 'bumpgate-init', stemOf(j.rel));
-      const res = await runJourney({ journeyRel: j.rel, seedDir: journeysDir, runDir, url: server.url, label: `init:${stemOf(j.rel)}`, kane: cfg.kane, budget });
+      const res = await runJourney({ journeyRel: j.rel, seedDir: journeysDir, runDir, url: server.url, label: `init:${stemOf(j.rel)}`, kane: cfg.kane, budget, commit: true });
       if (res.status === 'passed') {
         // Keep the recording next to the journey so CI replays it instead of re-authoring.
         const from = path.join(path.dirname(res.testPath), `output-${stemOf(j.rel)}`);

@@ -26,7 +26,9 @@ const { chromium } = await import(process.env.STUB_PLAYWRIGHT || 'playwright-cor
 
 out({ type: 'stream_start', cli_version: '0.10.7-stub', surface: 'testmd' });
 const outDir = path.join(path.dirname(file), `output-${stem}`);
-const recorded = existsSync(outDir);
+// Like Kane 0.10.7: a recording is the step tapes under .internal/steps/, written only by a commit.
+const recorded = existsSync(path.join(outDir, '.internal', 'steps'));
+const local = argv.includes('--local');
 const browser = await chromium.launch({ executablePath: process.env.STUB_CHROME || undefined, headless: true });
 const page = await browser.newPage();
 const consoleLines = [];
@@ -60,8 +62,20 @@ for (let i = 0; i < steps.length; i++) {
 const lastShot = await page.screenshot().catch(() => null);
 await browser.close();
 
-// Record on first run, like Kane does.
-if (!recorded) { mkdirSync(path.join(outDir, '.internal'), { recursive: true }); writeFileSync(path.join(outDir, '.internal', 'tape.json'), '{}'); }
+// Like Kane: every authoring run writes meta.json; only a passing commit (no --local) writes the tapes.
+const committed = !recorded && !local && !failedAt;
+if (!recorded) {
+  mkdirSync(path.join(outDir, '.internal'), { recursive: true });
+  writeFileSync(path.join(outDir, '.internal', 'meta.json'), JSON.stringify({ executions: [{ run_kind: 'author', status: failedAt ? 'failed' : 'passed', valid: true }] }));
+  if (committed) {
+    steps.forEach((st, i) => {
+      const d = path.join(outDir, '.internal', 'steps', `${i + 1}-s${i}`, 'flows', '0');
+      mkdirSync(d, { recursive: true });
+      writeFileSync(path.join(d, 'actions.ndjson'), '{}\n');
+    });
+    writeFileSync(path.join(outDir, 'Result.md'), 'status: passed\n');
+  }
+}
 
 const status = failedAt ? 'failed' : 'passed';
 const id = `exec_${Date.now()}`;
@@ -73,17 +87,17 @@ const files = {
   [`tests/${stem}/logs/1-console.ndjson`]: consoleLines.map((c) => JSON.stringify(c)).join('\n'),
   [`tests/${stem}/logs/1-network.har`]: JSON.stringify({ log: { entries: [] } }),
 };
-steps.forEach((s, i) => { if (!failedAt || i + 1 < failedAt) files[`tests/${stem}/steps/${String(i + 1).padStart(4, '0')}-s${i}/screenshot.png`] = lastShot || 'x'; });
+steps.forEach((s, i) => { if (!failedAt || i + 1 < failedAt) files[`tests/${stem}/steps/${i + 1}-0-${i + 1}/screenshot.jpg`] = lastShot || 'x'; });
 if (failedAt) {
-  const d = `tests/${stem}/steps/${String(failedAt).padStart(4, '0')}-s${failedAt - 1}/`;
-  files[d + 'screenshot.png'] = shot || 'x';
+  const d = `tests/${stem}/steps/${failedAt}-0-${failedAt}/`;
+  files[d + 'screenshot.jpg'] = shot || 'x';
   files[d + 'failure.yaml'] = `step: ${failedAt}\nreason: ${reason}\n`;
 }
 const pack = path.join(evDir, `${id}.evidence`);
 writeFileSync(pack, makeZip(Object.fromEntries(Object.entries(files).map(([k, v]) => [k, Buffer.isBuffer(v) ? v : String(v)]))));
 
 const passed = steps.length - (failedAt ? steps.length - failedAt + 1 : 0);
-out({ type: 'test_md_summary', overall_status: status, duration_s: 5, steps: { total: steps.length, passed, failed: failedAt ? 1 : 0, skipped: failedAt ? steps.length - failedAt : 0, replay_decisions: recorded ? steps.length : 0, author_decisions: recorded ? 0 : steps.length }, adaptive_heal: { triggered: false } });
+out({ type: 'test_md_summary', overall_status: status, duration_s: 5, steps: { total: steps.length, passed, failed: failedAt ? 1 : 0, skipped: failedAt ? steps.length - failedAt : 0, replay_decisions: recorded ? steps.length : 0, author_decisions: recorded ? 0 : steps.length }, adaptive_heal: { triggered: false }, commit: { committed, reason: committed ? 'ok' : local ? 'not_committed' : 'run_failed' } });
 out({ type: 'test_md_done', overall_status: status, duration_s: 5, session_id: id });
 process.stderr.write(`evidence: view locally with \`kane-cli evidence serve ${pack}\`\n`);
 process.exit(failedAt ? 1 : 0);

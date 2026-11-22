@@ -15,6 +15,7 @@ export const DEFAULTS = {
   maxFixAttempts: 3,
   kane: { timeout: 300, maxSteps: 30, maxRuns: 30, local: true, headed: false, policies: [] },
   protect: [],                // extra paths the fix agent may never touch
+  publishPacks: false,        // raw packs carry the Kane account email: opt in to publish them
 };
 
 export function loadConfig(repoDir, overrides = {}) {

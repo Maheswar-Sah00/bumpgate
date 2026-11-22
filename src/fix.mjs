@@ -88,6 +88,7 @@ function failureInputs(row, taskDir) {
     text: row.journey.text || `# ${row.journey.title}\n\n${(row.journey.steps || []).map((s) => `## ${s}`).join('\n')}`,
     failedStep: failed.failedStep || null,
     reason: failed.reason || null,
+    diagnosis: failed.diagnosis || null,
     bug: failed.bug || null,
     consoleErrors: (failed.consoleErrors || []).filter((c) => !baseCon.has(c)),
     networkErrors: (row.decision.newNetwork || []),

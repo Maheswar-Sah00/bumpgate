@@ -35,12 +35,40 @@ test('zip reader + evidence pack reader', () => {
   const z = openZip(pack);
   assert.equal(z.text('run.yaml'), 'status: finalized\n');
   const p = readPack(pack);
-  assert.equal(p.status, 'finalized');
+  assert.equal(p.status, 'failed'); // the test's outcome, not the pack's `finalized` state
   assert.deepEqual(p.consoleErrors, ['TypeError: useQuery is not a function']);
   assert.deepEqual(p.networkErrors, [{ status: 500, method: 'GET', url: 'http://localhost:4319/api/cart' }]);
   assert.equal(p.failure.screenshot, 'tests/t1/steps/0002-b/annotated.png');
   assert.match(p.failure.text, /did nothing/);
   assert.equal(p.lastScreenshot, 'tests/t1/steps/0002-b/screenshot.png');
+});
+
+test('real Kane 0.10.7 pack shape: jpg shots in ordinal order, totals fallback', () => {
+  const dir = mkdtempSync(path.join(os.tmpdir(), 'bg-'));
+  const pack = path.join(dir, 'real.evidence');
+  const files = {
+    'run.yaml': "evidence: '0.1'\nstatus: finalized\ntotals:\n  tests: 1\n  passed: 0\n  failed: 1\n",
+    'failure.yaml': 'totals:\n  failures: 1\n',
+    'tests/browse-1/logs/0-console.ndjson': [
+      JSON.stringify({ marker: 'step', step: '0-1', ordinal: 1 }),
+      JSON.stringify({ sequence: 0, level: 'error', text: 'a.defaultQueryOptions is not a function', step: '0-1' }),
+    ].join('\n'),
+    'tests/browse-1/steps/10-0-10/screenshot.jpg': 'j10',
+    'tests/browse-1/steps/9-0-9/failure.yaml': 'step: 0-9\nstatus: failed\n',
+  };
+  for (let i = 1; i <= 9; i++) files[`tests/browse-1/steps/${i}-0-${i}/screenshot.jpg`] = 'j' + i;
+  writeFileSync(pack, makeZip(files));
+  const p = readPack(pack);
+  assert.equal(p.status, 'failed');
+  assert.equal(p.screenshots.length, 10);
+  assert.equal(p.lastScreenshot, 'tests/browse-1/steps/10-0-10/screenshot.jpg');
+  assert.equal(p.failure.screenshot, 'tests/browse-1/steps/9-0-9/screenshot.jpg');
+  assert.deepEqual(p.consoleErrors, ['a.defaultQueryOptions is not a function']);
+  const passPack = path.join(dir, 'pass.evidence');
+  writeFileSync(passPack, makeZip({ 'run.yaml': 'status: finalized\ntotals:\n  passed: 1\n  failed: 0\n', 'failure.yaml': 'totals:\n  failures: 0\n' }));
+  const q = readPack(passPack);
+  assert.equal(q.status, 'passed');
+  assert.equal(q.failure, null);
 });
 
 test('changelog slicing keeps (from, to]', () => {

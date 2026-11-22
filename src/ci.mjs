@@ -81,9 +81,12 @@ export async function ci({ log, overrides = {} }) {
     }
   }
 
-  // Evidence: screenshots + packs for every red/amber journey, on an orphan branch.
+  // Evidence: screenshots for every red/amber journey, on an orphan branch. Raw packs carry the
+  // Kane account's email and org ids, so they are published only when the repo opts in.
+  const publishPacks = process.env.BUMPGATE_PUBLISH_PACKS === 'true' || cfg.publishPacks === true;
   const shotUrls = {};
   const packUrls = {};
+  const shotKey = (prefix, stem, side, file) => `${prefix}/${stem}-${side}${path.extname(file) || '.png'}`;
   const rowsForEvidence = result.rows.filter((r) => ['red', 'amber'].includes(r.decision.light));
   if (rowsForEvidence.length) {
     const files = {};
@@ -91,18 +94,23 @@ export async function ci({ log, overrides = {} }) {
     for (const row of rowsForEvidence) {
       const stem = stemOf(row.journey.rel);
       for (const side of ['base', 'bump']) {
-        if (row.shots?.[side] && existsSync(row.shots[side])) files[`${prefix}/${stem}-${side}.png`] = row.shots[side];
+        if (row.shots?.[side] && existsSync(row.shots[side])) files[shotKey(prefix, stem, side, row.shots[side])] = row.shots[side];
       }
-      const bumpPack = [...row.bump].reverse().find((r) => r.pack && existsSync(r.pack));
-      const basePack = [...row.base].reverse().find((r) => r.pack && existsSync(r.pack) && r.status === 'passed');
-      if (basePack) files[`${prefix}/${stem}-base.evidence`] = basePack.pack;
-      if (bumpPack) files[`${prefix}/${stem}-bump.evidence`] = bumpPack.pack;
+      if (publishPacks) {
+        const bumpPack = [...row.bump].reverse().find((r) => r.pack && existsSync(r.pack));
+        const basePack = [...row.base].reverse().find((r) => r.pack && existsSync(r.pack) && r.status === 'passed');
+        if (basePack) files[`${prefix}/${stem}-base.evidence`] = basePack.pack;
+        if (bumpPack) files[`${prefix}/${stem}-bump.evidence`] = bumpPack.pack;
+      }
     }
     const urls = await safe('evidence upload', () => uploadEvidence(repo, files, { message: `Evidence for PR #${pr.number}` }));
     if (urls) {
       for (const row of rowsForEvidence) {
         const stem = stemOf(row.journey.rel);
-        shotUrls[row.journey.rel] = { base: urls[`${prefix}/${stem}-base.png`], bump: urls[`${prefix}/${stem}-bump.png`] };
+        shotUrls[row.journey.rel] = {
+          base: row.shots?.base ? urls[shotKey(prefix, stem, 'base', row.shots.base)] : undefined,
+          bump: row.shots?.bump ? urls[shotKey(prefix, stem, 'bump', row.shots.bump)] : undefined,
+        };
         const p = {};
         if (urls[`${prefix}/${stem}-base.evidence`]) p.base = viewerUrl(urls[`${prefix}/${stem}-base.evidence`]);
         if (urls[`${prefix}/${stem}-bump.evidence`]) p.bump = viewerUrl(urls[`${prefix}/${stem}-bump.evidence`]);

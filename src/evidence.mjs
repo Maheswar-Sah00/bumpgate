@@ -54,23 +54,22 @@ export function readPack(packPath) {
 
   steps.sort((a, b) => a.ordinal - b.ordinal);
 
-  const failureNames = names.filter((n) => /\/steps\/\d+-[^/]+\/failure\.yaml$/.test(n));
+  // Kane 0.10 writes steps/<ordinal>-<id>/screenshot.jpg; accept png too, and sort by ordinal, not as text.
+  const failureNames = names.filter((n) => /\/steps\/\d+-[^/]+\/failure\.yaml$/.test(n)).sort(byOrdinal);
   const runFailure = zip.has('failure.yaml') ? zip.text('failure.yaml') : null;
   if (failureNames.length) {
-    const fn = failureNames.sort()[0];
+    const fn = failureNames[0];
     const dir = fn.replace(/failure\.yaml$/, '');
-    failure = {
-      entry: fn,
-      text: (zip.text(fn) || '').slice(0, 4000),
-      screenshot: zip.has(dir + 'annotated.png') ? dir + 'annotated.png' : zip.has(dir + 'screenshot.png') ? dir + 'screenshot.png' : null,
-    };
-  } else if (runFailure && /\S/.test(runFailure) && !/^\s*(failures:\s*\[\]|\{\})\s*$/m.test(runFailure)) {
+    const shot = ['annotated.png', 'annotated.jpg', 'annotated.jpeg', 'screenshot.png', 'screenshot.jpg', 'screenshot.jpeg']
+      .map((f) => dir + f).find((p) => zip.has(p)) || null;
+    failure = { entry: fn, text: (zip.text(fn) || '').slice(0, 4000), screenshot: shot };
+  } else if (runFailure && /\S/.test(runFailure) && !/^\s*(failures:\s*\[\]|\{\})\s*$/m.test(runFailure)
+    && !/^\s*failures:\s*0\b/m.test(runFailure)) {
     failure = { entry: 'failure.yaml', text: runFailure.slice(0, 4000), screenshot: null };
   }
 
-  const shots = names.filter((n) => /\/steps\/\d+-[^/]+\/screenshot\.png$/.test(n)).sort();
-  const runYaml = zip.text('run.yaml') || '';
-  const status = (runYaml.match(/^\s*status:\s*['"]?(\w+)/m) || [])[1] || null;
+  const shots = names.filter((n) => /\/steps\/\d+-[^/]+\/screenshot\.(png|jpe?g)$/i.test(n)).sort(byOrdinal);
+  const status = packStatus(zip, names);
 
   return {
     path: packPath,
@@ -90,6 +89,27 @@ export function readPack(packPath) {
       return toFile;
     },
   };
+}
+
+function byOrdinal(a, b) {
+  const o = (n) => Number((n.match(/\/steps\/(\d+)-/) || [])[1] ?? 0);
+  return o(a) - o(b) || a.localeCompare(b);
+}
+
+/**
+ * The test's outcome. run.yaml's own `status` is the pack's state (`finalized`), not the test's,
+ * so read tests/<t>/result.yaml first, then run.yaml's totals.
+ */
+function packStatus(zip, names) {
+  const results = names.filter((n) => /^tests\/[^/]+\/result\.yaml$/.test(n))
+    .map((n) => (zip.text(n).match(/^status:\s*['"]?(\w+)/m) || [])[1]).filter(Boolean);
+  if (results.length) return results.includes('failed') ? 'failed' : results.includes('broken') ? 'broken' : results[0];
+  const runYaml = zip.text('run.yaml') || '';
+  const count = (k) => Number((runYaml.match(new RegExp(`^\\s+${k}:\\s*(\\d+)`, 'm')) || [])[1] ?? NaN);
+  if (count('failed') > 0) return 'failed';
+  if (count('broken') > 0) return 'broken';
+  if (count('passed') > 0) return 'passed';
+  return (runYaml.match(/^status:\s*['"]?(\w+)/m) || [])[1] || null;
 }
 
 function pickStep(s) {

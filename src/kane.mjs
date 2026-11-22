@@ -1,5 +1,5 @@
 // Drive Kane CLI: replay one plain-English journey against one build, read its NDJSON stream.
-import { cpSync, existsSync, mkdirSync, readdirSync, statSync, writeFileSync, rmSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import { run } from './sh.mjs';
 import { readPack } from './evidence.mjs';
@@ -18,12 +18,20 @@ export function stemOf(file) {
 export function hasRecording(journeyPath) {
   const out = path.join(path.dirname(journeyPath), `output-${stemOf(journeyPath)}`);
   if (!existsSync(out)) return false;
+  // Kane writes output-<stem>/.internal/meta.json after every authoring run, even a failed or
+  // uncommitted (--local) one. Only a commit writes the step tapes under .internal/steps/.
+  const internal = path.join(out, '.internal');
+  return existsSync(internal) ? hasFile(path.join(internal, 'steps')) : hasFile(out);
+}
+
+function hasFile(dir) {
+  if (!existsSync(dir)) return false;
   try {
     const walk = (d) => readdirSync(d).some((n) => {
       const p = path.join(d, n);
       return statSync(p).isDirectory() ? walk(p) : true;
     });
-    return walk(out);
+    return walk(dir);
   } catch {
     return false;
   }
@@ -42,6 +50,8 @@ export function parseStream(lines) {
     summary: null,
     done: null,
     bug: null,
+    diagnosis: null,
+    reasonCode: null,
     verdict: null,
     errors: [],
     warnings: [],
@@ -72,6 +82,9 @@ export function parseStream(lines) {
         if (ev.reason) r.reasons.push(String(ev.reason));
         if (ev.one_liner) r.oneLiners.push(String(ev.one_liner));
         if (typeof ev.credits_consumed === 'number') r.credits += ev.credits_consumed;
+        // `summary` is Kane's diagnosis of a failure: root cause, suggested fix, and the evidence lines.
+        if (ev.status === 'failed' && ev.summary) r.diagnosis = String(ev.summary);
+        if (ev.status === 'failed' && ev.reason_code) r.reasonCode = String(ev.reason_code);
         break;
       case 'test_md_adaptive_heal':
         r.healTriggered = true;
@@ -134,6 +147,7 @@ export async function runJourney({
   kane = {},
   budget,
   onLine,
+  commit = false,      // true only when recording on the base branch: Kane saves step tapes only on a commit
 }) {
   if (budget) {
     if (budget.used >= budget.maxRuns) {
@@ -151,7 +165,9 @@ export async function runJourney({
   const args = ['testmd', 'run', testPath, '--override-start-url', url, '--agent',
     '--timeout', String(kane.timeout ?? 300), '--max-steps', String(kane.maxSteps ?? 30)];
   if (!kane.headed) args.push('--headless');
-  if (kane.local !== false) args.push('--local');
+  // --local skips Kane's commit and upload, so a heal on a bump can never rewrite main's recording.
+  // It also means nothing is saved, so the one run that records a journey on base commits.
+  if (kane.local !== false && !commit) args.push('--local');
   if (kane.bugDetection) args.push('--bug-detection', kane.bugDetection);
   for (const p of kane.policies || []) args.push('--policy', p);
   if (process.env.LT_USERNAME && process.env.LT_ACCESS_KEY) {
@@ -191,11 +207,14 @@ export async function runJourney({
     durationS: Math.round((Date.now() - started) / 1000),
     authored,
     healed,
+    committed: parsed.summary?.commit?.committed ?? null,
     replayed: parsed.summary?.steps?.replay_decisions ?? null,
     reauthored: parsed.summary?.steps?.author_decisions ?? null,
     failedStep: parsed.failedStep,
     reason: parsed.failedStep?.reason || (status === 'error' ? (parsed.errors[0] || lastLine(res.stderr)) : null),
     bug: parsed.bug,
+    diagnosis: parsed.diagnosis,
+    reasonCode: parsed.reasonCode,
     verdict: parsed.verdict,
     credits: parsed.credits || null,
     sessionId: parsed.done?.session_id ?? null,
