@@ -84,3 +84,16 @@ test('real Kane 0.10.7 stream: diagnosis, reason code, failed authoring is not a
   writeFileSync(path.join(dir, 'output-browse', '.internal', 'steps', '1-3db176ed', 'flows', '0', 'actions.ndjson'), '{}\n');
   assert.equal(hasRecording(test), true);
 });
+
+import { hardLimitS, stripNotices } from '../src/kane.mjs';
+
+test('hardLimitS gives multi-step recordings room; replays stay short', () => {
+  const four = '# T\n\n## One\na\n## Two\nb\n## Three\nc\n## Four\nd\n';
+  assert.equal(hardLimitS({ timeout: 300 }, four, false), 840); // recording: 240 + 4 x 150
+  assert.equal(hardLimitS({ timeout: 300 }, four, true), 480);  // replay: 240 + 4 x 60
+  assert.equal(hardLimitS({ timeout: 300 }, '# T\n## One\n', true), 420); // never below the old floor
+});
+
+test('stripNotices drops kane-cli update notices from stderr', () => {
+  assert.equal(stripNotices('Skill update available: not installed → 0.1.4 — run `kane-cli install skill`\nreal error').trim(), 'real error');
+});

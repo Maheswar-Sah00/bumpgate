@@ -178,7 +178,7 @@ export async function runJourney({
   const started = Date.now();
   const res = await run('kane-cli', args, {
     cwd: runDir,
-    timeoutMs: ((kane.timeout ?? 300) + 120) * 1000,
+    timeoutMs: hardLimitS(kane, readFileSync(testPath, 'utf8'), recorded) * 1000,
     env: { NO_COLOR: '1', FORCE_COLOR: '0' },
     onLine: (line) => {
       lines.push(line);
@@ -211,7 +211,9 @@ export async function runJourney({
     replayed: parsed.summary?.steps?.replay_decisions ?? null,
     reauthored: parsed.summary?.steps?.author_decisions ?? null,
     failedStep: parsed.failedStep,
-    reason: parsed.failedStep?.reason || (status === 'error' ? (parsed.errors[0] || lastLine(res.stderr)) : null),
+    reason: parsed.failedStep?.reason || (status === 'error'
+      ? (parsed.errors[0] || (res.timedOut ? `stopped by Bumpgate after ${Math.round((Date.now() - started) / 1000)}s with no result from Kane` : lastLine(stripNotices(res.stderr))))
+      : null),
     bug: parsed.bug,
     diagnosis: parsed.diagnosis,
     reasonCode: parsed.reasonCode,
@@ -234,6 +236,22 @@ export async function runJourney({
 function lastLine(s = '') {
   const lines = String(s).trim().split(/\r?\n/).filter(Boolean);
   return lines.length ? lines[lines.length - 1].slice(0, 300) : null;
+}
+
+/** kane-cli prints update notices on stderr; they are never the reason a run failed. */
+export function stripNotices(s = '') {
+  return String(s).split(/\r?\n/).filter((l) => !/update available|run `kane-cli install/i.test(l)).join('\n');
+}
+
+/**
+ * Hard limit for one kane-cli process. Kane's own --timeout bounds each step, but start-up takes up to
+ * ~3 minutes and recording a step takes 40-70 s, so a flat limit killed real multi-step recordings
+ * mid-run. Scale with the journey's step count; replays of a recording are much faster.
+ */
+export function hardLimitS(kane = {}, journeyText = '', recorded = false) {
+  const steps = Math.max(1, (String(journeyText).match(/^##\s+/gm) || []).length);
+  const perStep = recorded ? 60 : 150;
+  return Math.max((kane.timeout ?? 300) + 120, 240 + steps * perStep);
 }
 
 /** The pack path from the stderr hint, else the newest .evidence under the run dir. */
