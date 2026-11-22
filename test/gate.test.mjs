@@ -93,3 +93,16 @@ test('message normalisation ignores ports, hashes, line numbers', () => {
   );
   assert.deepEqual(newOnBump(['a'], ['a', 'b', 'b']), ['b']);
 });
+
+test('pickFailure prefers confirmed, then severity, then confidence, then latest', async () => {
+  const { pickFailure } = await import('../src/gate.mjs');
+  const major = { status: 'failed', bug: { title: 'major', severity: 'major', confidence: 0.96 } };
+  const minor = { status: 'failed', bug: { title: 'minor', severity: 'minor', confidence: 0.96 } };
+  const confirmedMinor = { status: 'failed', bug: { title: 'confirmed', severity: 'minor', confirmed: true, confidence: 0.5 } };
+  assert.equal(pickFailure([major, minor]).bug.title, 'major');
+  assert.equal(pickFailure([minor, major]).bug.title, 'major');
+  assert.equal(pickFailure([major, confirmedMinor]).bug.title, 'confirmed');
+  assert.equal(pickFailure([{ status: 'passed' }]), null);
+  const a = { status: 'failed', reason: 'a' }; const b = { status: 'failed', reason: 'b' };
+  assert.equal(pickFailure([a, b]).reason, 'b');
+});

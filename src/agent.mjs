@@ -29,7 +29,10 @@ export function buildTask({ bump, failures, notes, journeysDir, buildCmd, previo
     if (f.failedStep) L.push(`It passes on base and breaks on the upgrade at step ${f.failedStep.index}: **${f.failedStep.heading}**.`);
     if (f.reason) L.push(`Kane's reason: ${f.reason}`);
     if (f.bug?.title) L.push(`Kane's bug verdict: ${f.bug.title}${f.bug.severity ? ` (severity ${f.bug.severity})` : ''}`);
-    if (f.diagnosis) L.push('', 'Kane\'s diagnosis of the failure:', '```', f.diagnosis.slice(0, 1500), '```');
+    if (f.diagnosis) {
+      L.push('', `Kane's investigation of the failure${f.bug?.confirmed ? '' : ' (unconfirmed)'}. The journey is fixed and passes on base with the same recorded steps, so if this blames the test, look instead for what the upgrade changed:`,
+        '```', f.diagnosis.slice(0, 1500), '```');
+    }
     if (f.consoleErrors?.length) {
       L.push('', 'Console errors that appear only on the upgrade:', '```', ...f.consoleErrors.slice(0, 10), '```');
     }

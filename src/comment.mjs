@@ -1,5 +1,5 @@
 // The PR comment: a three-light verdict table, Kane's evidence, and what happens next.
-import { LIGHT } from './gate.mjs';
+import { LIGHT, pickFailure } from './gate.mjs';
 import { bumpLabel } from './deps.mjs';
 
 export const MARKER = '<!-- bumpgate:v1 -->';
@@ -44,13 +44,16 @@ function stateCell(runs, light, side) {
 
 function kaneSays(row) {
   const d = row.decision;
-  const failed = [...row.bump].reverse().find((r) => r.status === 'failed');
+  const failed = pickFailure(row.bump);
   if (d.light === 'red' && failed) {
     const bits = [];
     if (failed.failedStep?.heading) bits.push(`**${esc(failed.failedStep.heading)}**`);
     if (failed.bug?.title) bits.push(`${esc(failed.bug.title)}${failed.bug.severity ? ` (${esc(failed.bug.severity)})` : ''}`);
     else if (failed.reason) bits.push(esc(trim(failed.reason, 180)));
-    return bits.join(': ') || d.reasons.join(' ');
+    // The hard evidence: an error that shows up only on the bump.
+    const con = (d.newConsole || newConsoleFromRuns(row))[0];
+    const cell = bits.join(': ') || esc(d.reasons.join(' '));
+    return con ? `${cell} · new error on this bump: \`${esc(trim(con, 90)).replace(/`/g, "'")}\`` : cell;
   }
   return esc(d.reasons.join(' '));
 }
@@ -134,9 +137,17 @@ function renderEvidence(result, ctx) {
       out.push(`| ${urls.base ? `<img src="${urls.base}" width="380">` : '–'} | ${urls.bump ? `<img src="${urls.bump}" width="380">` : '–'} |`);
     }
     const d = row.decision;
-    const failed = [...row.bump].reverse().find((r) => r.status === 'failed');
-    if (failed?.reason) out.push('', `Kane: _${esc(trim(failed.reason, 400))}_`);
-    const diag = (failed?.diagnosis || '').split(/\r?\n/).filter((l) => l.trim() && !/^evidence:/i.test(l.trim())).slice(0, 2).join(' ');
+    const failed = pickFailure(row.bump);
+    // The deterministic fact first: the same recorded steps, replayed on both builds.
+    if (d.light === 'red' && failed && failed.replayed > 0 && !failed.reauthored && row.base.some((r) => r.status === 'passed')) {
+      out.push('', `Kane replayed the same recorded steps on both builds (${failed.replayed} replayed, none re-authored). They pass on base and fail on this bump, so the difference comes from the bump.`);
+    }
+    if (failed?.reason) {
+      out.push('', `${failed.bug?.confirmed ? 'Kane (confirmed bug)' : 'Kane\'s investigation (unconfirmed)'}: _${esc(trim(failed.reason, 400))}_`);
+    }
+    // Kane's diagnosis is shown only for a confirmed bug: an unconfirmed one can blame the test.
+    const diag = failed?.bug?.confirmed
+      ? (failed.diagnosis || '').split(/\r?\n/).filter((l) => l.trim() && !/^evidence:/i.test(l.trim())).slice(0, 2).join(' ') : '';
     if (diag) out.push('', `Kane's diagnosis: ${esc(trim(diag, 400))}`);
     const con = d.newConsole || newConsoleFromRuns(row);
     if (con.length) {

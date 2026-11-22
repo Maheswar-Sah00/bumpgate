@@ -8,6 +8,7 @@ import { buildTask, runAgent, AGENTS } from './agent.mjs';
 import { releaseNotes } from './notes.mjs';
 import { readJson } from './workspace.mjs';
 import { lockVersions } from './deps.mjs';
+import { pickFailure } from './gate.mjs';
 import { resolveCommands } from './config.mjs';
 
 const LOCKFILES = ['package-lock.json', 'pnpm-lock.yaml', 'yarn.lock', 'bun.lockb', 'bun.lock', 'npm-shrinkwrap.json'];
@@ -72,7 +73,7 @@ function resetWorktree(dir, sha) {
 }
 
 function failureInputs(row, taskDir) {
-  const failed = [...row.bump].reverse().find((r) => r.status === 'failed') || row.bump[row.bump.length - 1] || {};
+  const failed = pickFailure(row.bump) || row.bump[row.bump.length - 1] || {};
   const baseCon = new Set(row.base.flatMap((r) => r.consoleErrors || []));
   const shots = {};
   for (const side of ['base', 'bump']) {

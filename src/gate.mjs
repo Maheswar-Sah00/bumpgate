@@ -185,3 +185,19 @@ export function needsConfirmation({ base = [], bump = [] }, confirmRuns = 3) {
 }
 
 export const LIGHT = { green: '🟢', amber: '🟡', red: '🔴', grey: '⚪' };
+
+const SEVERITY = { blocker: 4, critical: 4, major: 3, high: 3, medium: 2, moderate: 2, minor: 1, low: 1, trivial: 0 };
+
+/**
+ * The failed run that explains a breakage best: a confirmed Kane bug first, then the most severe,
+ * then the most confident, then the latest. Kane's after-the-fact story can differ between two
+ * runs of the same failure; the gate never depends on it, but the comment should show the best one.
+ */
+export function pickFailure(runs = []) {
+  const failed = runs.map((r, i) => ({ r, i })).filter(({ r }) => r && r.status === 'failed');
+  if (!failed.length) return null;
+  const sev = (r) => SEVERITY[String(r.bug?.severity || '').toLowerCase()] ?? -1;
+  failed.sort((a, b) => (b.r.bug?.confirmed ? 1 : 0) - (a.r.bug?.confirmed ? 1 : 0)
+    || sev(b.r) - sev(a.r) || (b.r.bug?.confidence ?? 0) - (a.r.bug?.confidence ?? 0) || b.i - a.i);
+  return failed[0].r;
+}
