@@ -56,6 +56,7 @@ export function parseStream(lines) {
     errors: [],
     warnings: [],
     cliVersion: null,
+    urls: [],
   };
   for (const raw of lines) {
     const line = String(raw).trim();
@@ -78,7 +79,11 @@ export function parseStream(lines) {
         if (ev.status === 'failed' && !r.failedStep) r.failedStep = { ...s };
         break;
       }
+      case 'step_event':
+        if (ev.event === 'screenshot' && /^https?:\/\//.test(String(ev.detail || ''))) r.urls.push(String(ev.detail));
+        break;
       case 'run_end':
+        for (const u of [ev.final_state?.url, ev.final_url]) if (/^https?:\/\//.test(String(u || ''))) r.urls.push(String(u));
         if (ev.reason) r.reasons.push(String(ev.reason));
         if (ev.one_liner) r.oneLiners.push(String(ev.one_liner));
         if (typeof ev.credits_consumed === 'number') r.credits += ev.credits_consumed;
@@ -120,6 +125,19 @@ export function parseStream(lines) {
     r.failedStep.reason = r.oneLiners[r.oneLiners.length - 1] || r.reasons[r.reasons.length - 1] || null;
   }
   return r;
+}
+
+/**
+ * Pages Kane visited on a different origin than the app under test. Kane can carry URLs between
+ * sessions; a failure that happened on someone else's page says nothing about this bump.
+ */
+export function offAppUrls(parsed, appUrl) {
+  let origin;
+  try { origin = new URL(appUrl).origin; } catch { return []; }
+  const local = (u) => /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i.test(u);
+  return [...new Set(parsed.urls.filter((u) => {
+    try { return local(u) && new URL(u).origin !== origin; } catch { return false; }
+  }))];
 }
 
 /** Map exit code + stream to passed | failed | error. */
@@ -189,7 +207,10 @@ export async function runJourney({
   writeFileSync(path.join(runDir, 'kane.stderr.txt'), res.stderr || '');
 
   const parsed = parseStream(lines);
-  const status = classify(res.code, parsed, res.timedOut);
+  let status = classify(res.code, parsed, res.timedOut);
+  // A failure on another local app is not evidence about this bump: count it as a run error (re-run, never block).
+  const offApp = offAppUrls(parsed, url);
+  if (status === 'failed' && offApp.length) status = 'error';
   const packPath = findPack(runDir, res.stderr);
   let pack = null;
   if (packPath) {
@@ -210,8 +231,10 @@ export async function runJourney({
     committed: parsed.summary?.commit?.committed ?? null,
     replayed: parsed.summary?.steps?.replay_decisions ?? null,
     reauthored: parsed.summary?.steps?.author_decisions ?? null,
-    failedStep: parsed.failedStep,
-    reason: parsed.failedStep?.reason || (status === 'error'
+    failedStep: status === 'error' && offApp.length ? null : parsed.failedStep,
+    offApp,
+    reason: (status === 'error' && offApp.length ? `Kane left the app under test (went to ${offApp[0]}); not counted` : null)
+      || parsed.failedStep?.reason || (status === 'error'
       ? (parsed.errors[0] || (res.timedOut ? `stopped by Bumpgate after ${Math.round((Date.now() - started) / 1000)}s with no result from Kane` : lastLine(stripNotices(res.stderr))))
       : null),
     bug: parsed.bug,

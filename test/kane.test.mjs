@@ -97,3 +97,15 @@ test('hardLimitS gives multi-step recordings room; replays stay short', () => {
 test('stripNotices drops kane-cli update notices from stderr', () => {
   assert.equal(stripNotices('Skill update available: not installed → 0.1.4 — run `kane-cli install skill`\nreal error').trim(), 'real error');
 });
+
+import { offAppUrls } from '../src/kane.mjs';
+
+test('offAppUrls flags another local app Kane wandered into, not the app itself or the open web', () => {
+  const parsed = parseStream(lines([
+    { type: 'step_event', event: 'screenshot', detail: 'http://localhost:4371/voxel-rpg-game/' },
+    { type: 'step_event', event: 'screenshot', detail: 'https://github.com/someone/repo' },
+    { type: 'run_end', status: 'failed', final_state: { url: 'http://localhost:4381/#/login' } },
+  ]));
+  assert.deepEqual(offAppUrls(parsed, 'http://localhost:4371/voxel-rpg-game/'), ['http://localhost:4381/#/login']);
+  assert.deepEqual(offAppUrls(parseStream(lines([{ type: 'step_event', event: 'screenshot', detail: 'http://localhost:4371/x' }])), 'http://localhost:4371/'), []);
+});
