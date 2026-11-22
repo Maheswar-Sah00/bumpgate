@@ -1,0 +1,1 @@
+No bump screenshot for `start_new_game`: that journey is inconclusive. Its last bump run left the app under test (Kane carried a URL in from another local app), so its screenshot shows a different app and is not evidence about this bump.
