@@ -131,3 +131,12 @@ test('drift must repeat: one flaky request triggers a confirmation run and only 
   assert.equal(needsConfirmation({ base, bump: [healed] }), null);
   assert.equal(decideJourney({ base, bump: [healed] }).light, 'amber');
 });
+
+test('a heal counts as drift only when base replayed cleanly', () => {
+  const healedBump = { status: 'passed', healed: true, consoleErrors: [], networkErrors: [] };
+  const clean = { status: 'passed', healed: false, consoleErrors: [], networkErrors: [] };
+  assert.equal(decideJourney({ base: [clean], bump: [healedBump] }).light, 'amber');
+  const both = decideJourney({ base: [{ ...clean, healed: true }], bump: [healedBump] });
+  assert.equal(both.light, 'green');
+  assert.match(both.reasons.join(' '), /also had to self-heal this journey on base/);
+});

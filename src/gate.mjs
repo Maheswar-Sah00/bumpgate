@@ -98,7 +98,12 @@ export function decideJourney({ base = [], bump = [] }) {
   }
 
   const passing = bump.filter((r) => r.status === 'passed');
-  const healed = passing.some((r) => r.healed);
+  // A heal is drift only if base replayed cleanly. If Kane had to heal on base too, the recording itself
+  // is unstable, and blaming the bump for it would cry wolf.
+  const baseHealed = base.some((r) => r.status === 'passed' && r.healed);
+  const healed = passing.some((r) => r.healed) && !baseHealed;
+  const note = baseHealed && passing.some((r) => r.healed)
+    ? 'Kane also had to self-heal this journey on base, so the heal is not counted against the bump. Re-record it.' : null;
   // A new error must show up in every passing bump run: one flaky third-party request is not drift.
   const newConsole = newOnBump(flatten(base, 'consoleErrors'), seenInEvery(passing, 'consoleErrors'));
   const newNetwork = newOnBump(
@@ -109,11 +114,11 @@ export function decideJourney({ base = [], bump = [] }) {
   if (newConsole.length) reasons.push(`${newConsole.length} new console error(s) on the bump.`);
   if (newNetwork.length) reasons.push(`${newNetwork.length} new failed request(s) on the bump.`);
   if (reasons.length) {
-    return { light: 'amber', kind: 'drift', base: b, bump: h, blocks: false, holds: false, reasons,
+    return { light: 'amber', kind: 'drift', base: b, bump: h, blocks: false, holds: false, reasons: note ? [...reasons, note] : reasons,
       newConsole, newNetwork, healed };
   }
   return { light: 'green', kind: 'same', base: b, bump: h, blocks: false, holds: false,
-    reasons: ['Same journey, same result.'] };
+    reasons: note ? ['Same journey, same result.', note] : ['Same journey, same result.'] };
 }
 
 // Compare requests by shape, not by ids: map tiles (/tile/11/758/972), record ids and content hashes
