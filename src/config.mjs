@@ -1,5 +1,6 @@
 // bumpgate.config.json (optional). Everything has a default detected from package.json.
 import { existsSync, readFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 
 export const DEFAULTS = {
@@ -44,13 +45,14 @@ export function resolveCommands(cfg, sideDir) {
   const pkg = existsSync(pkgPath) ? JSON.parse(readFileSync(pkgPath, 'utf8')) : {};
   const scripts = pkg.scripts || {};
   const pm = detectPackageManager(sideDir);
+  const bin = pmBin(pm);
   const install = cfg.install || {
     npm: 'npm ci --no-audit --no-fund',
-    pnpm: 'pnpm install --frozen-lockfile',
-    yarn: 'yarn install --frozen-lockfile',
+    pnpm: `${bin} install --frozen-lockfile`,
+    yarn: `${bin} install --frozen-lockfile`,
     bun: 'bun install --frozen-lockfile',
   }[pm];
-  const runner = pm === 'npm' ? 'npm run' : pm;
+  const runner = pm === 'npm' ? 'npm run' : bin;
   const build = cfg.build ?? (scripts.build ? `${runner} build` : null);
   let serve = cfg.serve;
   if (!serve) {
@@ -63,6 +65,14 @@ export function resolveCommands(cfg, sideDir) {
     else serve = { type: 'static', dir: 'dist', spa: true };
   }
   return { pm, install, build, serve };
+}
+
+const onPath = new Map();
+/** yarn / pnpm, or `corepack yarn` / `corepack pnpm` when the binary is not installed (corepack ships with Node). */
+export function pmBin(pm) {
+  if (pm !== 'yarn' && pm !== 'pnpm') return pm;
+  if (!onPath.has(pm)) onPath.set(pm, spawnSync(pm, ['--version'], { shell: true, stdio: 'ignore', timeout: 20000 }).status === 0);
+  return onPath.get(pm) ? pm : `corepack ${pm}`;
 }
 
 export function detectPackageManager(dir) {

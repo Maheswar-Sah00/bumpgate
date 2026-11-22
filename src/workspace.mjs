@@ -44,11 +44,17 @@ export function readJson(file) {
 export async function buildSide(dir, cfg, { onLog, skipInstall = false } = {}) {
   const commands = resolveCommands(cfg, dir);
   const started = Date.now();
-  const env = { CI: 'true', NODE_ENV: undefined, BROWSER: 'none', NEXT_TELEMETRY_DISABLED: '1', HUSKY: '0' };
+  const env = { CI: 'true', NODE_ENV: undefined, BROWSER: 'none', NEXT_TELEMETRY_DISABLED: '1', HUSKY: '0', COREPACK_ENABLE_DOWNLOAD_PROMPT: '0' };
   delete env.NODE_ENV;
   if (!skipInstall || !existsSync(path.join(dir, 'node_modules'))) {
     onLog?.(`install: ${commands.install}`);
-    const r = await sh(commands.install, { cwd: dir, env, timeoutMs: 15 * 60 * 1000 });
+    let r = await sh(commands.install, { cwd: dir, env, timeoutMs: 15 * 60 * 1000 });
+    // Many repos install with legacy peer deps (an .npmrc or a habit); npm ci refuses with ERESOLVE.
+    if (r.code !== 0 && /^npm (ci|install)\b/.test(commands.install) && /ERESOLVE/.test(r.stdout + r.stderr)) {
+      commands.install = `${commands.install} --legacy-peer-deps`;
+      onLog?.(`install: peer-dependency conflict, retrying: ${commands.install}`);
+      r = await sh(commands.install, { cwd: dir, env, timeoutMs: 15 * 60 * 1000 });
+    }
     if (r.code !== 0) return { ok: false, step: 'install', log: tail(r.stdout + r.stderr), commands, seconds: secs(started) };
   }
   if (commands.build) {

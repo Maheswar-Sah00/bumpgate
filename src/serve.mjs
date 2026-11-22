@@ -116,9 +116,16 @@ export async function waitForHttp(url, timeoutMs = 60000, gaveUp = () => false) 
   return false;
 }
 
-function probe(url) {
+// A dev server may listen on IPv4 or IPv6 only (Vite on Windows binds `localhost` to ::1), while
+// the browser Kane drives tries both. Probe both, or a running server looks dead.
+async function probe(url) {
+  if (!url.includes('://localhost')) return probeOne(url);
+  return (await probeOne(url.replace('://localhost', '://127.0.0.1'))) ?? probeOne(url.replace('://localhost', '://[::1]'));
+}
+
+function probeOne(url) {
   return new Promise((resolve) => {
-    const req = http.get(url.replace('://localhost', '://127.0.0.1'), (res) => {
+    const req = http.get(url, (res) => {
       res.resume();
       resolve(res.statusCode);
     });
