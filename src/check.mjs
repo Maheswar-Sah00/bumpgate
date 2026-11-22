@@ -239,9 +239,12 @@ export class Session {
           const entry = pack.failure?.screenshot || pack.lastScreenshot;
           if (entry) {
             row.shots.bump = pack.extract(entry, path.join(shotsDir, `${stem}-bump${path.extname(entry) || '.png'}`));
-            const ord = (entry.match(/steps\/(\d+)-/) || [])[1];
+            let ord = (entry.match(/steps\/(\d+)-/) || [])[1];
             if (baseRun && ord) {
               const bp = readPack(baseRun.pack);
+              // Step 1's screenshot can be taken before the app has opened; pair a step-1 failure
+              // with base's step 2, where the app is on screen.
+              if (ord === '1' && bp.screenshots.some((s) => s.includes('/steps/2-'))) ord = '2';
               const twin = bp.screenshots.find((s) => s.includes(`/steps/${ord}-`)) || bp.lastScreenshot;
               if (twin) row.shots.base = bp.extract(twin, path.join(shotsDir, `${stem}-base${path.extname(twin) || '.png'}`));
             }

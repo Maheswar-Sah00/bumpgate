@@ -3,207 +3,365 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Bumpgate · Dependabot says CI is green. Kane checks it still works.</title>
+  <title>Bumpgate · Verified dependency upgrades</title>
   <meta name="description" content="Bumpgate is the merge gate for Dependabot and Renovate PRs. Kane CLI replays your app's critical journeys in a real browser on main and on the bump; it merges only if nothing broke, and Claude Code migrates the code when something did.">
   <meta property="og:title" content="Bumpgate: Kane CLI checks every Dependabot bump still works">
   <meta property="og:description" content="CI checks the code builds. Kane CLI checks the app still works. The bump merges only if it does.">
-  <meta property="og:image" content="og.png">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2314110e'/%3E%3Crect x='5' y='8' width='4' height='19' fill='%23f3ebde'/%3E%3Crect x='9' y='10' width='19' height='6' fill='%23ffb000'/%3E%3Cpath d='M13 10h3l-3 6h-3zM20 10h3l-3 6h-3z' fill='%2314110e'/%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b0b0a'/%3E%3Crect x='8' y='7' width='3.5' height='18' rx='1' fill='%23fafaf8'/%3E%3Crect x='11.5' y='10' width='13' height='5' rx='1' fill='%23fafaf8'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700&family=Caveat:wght@700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <script>
     try { const t = localStorage.getItem('bg-theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
   </script>
 </head>
 <body>
-  <nav class="nav">
-    <div class="wrap">
+  <nav class="nav" id="nav">
+    <div class="wrap nav-in">
       <a class="logo" href="#top" aria-label="Bumpgate home">
-        <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="6" width="5" height="23" fill="currentColor"/><rect x="8" y="9" width="22" height="7" fill="#ffb000"/><path d="M12.5 9h3.5l-3.5 7H9zM20.5 9H24l-3.5 7H17z" fill="#14110e"/><circle cx="5.5" cy="4.5" r="2.5" fill="#ff5a4e"/></svg>
-        Bumpgate
+        <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" class="lg-bg"/><rect x="8" y="7" width="3.5" height="18" rx="1" class="lg-fg"/><rect x="11.5" y="10" width="13" height="5" rx="1" class="lg-fg"/></svg>
+        <span>Bumpgate</span>
       </a>
       <div class="links">
-        <a href="#how">How it works</a>
+        <a href="#loop">How it works</a>
         <a href="#rule">The rule</a>
         <a href="#proof">Proof</a>
         <a href="#judges">Judges</a>
       </div>
       <div class="nav-cta">
-        <button class="theme-toggle" id="theme" aria-label="Switch light or dark theme" title="Theme">◐</button>
-        <a class="btn btn-sm" href="https://github.com/Maheswar-Sah00/bumpgate">GitHub</a>
-        <a class="btn btn-sm btn-accent" href="#install"><span class="long">Add to a repo</span><span class="short">Install</span></a>
+        <button class="icon-btn" id="theme" aria-label="Switch light or dark theme">
+          <svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>
+          <svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.6A8.2 8.2 0 0 1 9.4 4a8.2 8.2 0 1 0 10.6 10.6Z"/></svg>
+        </button>
+        <a class="btn btn-ghost btn-sm hide-sm" href="https://github.com/Maheswar-Sah00/bumpgate">GitHub</a>
+        <a class="btn btn-sm" href="#install">Add to a repo <span class="arr">→</span></a>
       </div>
     </div>
   </nav>
 
   <header class="hero" id="top">
     <div class="wrap">
-      <a class="pill" href="https://www.testmuai.com/kane-cli/"><span class="k">K</span>Verified with <b>Kane CLI</b> · by TestMu AI</a>
-
-      <div class="rotor" aria-label="Dependabot bumps your deps">
-        <span class="rotor-words" id="rotor" aria-hidden="true"><span>Dependabot</span><span class="in">Renovate</span><span class="in">Your bot</span></span>
-        <span>bumps your deps.</span>
+      <div class="eyebrow center">The Kane CLI merge gate for dependency bots</div>
+      <h1 class="display">Verified<br>Dependency Upgrades</h1>
+      <p class="lede">Bumpgate replays your app's critical journeys on every Dependabot and Renovate PR. It merges what still works, and fixes what broke.</p>
+      <div class="cmd" role="group" aria-label="Install">
+        <code><span class="mut">uses:</span> Maheswar-Sah00/bumpgate@main</code>
+        <button class="btn btn-sm" id="copy-hero">Copy workflow <span class="arr">→</span></button>
       </div>
-      <h1 class="mega"><span class="l1">Kane checks</span> <span class="swipe">it still works.</span></h1>
-      <p class="lede">Bumpgate is the <u>merge gate for bot PRs</u>. On every Dependabot or Renovate PR, Kane CLI replays your app's critical journeys in a real browser on <b>main</b> and on <b>the bump</b>. It merges only if nothing broke. If something did, Claude Code migrates the code and Kane proves the fix.</p>
-      <div class="cta-row">
-        <button class="btn btn-accent" id="copy-hero">Copy the workflow →</button>
-        <a class="btn" href="https://github.com/Maheswar-Sah00/bumpgatedemo/pulls?q=is%3Apr+author%3Aapp%2Fdependabot">See it on real Dependabot PRs</a>
-      </div>
-      <div class="cta-note">One file in .github/workflows. Your journeys are plain English.</div>
+      <a class="proof-link" href="https://github.com/Maheswar-Sah00/bumpgatedemo/pulls?q=is%3Apr"><i class="lt g"></i>Live on real Dependabot PRs · 3 merged, 2 fixed by Claude Code <span>↗</span></a>
 
-      <div class="demo" id="demo" aria-label="Animated demo of a Dependabot PR going through Bumpgate">
-        <button class="play" id="play"><span class="orb"></span><span id="play-label">Replay demo</span></button>
-        <div class="demo-bar">
-          <div class="dots"><i></i><i></i><i></i></div>
-          <span class="where">bumpgatedemo · pull request #2</span>
-          <span id="clock">00:00</span>
-        </div>
-        <div class="demo-body">
-          <div class="pr-side">
-            <div class="pr-title">Bump zod from 3.25.76 to 4.6.7 <span class="num">#2</span></div>
-            <div class="pr-meta"><span class="state" id="pr-state">● Open</span><span class="bot">🤖</span> dependabot[bot] wants to merge 1 commit</div>
-            <div class="files"><b>package.json</b> · <b>package-lock.json</b></div>
-            <div>
-              <div class="diffline del">-    "zod": "^3.25.76"</div>
-              <div class="diffline add">+    "zod": "^4.6.7"</div>
+      <!-- product window -->
+      <div class="app" id="app" aria-label="Animated: a Dependabot PR going through Bumpgate">
+        <aside class="app-side">
+          <div class="ws"><span class="ws-ic">B</span><b>bumpgatedemo</b><span class="ws-car">⌄</span></div>
+          <div class="side-lab">Bot pull requests</div>
+          <a class="side-i on"><span class="h">#</span>3 zod 3 → 4<i class="dot r" id="side-dot"></i></a>
+          <a class="side-i"><span class="h">#</span>2 react-query 4 → 5<i class="dot g"></i></a>
+          <a class="side-i"><span class="h">#</span>1 clsx 1 → 2<i class="dot g"></i></a>
+          <div class="side-lab">Journeys <span class="mut">.kane/</span></div>
+          <a class="side-i"><span class="h">›</span>find-and-add</a>
+          <a class="side-i"><span class="h">›</span>checkout-errors</a>
+          <a class="side-i"><span class="h">›</span>buy-valid</a>
+          <div class="side-lab">Agents</div>
+          <a class="side-i"><span class="av-s">K</span>kane-cli</a>
+          <a class="side-i"><span class="av-s">C</span>claude-code</a>
+          <a class="side-i"><span class="av-s">D</span>dependabot</a>
+        </aside>
+        <div class="app-main">
+          <div class="app-top">
+            <span><span class="mut">#3</span> Bump zod from 3.25.76 to 4.6.7</span>
+            <span class="state" id="pr-state">open</span>
+          </div>
+          <div class="thread" id="thread">
+            <div class="msg" data-at="0.2">
+              <span class="av av-d">D</span>
+              <div class="mb">
+                <div class="mh"><b>dependabot</b><span class="tagapp">BOT</span><span class="tm">09:02</span></div>
+                <p>Bumps <code>zod</code> from 3.25.76 to 4.6.7.</p>
+                <div class="ci"><span class="ok">✓</span> CI / build <span class="mut">· passed in 38s</span></div>
+              </div>
             </div>
-            <div class="checks" id="checks">
-              <div class="check" data-at="0.6"><span class="ic ok">✓</span><span>CI / build</span><span class="st">passed · 38s</span></div>
-              <div class="check" data-at="1.2" id="gate-check"><span class="ic run" id="gate-ic"></span><span>Bumpgate / Kane CLI</span><span class="st" id="gate-st">replaying 3 journeys…</span></div>
+
+            <div class="msg" data-at="1.4">
+              <span class="av">B</span>
+              <div class="mb">
+                <div class="mh"><b>Bumpgate</b><span class="tagapp">APP</span><span class="tm">09:03</span></div>
+                <p id="m2-text">CI says it builds. Kane is replaying 3 journeys on <b>main</b> and on <b>this bump</b>…</p>
+                <div class="card">
+                  <div class="card-h"><span>Kane CLI replay</span><span class="mut" id="m2-meta">real browser · localhost:4319</span></div>
+                  <div class="jt">
+                    <div class="jr jh"><span>Journey</span><span>main</span><span>bump</span></div>
+                    <div class="jr"><span>Find a product, add to cart</span><span class="cell" data-k="b0"><i class="lt g"></i>pass</span><span class="cell" data-k="h0"><i class="lt g"></i>pass</span></div>
+                    <div class="jr"><span>Checkout explains what is wrong</span><span class="cell" data-k="b1"><i class="lt g"></i>pass</span><span class="cell" data-k="h1"><i class="lt r"></i><em>broke · step 3</em></span></div>
+                    <div class="jr"><span>Buy with valid details</span><span class="cell" data-k="b2"><i class="lt g"></i>pass</span><span class="cell" data-k="h2"><i class="lt g"></i>pass</span></div>
+                  </div>
+                  <div class="card-f" id="m2-rule"><span class="mut">rule</span> every journey that passes on main must pass on the bump</div>
+                </div>
+              </div>
             </div>
-            <div class="fix" id="fix">
-              <div class="fix-h">🛠️ Claude Code · attempt 1/3 · from Kane's evidence</div>
-              <div class="diffline del">-  result.error.errors.forEach((issue) =&gt; {</div>
-              <div class="diffline add">+  result.error.issues.forEach((issue) =&gt; {</div>
-              <div class="files">src/pages/Checkout.jsx · journeys untouched ✓ · zod kept at 4.6.7 ✓</div>
+
+            <div class="msg" data-at="7.2">
+              <span class="av">B</span>
+              <div class="mb">
+                <div class="mh"><b>Bumpgate</b><span class="tagapp">APP</span><span class="tm">09:07</span></div>
+                <p id="m3-text">The checkout broke, so I blocked the merge. Claude Code migrated it from Kane's evidence, and Kane re-verified every journey.</p>
+                <div class="card">
+                  <div class="card-h"><span>Agent execution</span></div>
+                  <div class="ex" data-at="7.9">
+                    <i class="b"></i>
+                    <div><b>Migrate <code>error.errors</code> → <code>error.issues</code></b><span class="mut">src/pages/Checkout.jsx · claude-code · attempt 1/3</span></div>
+                    <span class="st" id="ex1">status: running</span>
+                  </div>
+                  <div class="ex" data-at="9.2">
+                    <i class="b"></i>
+                    <div><b>Guardrails</b><span class="mut">.kane/ untouched · zod kept at 4.6.7</span></div>
+                    <span class="st done">status: held</span>
+                  </div>
+                  <div class="ex" data-at="10.2">
+                    <i class="b"></i>
+                    <div><b>Kane re-verify</b><span class="mut">3/3 journeys pass on the migrated code</span></div>
+                    <span class="st" id="ex3">status: running</span>
+                  </div>
+                  <div class="card-a">
+                    <a class="btn btn-xs" href="https://github.com/Maheswar-Sah00/bumpgatedemo/pulls?q=is%3Apr">Open PR</a>
+                    <span class="mut" id="m3-foot">auto-merge after re-verify · evidence stays on the PR</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="comment">
-            <div class="cm-head"><span class="av">B</span><b>bumpgate</b> commented</div>
-            <div class="cm-title" id="cm-title">Kane is checking this bump</div>
-            <div class="cm-sub">CI checks that the code builds. <b>Kane CLI checks that the app still works</b>: 3 journeys in a real browser, on main and on this bump.</div>
-            <div class="tbl" id="tbl">
-              <div class="tr"><span>Journey</span><span>main</span><span>this bump</span></div>
-              <div class="tr"><span>Find a product, add to cart</span><span class="cell" data-k="b0"><i class="light g"></i>passed</span><span class="cell" data-k="h0"><i class="light g" data-l></i><em>passed</em></span></div>
-              <div class="tr"><span>Checkout explains what is wrong</span><span class="cell" data-k="b1"><i class="light g"></i>passed</span><span class="cell" data-k="h1"><i class="light r" data-l></i><em>broke · step 3</em></span></div>
-              <div class="tr"><span>Buy with valid details</span><span class="cell" data-k="b2"><i class="light g"></i>passed</span><span class="cell" data-k="h2"><i class="light g" data-l></i><em>passed</em></span></div>
-            </div>
-            <div class="rule" id="rule-line"><b>The rule (code, not a prompt):</b> every journey that passes on main must pass on the bump.</div>
-            <div class="term" id="term" aria-live="polite"></div>
+          <div class="composer">
+            <span class="mut">Comment on #3…</span>
+            <button class="send" id="replay" aria-label="Replay the demo" title="Replay">↻</button>
           </div>
         </div>
       </div>
     </div>
   </header>
 
-  <section class="blk" id="problem">
+  <section class="strip">
     <div class="wrap">
-      <div class="tag reveal"><b>01</b> The problem</div>
-      <h2 class="big reveal">CI passed. The checkout <span class="script">didn't.</span></h2>
-      <div class="points">
-        <div>
-          <div class="point reveal"><span class="n">01</span><p><b>Bots open dependency PRs every week.</b> Most are harmless, so teams merge them on a green tick, or turn on auto-merge.</p></div>
-          <div class="point reveal"><span class="n">02</span><p><b>CI proves the code builds. It never clicks the button.</b> A plain-JS shop on zod 4 builds fine, then silently stops showing checkout errors: <code>error.errors</code> is gone.</p></div>
-          <div class="point reveal"><span class="n">03</span><p><b>A user finds it. A maintainer reverts it.</b> These bot bumps all had green CI and were reverted by hand →</p></div>
+      <div class="eyebrow center">Built on</div>
+      <div class="marks">
+        <span class="mk mk-kane">KANE<b>CLI</b><small>TestMu AI</small></span>
+        <span class="mk mk-claude">✳ Claude Code</span>
+        <span class="mk mk-gh">GitHub Actions</span>
+        <span class="mk mk-dep">dependabot · renovate</span>
+      </div>
+      <div class="eyebrow center gap">Reverted by hand, after green CI</div>
+      <div class="reverts" id="reverts"></div>
+      <p class="fine center">Real bot PRs from public GitHub repos. Each one passed CI, merged, and a human reverted it.</p>
+    </div>
+  </section>
+
+  <section class="sec" id="loop">
+    <div class="wrap">
+      <h2 class="h2 center">Bumpgate turns bot PRs<br>into verified merges</h2>
+      <p class="sub center">A gate on every bot PR, every week. The model proposes, code decides.</p>
+
+      <div class="tl">
+        <div class="tl-row reveal">
+          <div class="tl-txt">
+            <div class="tl-n"><i></i>01 /</div>
+            <h3>Replay every journey</h3>
+            <p>Bumpgate builds main and the bump side by side. Kane CLI replays your plain-English journeys in a real browser on both, with screenshots, console and network for every step.</p>
+          </div>
+          <div class="panel">
+            <div class="p-h"><b>Replay journeys on main and the bump</b><span class="mut">3 journeys · recorded once on main</span></div>
+            <div class="pr">
+              <span class="pr-ic">⬆</span>
+              <div><b>Bump zod from 3.25.76 to 4.6.7</b><span class="mut">dependabot · npm_and_yarn · package.json</span></div>
+              <span class="pill">MAJOR</span>
+            </div>
+            <div class="kv"><span>CI build ✓</span><span>2 worktrees</span><span>port :4319</span><span>Kane 0.10.7</span></div>
+            <div class="p-lab">Evidence captured</div>
+            <div class="chips">
+              <span>▢ Screenshots</span><span>⌁ Console</span><span>⇅ Network</span>
+              <span>“Add to cart”</span><span>“Place order”</span><span>“See the errors”</span>
+              <span>Failed step</span><span>Bug verdict</span><span>Self-heal flag</span>
+            </div>
+          </div>
         </div>
-        <div class="reverts reveal" id="reverts"></div>
+
+        <div class="tl-row reveal">
+          <div class="tl-txt">
+            <div class="tl-n"><i></i>02 /</div>
+            <h3>Code decides</h3>
+            <p>No model votes on the merge. Every journey that passes on main must pass on the bump. Disagreements re-run until two of three agree; if Kane can't run, nothing merges.</p>
+          </div>
+          <div class="panel">
+            <div class="p-h"><b>The rule, in code</b><span class="mut">src/gate.mjs · 35 unit tests</span></div>
+            <div class="p-sub">zod 4.6.7 changed what the app does</div>
+            <div class="nums">
+              <div><span class="mut">Pass on main</span><b>3/3</b><span class="mut">base a743b37</span></div>
+              <div><span class="mut">Pass on bump</span><b class="red">2/3</b><span class="mut">confirmed 2/2</span></div>
+              <div><span class="mut">New console error</span><b class="red">+1</b><span class="mut">TypeError · forEach</span></div>
+            </div>
+            <div class="p-lab">Three lights</div>
+            <div class="rows">
+              <div><span><i class="lt g"></i>Green · nothing broke, no heal</span><span class="tag">auto-merge</span></div>
+              <div><span><i class="lt a"></i>Amber · passed after a self-heal</span><span class="tag">one look</span></div>
+              <div><span><i class="lt r"></i>Red · a journey broke</span><span class="tag red">blocked</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tl-row reveal">
+          <div class="tl-txt">
+            <div class="tl-n"><i></i>03 /</div>
+            <h3>Fix until verified</h3>
+            <p>On red, Claude Code gets Kane's failed step, screenshot, console errors and the release notes. Code checks its diff, Kane re-runs every journey. Three tries, then a human.</p>
+          </div>
+          <div class="panel">
+            <div class="p-h"><b>Migrate, then prove it</b><span class="mut">blocked bump · fix loop</span></div>
+            <div class="p-sub">Claude Code, attempt 1 of 3</div>
+            <div class="rows">
+              <div><span>Read Kane's evidence pack</span><span class="tag">complete</span></div>
+              <div><span>Apply zod 4 release notes</span><span class="tag">complete</span></div>
+              <div><span>Guardrails: journeys untouched, bump kept</span><span class="tag">complete</span></div>
+            </div>
+            <div class="p-sub sp">Re-verify and merge</div>
+            <div class="rows">
+              <div><span>Kane replays 3/3 on the migrated code</span><span class="tag">complete</span></div>
+              <div><span>Commit status on the verified commit</span><span class="tag">complete</span></div>
+              <div><span>Auto-merge</span><span class="tag ink">merged</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tl-end reveal">
+          <div>
+            <h3>Loop closed, evidence kept</h3>
+            <p>The verdict, both screenshots and Kane's own bug title stay on the PR, so a reviewer can check it in seconds.</p>
+          </div>
+          <div class="out">
+            <div class="out-c">
+              <div class="p-lab">Outcome</div>
+              <div class="pr sm"><span class="pr-ic">✓</span><div><b>bumpgatedemo #3</b><span class="mut">zod 4.6.7 · migrated</span></div></div>
+              <div class="mut s">no human needed · 1 attempt</div>
+            </div>
+            <span class="out-arr">→</span>
+            <div class="out-c">
+              <div class="p-lab">On the PR</div>
+              <div class="mono-s">base vs bump screenshots</div>
+              <div class="mono-s">Kane bug verdict</div>
+              <div class="mono-s">verified commit status</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="blk" id="how">
+  <section class="sec" id="rule">
     <div class="wrap">
-      <div class="tag reveal"><b>02</b> How it works</div>
-      <h2 class="big reveal">On every bot PR, <span class="script">every week.</span></h2>
-      <div class="steps-head"><span id="step-of">01 / 04</span><span class="bar"><i id="step-bar" style="width:25%"></i></span><span id="step-name">Build</span></div>
-      <div class="steps" id="steps">
-        <div class="step on" data-name="Build"><div class="bd"><div class="num">01</div><h3>Build both sides</h3><p>Checks out main and the bump side by side as git worktrees, installs and builds each. Journeys and config are read from main, so a PR can't edit its own exam.</p></div>
-          <div class="term"><span class="d">▸</span> Checking out base a743b37 and bump 07449b0<br><span class="d">  </span>Bump: zod 3.25.76 → 4.6.7<br><span class="g">✓</span> base built in 14s<br><span class="g">✓</span> bump built in 16s</div></div>
-        <div class="step" data-name="Replay"><div class="bd"><div class="num">02</div><h3>Kane replays</h3><p>Kane CLI replays your plain-English journeys in a real browser on each build, on the same port. Recorded once on main, replayed with <code>--override-start-url --local</code>.</p></div>
-          <div class="term"><span class="y">▸</span> Kane on base (localhost:4319)<br><span class="g">✓</span> base · Checkout explains what is wrong<br><span class="y">▸</span> Kane on bump (localhost:4319)<br><span class="r">✗</span> bump · failed at "See the errors"</div></div>
-        <div class="step" data-name="Decide"><div class="bd"><div class="num">03</div><h3>Code decides</h3><p>One rule, in code. Disagreements re-run until two of three agree. If Kane can't run, nothing merges. A journey already broken on main can't block.</p></div>
-          <div class="term"><span class="y">▸</span> Confirming 1 disagreement (round 2/3)<br><span class="r">✗</span> bump · failed at "See the errors"<br><span class="r">● red</span> Passes on base, fails on the bump.<br><span class="r">🔴 1 journey broke · merge blocked</span></div></div>
-        <div class="step" data-name="Fix"><div class="bd"><div class="num">04</div><h3>Agent fixes, Kane proves</h3><p>Claude Code gets Kane's failed step, screenshot, console errors and the release notes. Code checks its diff. Kane re-runs everything. Three tries, then a human.</p></div>
-          <div class="term"><span class="y">▸</span> Claude Code, attempt 1/3<br><span class="g">✓</span> changed src/pages/Checkout.jsx<br><span class="g">✓</span> Kane re-verified: 3/3 journeys pass<br><span class="g">🟢 auto-merge enabled</span></div></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="blk" id="rule">
-    <div class="wrap">
-      <div class="tag reveal"><b>03</b> The rule</div>
-      <h2 class="big reveal">The agent proposes. <span class="script">Code decides.</span></h2>
-      <p class="intro reveal">No model votes on the merge. Kane observes, a few lines of code decide, a maintainer can always override. Three lights, three actions.</p>
-      <div class="rule-grid">
-        <pre class="code reveal"><span class="c">// src/gate.mjs: the whole merge decision</span>
+      <h2 class="h2 center">The agent proposes.<br>Code decides.</h2>
+      <p class="sub center">The whole merge decision is a few lines you can read. A maintainer can always override.</p>
+      <div class="rule-grid reveal">
+        <div class="win">
+          <div class="win-h"><i></i><i></i><i></i><span>src/gate.mjs</span></div>
+<pre class="code"><span class="c">// the whole merge decision</span>
 <span class="k">const</span> comparable = rows.filter(r =&gt; majority(r.base) === <span class="s">'pass'</span>);
 <span class="k">const</span> everyBasePassStillPasses = comparable.every(
   r =&gt; [<span class="s">'green'</span>, <span class="s">'amber'</span>].includes(decideJourney(r).light));
 
 <span class="c">// fail closed: no comparison, no merge</span>
-<span class="k">if</span> (comparable.length === 0) <span class="k">return</span> <span class="s">'hold'</span>;
+<span class="k">if</span> (comparable.length === <span class="s">0</span>) <span class="k">return</span> <span class="s">'hold'</span>;
 
 <span class="c">// the fix agent can't touch the exam or undo the bump</span>
 guardrails({ files, journeysDir: <span class="s">'.kane'</span>, bumps, headPkg, newPkg });</pre>
-        <div class="lights">
-          <div class="lt g reveal"><span class="bulb"></span><div><h4>Green · merge</h4><p>Every journey that passes on main passes on the bump, with no heal and no new console errors. Auto-merge is enabled.</p></div></div>
-          <div class="lt a reveal"><span class="bulb"></span><div><h4>Amber · one look</h4><p>It works, but Kane had to self-heal a step (the UI moved), or new console errors appeared. A human glances, then merges.</p></div></div>
-          <div class="lt r reveal"><span class="bulb"></span><div><h4>Red · block, then fix</h4><p>A journey broke. Merge blocked. Claude Code migrates from Kane's evidence; Kane re-verifies; after 3 tries it's labelled <code>needs-human</code>.</p></div></div>
+        </div>
+        <div class="facts">
+          <div><b>Fail closed</b><p>If Kane can't run a journey, nothing merges.</p></div>
+          <div><b>Base-only exam</b><p>Journeys and config are read from main, so a PR can't edit its own exam.</p></div>
+          <div><b>Two of three</b><p>A disagreeing run is repeated until two of three agree.</p></div>
+          <div><b>Already broken?</b><p>A journey that fails on main can't block a bump.</p></div>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="blk" id="proof">
+  <section class="sec" id="proof">
     <div class="wrap">
-      <div class="tag reveal"><b>04</b> Proof</div>
-      <h2 class="big reveal">Every verdict arrives with <span class="script">evidence.</span></h2>
-      <p class="intro reveal" id="proof-intro">Real library upgrades, real Kane runs. Every number links to Kane's own sealed evidence pack.</p>
-      <div class="headline reveal" id="stats"></div>
+      <h2 class="h2 center">Every verdict arrives<br>with evidence</h2>
+      <p class="sub center" id="proof-intro">Real Dependabot PRs, real Kane runs, real migrations.</p>
+      <div class="stats reveal" id="stats"></div>
       <div class="cases" id="cases"></div>
-    </div>
-  </section>
 
-  <section class="blk" id="why">
-    <div class="wrap">
-      <div class="tag reveal"><b>05</b> Why only Kane</div>
-      <h2 class="big reveal">A selector script breaks on the <span class="script">churn.</span></h2>
-      <div class="vs reveal">
-        <div><h4>A recorded Playwright test</h4><p>Breaks when a UI-kit major renames classes and wraps buttons, even when the shop works. So teams skip it on bot PRs, or it cries wolf and gets ignored.</p>
-          <ul><li>Selectors tied to today's DOM</li><li>Someone writes and maintains the code</li><li>Pass or fail, nothing in between</li></ul></div>
-        <div><h4>A Kane CLI journey</h4><p>Plain English like "Click Place order, verify the errors are shown". It survives cosmetic churn and fails on broken behaviour. When it only passes after a self-heal, that's the amber light.</p>
-          <ul><li>Written in English, kept in <code>.kane/*_test.md</code></li><li>Recorded once, replayed cheaply on every PR</li><li>A sealed evidence pack for every run</li></ul></div>
-      </div>
-      <div class="flags">
-        <div class="flag reveal"><code>--override-start-url</code><p>The same journey runs against each PR build on localhost.</p></div>
-        <div class="flag reveal"><code>--local</code><p>CI replays never write back to Test Manager, so a heal on the bump can't rewrite main's recording.</p></div>
-        <div class="flag reveal"><code>test_md_adaptive_heal</code><p>Kane tells us when a replay only passed after healing: the amber light.</p></div>
-        <div class="flag reveal"><code>test_md_bug_verdict</code><p>Kane's own bug title and severity land in the PR comment.</p></div>
-        <div class="flag reveal"><code>.evidence</code><p>Screenshots, console and network for each step. The fix agent reads them; the PR shows the base and bump screenshots side by side.</p></div>
+      <div class="why reveal">
+        <div class="why-h">
+          <div class="eyebrow">Why this only works on Kane CLI</div>
+          <p>A recorded selector script breaks when a UI kit renames classes, even when the shop works, so teams skip it on bot PRs. A Kane journey is plain English. It survives cosmetic churn and fails on broken behaviour.</p>
+        </div>
+        <div class="flags">
+          <div><code>--override-start-url</code><p>The same journey runs against each PR build on localhost.</p></div>
+          <div><code>--local</code><p>A heal on the bump can't rewrite main's recording.</p></div>
+          <div><code>test_md_adaptive_heal</code><p>Passed only after a self-heal: the amber light.</p></div>
+          <div><code>.evidence</code><p>Screenshots, console and network for the fix agent and the reviewer.</p></div>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="blk" id="judges">
+  <section class="sec" id="surfaces">
     <div class="wrap">
-      <div class="tag reveal"><b>06</b> Judges: start here</div>
-      <h2 class="big reveal">Check it in <span class="script">five minutes.</span></h2>
+      <h2 class="h2 center">Meets you where you merge</h2>
+      <p class="sub center">On the PR, in your terminal, in CI. Pick whichever fits the day.</p>
+      <div class="surf">
+        <div class="sf reveal">
+          <div class="sf-top"><span class="sf-ic">◎</span><code>bumpgate commented on #3</code></div>
+          <div class="sf-body">
+            <div class="sfl"><b class="green"><i class="lt g"></i> Fixed and re-verified</b></div>
+            <div class="sfl mut">Checkout explains what is wrong</div>
+            <div class="sfl"><span class="mut">main</span> pass · <span class="mut">bump</span> pass after fix</div>
+            <div class="sfl mut">Claude Code · 1 attempt · journeys untouched</div>
+          </div>
+          <div class="sf-f"><b>Pull request</b><span>The verdict, screenshots and fix land as a comment.</span></div>
+        </div>
+        <div class="sf reveal">
+          <div class="sf-top"><span class="sf-ic">$</span><code>bumpgate check --fix</code></div>
+          <div class="sf-body term">
+            <div><span class="mut">▸</span> zod 3.25.76 → 4.6.7</div>
+            <div><span class="ok">✓</span> base · 3/3 journeys</div>
+            <div><span class="red">✗</span> bump · “See the errors”</div>
+            <div><span class="ok">✓</span> fixed · Kane 3/3</div>
+          </div>
+          <div class="sf-f"><b>CLI</b><span>Run the same gate locally against any bump branch.</span></div>
+        </div>
+        <div class="sf reveal">
+          <div class="sf-top"><span class="sf-ic">⚙</span><code>.github/workflows/bumpgate.yml</code></div>
+          <div class="sf-body term">
+            <div><span class="mut">- uses:</span> Maheswar-Sah00/bumpgate@main</div>
+            <div><span class="mut">  with:</span></div>
+            <div><span class="mut">    lt-username:</span> ${{ secrets… }}</div>
+            <div><span class="mut">    agent:</span> claude</div>
+          </div>
+          <div class="sf-f"><b>GitHub Action</b><span>One file. Runs only on Dependabot and Renovate PRs.</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="judges">
+    <div class="wrap">
+      <h2 class="h2 center">Judges: start here</h2>
+      <p class="sub center">Check it in five minutes, no sign-up.</p>
       <div class="judge">
-        <a class="jcard reveal" href="https://github.com/Maheswar-Sah00/bumpgatedemo/pulls?q=is%3Apr"><div class="t">1 · two minutes</div><h4>Real Dependabot PRs</h4><p>A shop with real bot PRs: one blocked then migrated by Claude Code and merged, one green auto-merge. Read Bumpgate's comments.</p></a>
-        <a class="jcard reveal" href="https://github.com/Maheswar-Sah00/bumpgate/blob/main/src/gate.mjs"><div class="t">2 · one minute</div><h4>Read the rule</h4><p>The merge decision is ~40 lines of plain code with 35+ unit tests. No prompt decides a merge.</p></a>
-        <a class="jcard reveal" href="https://github.com/Maheswar-Sah00/bumpgate#judges-start-here"><div class="t">3 · two minutes</div><h4>Run it yourself</h4><p>Clone the demo, then <code>npx github:Maheswar-Sah00/bumpgate check</code> against a bump branch. Kane does the rest.</p></a>
+        <a class="jc reveal" href="https://github.com/Maheswar-Sah00/bumpgatedemo/pulls?q=is%3Apr"><span class="t">01 · 2 min</span><b>Real Dependabot PRs</b><p>A shop with real bot PRs: two blocked, migrated by Claude Code and merged; one green auto-merge.</p><span class="go">Open PRs ↗</span></a>
+        <a class="jc reveal" href="https://github.com/Maheswar-Sah00/bumpgate/blob/main/src/gate.mjs"><span class="t">02 · 1 min</span><b>Read the rule</b><p>The merge decision is plain code with unit tests. No prompt decides a merge.</p><span class="go">src/gate.mjs ↗</span></a>
+        <a class="jc reveal" href="https://github.com/Maheswar-Sah00/bumpgate#run-it-yourself"><span class="t">03 · 2 min</span><b>Run it yourself</b><p>Clone the demo, then run <code>bumpgate check</code> against a bump branch.</p><span class="go">README ↗</span></a>
       </div>
-      <div class="install reveal" id="install">
-        <button class="btn btn-sm btn-accent copy" id="copy-yaml">Copy</button>
+
+      <div class="win install reveal" id="install">
+        <div class="win-h"><i></i><i></i><i></i><span>.github/workflows/bumpgate.yml</span><button class="btn btn-xs" id="copy-yaml">Copy</button></div>
 <pre class="code" id="yaml"># .github/workflows/bumpgate.yml
 name: Bumpgate
 on:
   pull_request:
-    types: [opened, synchronize, reopened, labeled]
-permissions: { contents: write, pull-requests: write, issues: write }
+    types: [opened, synchronize, reopened]
+permissions: { contents: write, pull-requests: write, issues: write, statuses: write }
+concurrency: { group: "bumpgate-${{ github.event.pull_request.number }}", cancel-in-progress: true }
 jobs:
   gate:
     if: github.event.pull_request.user.login == 'dependabot[bot]' || github.event.pull_request.user.login == 'renovate[bot]'
@@ -217,16 +375,33 @@ jobs:
         with:
           lt-username: ${{ secrets.LT_USERNAME }}
           lt-access-key: ${{ secrets.LT_ACCESS_KEY }}
-          openai-api-key: ${{ secrets.OPENAI_API_KEY }}</pre>
+          anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}</pre>
+      </div>
+      <p class="fine center">Dependabot PRs read only Dependabot secrets: add them under Settings → Secrets → Dependabot.</p>
+    </div>
+  </section>
+
+  <section class="final">
+    <div class="wrap center">
+      <div class="eyebrow">Every Dependabot PR · every week</div>
+      <h2 class="display sm">Every bump,<br>verified.</h2>
+      <div class="final-cta">
+        <a class="btn" href="#install">Add to a repo <span class="arr">→</span></a>
+        <a class="btn btn-ghost" href="https://github.com/Maheswar-Sah00/bumpgate">Star on GitHub</a>
       </div>
     </div>
   </section>
 
-  <div class="stripe" aria-hidden="true"></div>
-  <footer>
-    <div class="wrap">
-      <span>Bumpgate · built for the Kane CLI Hackathon by TestMu AI, supported by OpenAI. MIT licensed.</span>
-      <span><a href="https://github.com/Maheswar-Sah00/bumpgate">GitHub</a> · <a href="https://www.testmuai.com/kane-cli/">Kane CLI</a></span>
+  <footer class="foot">
+    <div class="wrap foot-in">
+      <div class="foot-mark">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" class="lg-bg"/><rect x="8" y="7" width="3.5" height="18" rx="1" class="lg-fg"/><rect x="11.5" y="10" width="13" height="5" rx="1" class="lg-fg"/></svg>
+        <div><b>Bumpgate</b><span>Every bump, verified.</span></div>
+      </div>
+      <div class="foot-r">
+        <span>Built for the Kane CLI Hackathon by TestMu AI · MIT</span>
+        <span><a href="https://github.com/Maheswar-Sah00/bumpgate">GitHub</a><a href="https://www.testmuai.com/kane-cli/">Kane CLI</a></span>
+      </div>
     </div>
   </footer>
   <script src="app.js"></script>

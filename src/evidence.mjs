@@ -4,7 +4,8 @@ import { openZip } from './zip.mjs';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 
-const IGNORED_URLS = /favicon\.ico|\/__vite_ping|hot-update|sockjs-node|\/@vite\/client|google-analytics|googletagmanager|doubleclick|hotjar|sentry\.io/i;
+const STATIC_ASSET = /\.(png|jpe?g|gif|webp|avif|svg|ico|bmp|pbf|mvt|woff2?|ttf|otf|eot|mp4|webm)(\?|#|$)|\/(tiles?|MapServer\/tile)\//i;
+const IGNORED_URLS =/favicon\.ico|\/__vite_ping|hot-update|sockjs-node|\/@vite\/client|google-analytics|googletagmanager|doubleclick|hotjar|sentry\.io/i;
 
 export function readPack(packPath) {
   const zip = openZip(packPath);
@@ -37,6 +38,10 @@ export function readPack(packPath) {
         for (const e of har?.log?.entries || []) {
           const status = e?.response?.status;
           const url = e?.request?.url || '';
+          // Status 0 on an image, tile or font is a load the page cancelled (the map moved, the view
+          // changed), not a failure of the app. A failed API call still counts.
+          const staticAsset = STATIC_ASSET.test(url) || /^(image|font|media)$/i.test(e?._resourceType || '');
+          if (status === 0 && staticAsset) continue;
           if ((status >= 400 || status === 0) && !IGNORED_URLS.test(url) && !/^data:/.test(url)) {
             networkErrors.push({ status, method: e?.request?.method || 'GET', url: url.slice(0, 300) });
           }
@@ -55,7 +60,13 @@ export function readPack(packPath) {
   steps.sort((a, b) => a.ordinal - b.ordinal);
 
   // Kane 0.10 writes steps/<ordinal>-<id>/screenshot.jpg; accept png too, and sort by ordinal, not as text.
-  const failureNames = names.filter((n) => /\/steps\/\d+-[^/]+\/failure\.yaml$/.test(n)).sort(byOrdinal);
+  // A replay that tried to heal also holds sub-runs (tests/<t>/<n>/steps/...): prefer the main run,
+  // which is what was replayed, and fall back to the sub-runs only when the main run has nothing.
+  const mainRun = (list) => {
+    const main = list.filter((n) => /^tests\/[^/]+\/steps\//.test(n));
+    return main.length ? main : list;
+  };
+  const failureNames = mainRun(names.filter((n) => /\/steps\/\d+-[^/]+\/failure\.yaml$/.test(n))).sort(byOrdinal);
   const runFailure = zip.has('failure.yaml') ? zip.text('failure.yaml') : null;
   if (failureNames.length) {
     const fn = failureNames[0];
@@ -68,7 +79,7 @@ export function readPack(packPath) {
     failure = { entry: 'failure.yaml', text: runFailure.slice(0, 4000), screenshot: null };
   }
 
-  const shots = names.filter((n) => /\/steps\/\d+-[^/]+\/screenshot\.(png|jpe?g)$/i.test(n)).sort(byOrdinal);
+  const shots = mainRun(names.filter((n) => /\/steps\/\d+-[^/]+\/screenshot\.(png|jpe?g)$/i.test(n))).sort(byOrdinal);
   const status = packStatus(zip, names);
 
   return {

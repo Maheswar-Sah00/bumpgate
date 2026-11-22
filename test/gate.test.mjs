@@ -106,3 +106,28 @@ test('pickFailure prefers confirmed, then severity, then confidence, then latest
   const a = { status: 'failed', reason: 'a' }; const b = { status: 'failed', reason: 'b' };
   assert.equal(pickFailure([a, b]).reason, 'b');
 });
+
+test('netKey compares requests by shape (tiles, ids, hashes), keeping status and path', async () => {
+  const { netKey } = await import('../src/gate.mjs');
+  const a = netKey({ status: 0, url: 'https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/MapServer/tile/11/758/972' });
+  const b = netKey({ status: 0, url: 'https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/MapServer/tile/11/755/974?x=1' });
+  assert.equal(a, b);
+  assert.equal(netKey({ status: 0, url: 'https://tilecache.rainviewer.com/v2/radar/a0fb13aa059a/256/7/60/47/2/0_0.png' }),
+    netKey({ status: 0, url: 'https://tilecache.rainviewer.com/v2/radar/e3a5e01ab93c/256/7/61/46/2/0_0.png' }));
+  assert.notEqual(netKey({ status: 500, url: 'http://host/api/cart' }), netKey({ status: 404, url: 'http://host/api/cart' }));
+  assert.notEqual(netKey({ status: 500, url: 'http://host/api/cart' }), netKey({ status: 500, url: 'http://host/api/orders' }));
+});
+
+test('drift must repeat: one flaky request triggers a confirmation run and only counts if it recurs', async () => {
+  const { needsConfirmation, decideJourney } = await import('../src/gate.mjs');
+  const base = [{ status: 'passed', networkErrors: [] }];
+  const flake = { status: 'passed', networkErrors: [{ status: 0, method: 'GET', url: 'https://api.example.com/marine' }] };
+  const clean = { status: 'passed', networkErrors: [] };
+  assert.equal(needsConfirmation({ base, bump: [flake] }), 'bump');
+  assert.equal(decideJourney({ base, bump: [flake, clean] }).light, 'green');
+  assert.equal(decideJourney({ base, bump: [flake, { ...flake }] }).light, 'amber');
+  assert.equal(needsConfirmation({ base, bump: [flake, clean] }), null);
+  const healed = { status: 'passed', healed: true, networkErrors: [] };
+  assert.equal(needsConfirmation({ base, bump: [healed] }), null);
+  assert.equal(decideJourney({ base, bump: [healed] }).light, 'amber');
+});

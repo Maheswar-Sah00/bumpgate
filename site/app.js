@@ -1,132 +1,104 @@
-// Bumpgate site: theme, rotor, demo timeline, step carousel, scroll reveals, data-driven proof.
+// Bumpgate site: theme (circular reveal), product-window timeline, reveals, data-driven proof.
 (() => {
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const root = document.documentElement;
 
-  // theme
-  $('#theme')?.addEventListener('click', () => {
-    const root = document.documentElement;
-    const next = root.dataset.theme === 'light' ? 'dark' : 'light';
-    root.dataset.theme = next;
-    try { localStorage.setItem('bg-theme', next); } catch (e) { /* private mode */ }
+  // nav border on scroll
+  const nav = $('#nav');
+  const onScroll = () => nav.classList.toggle('scrolled', scrollY > 8);
+  addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+  // theme with circular reveal
+  const isDark = () => root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  $('#theme')?.addEventListener('click', (e) => {
+    const next = isDark() ? 'light' : 'dark';
+    const apply = () => { root.dataset.theme = next; try { localStorage.setItem('bg-theme', next); } catch (err) { /* private mode */ } };
+    if (!document.startViewTransition || reduce) return apply();
+    const r = e.currentTarget.getBoundingClientRect();
+    const x = r.left + r.width / 2, y = r.top + r.height / 2;
+    const end = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+    document.startViewTransition(apply).ready.then(() => {
+      root.animate({ clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${end}px at ${x}px ${y}px)`] },
+        { duration: 650, easing: 'cubic-bezier(.7,0,.2,1)', pseudoElement: '::view-transition-new(root)' });
+    });
   });
-
-  // rotor
-  const rotor = $('#rotor');
-  if (rotor && !reduce) {
-    const words = $$('span', rotor);
-    let i = 0;
-    setInterval(() => {
-      const cur = words[i];
-      const nxt = words[(i + 1) % words.length];
-      cur.className = 'out';
-      nxt.className = '';
-      setTimeout(() => { cur.className = 'in'; }, 650);
-      i = (i + 1) % words.length;
-    }, 2400);
-  }
 
   // copy
   const yaml = $('#yaml')?.textContent || '';
   const copy = async (btn) => {
-    try { await navigator.clipboard.writeText(yaml); const t = btn.textContent; btn.textContent = 'Copied ✓'; setTimeout(() => { btn.textContent = t; }, 1600); }
-    catch (e) { location.hash = '#install'; }
+    const label = btn.innerHTML;
+    try { await navigator.clipboard.writeText(yaml); btn.textContent = 'Copied ✓'; setTimeout(() => { btn.innerHTML = label; }, 1600); }
+    catch (err) { location.hash = '#install'; }
   };
   $('#copy-yaml')?.addEventListener('click', (e) => copy(e.currentTarget));
   $('#copy-hero')?.addEventListener('click', (e) => copy(e.currentTarget));
 
-  // demo timeline
-  const term = $('#term');
-  const lines = [];
-  const say = (html) => { lines.push(html); term.innerHTML = lines.slice(-6).join('<br>'); };
+  // product window timeline
   const timers = [];
-  let t0 = 0;
+  const at = (s, fn) => timers.push(setTimeout(fn, s * 1000));
+  const set = (sel, cls, txt) => { const el = $(sel); if (!el) return; if (cls != null) el.className = cls; if (txt != null) el.textContent = txt; };
   function reset() {
     timers.splice(0).forEach(clearTimeout);
-    lines.length = 0;
-    term.innerHTML = '';
-    $$('.check').forEach((c) => c.classList.remove('on'));
-    $$('.cell').forEach((c) => c.classList.remove('on'));
-    $('#gate-ic').className = 'ic run'; $('#gate-ic').textContent = '';
-    $('#gate-st').textContent = 'replaying 3 journeys…';
-    $('#pr-state').className = 'state'; $('#pr-state').textContent = '● Open';
-    $('#cm-title').className = 'cm-title'; $('#cm-title').textContent = 'Kane is checking this bump';
-    $('#fix').classList.remove('on');
+    $$('#thread .msg, #thread .ex').forEach((m) => m.classList.remove('on'));
+    $$('#thread .cell').forEach((c) => c.classList.remove('on', 'fixed'));
     const h1 = $('[data-k="h1"]');
-    h1.querySelector('i').className = 'light r';
-    h1.querySelector('em').textContent = 'broke · step 3';
-    $('#rule-line').innerHTML = '<b>The rule (code, not a prompt):</b> every journey that passes on main must pass on the bump.';
+    h1.querySelector('i').className = 'lt r'; h1.querySelector('em').textContent = 'broke · step 3';
+    set('#pr-state', 'state', 'open');
+    set('#side-dot', 'dot');
+    set('#ex1', 'st', 'status: running');
+    set('#ex3', 'st', 'status: running');
+    $('#m2-text').innerHTML = 'CI says it builds. Kane is replaying 3 journeys on <b>main</b> and on <b>this bump</b>…';
+    $('#m2-rule').innerHTML = '<span class="mut">rule</span> every journey that passes on main must pass on the bump';
+    set('#m3-foot', null, 'auto-merge after re-verify · evidence stays on the PR');
+    set('#m3-text', null, "The checkout broke, so I blocked the merge. Claude Code is migrating it from Kane's evidence…");
   }
-  const at = (s, fn) => timers.push(setTimeout(fn, s * 1000));
+  function finalState() {
+    $$('#thread .msg, #thread .ex, #thread .cell').forEach((m) => m.classList.add('on'));
+    blocked(); fixed();
+  }
+  function blocked() {
+    set('#pr-state', 'state blocked', 'merge blocked');
+    set('#side-dot', 'dot r');
+    $('#m2-text').innerHTML = 'CI says it builds. <b>Kane says the checkout broke.</b> Errors never appear after “Place order”.';
+    $('#m2-rule').innerHTML = '<span class="mut">rule</span> every journey that passes on main must pass on the bump → <b class="red">1 broke · blocked</b>';
+  }
+  function fixed() {
+    const h1 = $('[data-k="h1"]');
+    h1.classList.add('fixed'); h1.querySelector('i').className = 'lt g'; h1.querySelector('em').textContent = 'pass after fix';
+    set('#ex1', 'st done', 'status: done');
+    set('#ex3', 'st pass', 'status: 3/3 pass');
+    set('#pr-state', 'state merged', 'merged');
+    set('#side-dot', 'dot g');
+    $('#m2-rule').innerHTML = '<span class="mut">rule</span> every journey that passes on main must pass on the bump → <b class="green">3/3 · merged</b>';
+    set('#m3-foot', null, 'auto-merged · no human needed · evidence kept');
+    set('#m3-text', null, "The checkout broke, so I blocked the merge. Claude Code migrated it from Kane's evidence, and Kane re-verified every journey.");
+  }
   function play() {
     reset();
-    t0 = performance.now();
-    $$('.check').forEach((c) => at(Number(c.dataset.at), () => c.classList.add('on')));
-    at(1.6, () => say('<span class="y">▸</span> Building main and the bump <span class="d">(npm ci · vite build)</span>'));
-    at(2.6, () => say('<span class="y">▸</span> Kane on main · <span class="d">localhost:4319</span>'));
-    ['b0', 'b1', 'b2'].forEach((k, i) => at(3.0 + i * 0.45, () => $(`[data-k="${k}"]`).classList.add('on')));
-    at(4.4, () => say('<span class="g">✓</span> main · 3/3 journeys passed'));
-    at(4.9, () => say('<span class="y">▸</span> Kane on the bump'));
-    at(5.4, () => $('[data-k="h0"]').classList.add('on'));
-    at(6.0, () => { $('[data-k="h1"]').classList.add('on'); say('<span class="r">✗</span> "See the errors": clicking Place order shows no messages'); });
-    at(6.5, () => $('[data-k="h2"]').classList.add('on'));
-    at(7.0, () => say('<span class="r">console</span> <span class="d">TypeError: Cannot read properties of undefined (reading \'forEach\')</span>'));
-    at(7.8, () => {
-      $('#cm-title').className = 'cm-title red'; $('#cm-title').textContent = '🔴 Blocked: the app broke on this bump';
-      $('#gate-ic').className = 'ic bad'; $('#gate-ic').textContent = '✕'; $('#gate-st').textContent = '1 journey broke';
-      $('#pr-state').className = 'state blocked'; $('#pr-state').textContent = '● Merge blocked';
-      $('#rule-line').innerHTML = '<b>The rule:</b> every journey that passes on main must pass on the bump → <b style="color:var(--red)">❌ 1 broke. Merge blocked.</b>';
-    });
-    at(9.0, () => { $('#fix').classList.add('on'); say('<span class="y">▸</span> Claude Code, attempt 1/3: Kane\'s evidence + zod 4 release notes'); });
-    at(10.6, () => say('<span class="g">✓</span> guardrails: .kane/ untouched, zod kept at 4.6.7'));
-    at(11.3, () => { say('<span class="y">▸</span> Kane re-runs all 3 journeys on the migrated code'); $('#gate-ic').className = 'ic run'; $('#gate-ic').textContent = ''; $('#gate-st').textContent = 're-verifying…'; });
-    at(12.6, () => {
-      const h1 = $('[data-k="h1"]');
-      h1.querySelector('i').className = 'light g';
-      h1.querySelector('em').textContent = 'passed after fix';
-      say('<span class="g">✓</span> 3/3 pass · committed "Migrate to zod 4.6.7 (verified by Kane CLI)"');
-    });
-    at(13.4, () => {
-      $('#cm-title').className = 'cm-title green'; $('#cm-title').textContent = '🟢 Fixed and re-verified';
-      $('#gate-ic').className = 'ic ok'; $('#gate-ic').textContent = '✓'; $('#gate-st').textContent = 'passed after fix';
-      $('#pr-state').className = 'state merged'; $('#pr-state').textContent = '✓ Merged';
-      $('#rule-line').innerHTML = '<b>The rule:</b> every journey that passes on main must pass on the bump → <b style="color:var(--green)">✅ 3/3 still pass. Auto-merged.</b>';
-      say('<span class="g">🟢 merged</span> <span class="d">no human needed; the comment keeps the evidence</span>');
-    });
+    $$('#thread .msg').forEach((m) => at(Number(m.dataset.at), () => m.classList.add('on')));
+    ['b0', 'b1', 'b2'].forEach((k, i) => at(2.4 + i * 0.45, () => $(`[data-k="${k}"]`).classList.add('on')));
+    ['h0', 'h1', 'h2'].forEach((k, i) => at(4.2 + i * 0.6, () => $(`[data-k="${k}"]`).classList.add('on')));
+    at(6.2, blocked);
+    $$('#thread .ex').forEach((x) => at(Number(x.dataset.at), () => x.classList.add('on')));
+    at(9.0, () => set('#ex1', 'st done', 'status: done'));
+    at(11.6, fixed);
   }
-  const clock = $('#clock');
-  setInterval(() => {
-    if (!t0) return;
-    const s = Math.min(99, Math.floor((performance.now() - t0) / 1000));
-    clock.textContent = `00:${String(s).padStart(2, '0')}`;
-  }, 250);
-  $('#play')?.addEventListener('click', play);
-  const demo = $('#demo');
-  if (demo) {
-    const io = new IntersectionObserver((es) => {
-      if (es.some((e) => e.isIntersecting)) { play(); io.disconnect(); }
-    }, { threshold: 0.25 });
-    io.observe(demo);
+  $('#replay')?.addEventListener('click', () => (reduce ? finalState() : play()));
+  const app = $('#app');
+  if (app) {
+    if (reduce) finalState();
+    else {
+      const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { play(); io.disconnect(); } }, { threshold: 0.3 });
+      io.observe(app);
+    }
   }
-
-  // steps carousel
-  const steps = $$('#steps .step');
-  let si = 0;
-  let auto = null;
-  function show(i) {
-    si = i;
-    steps.forEach((s, j) => s.classList.toggle('on', j === i));
-    $('#step-of').textContent = `0${i + 1} / 0${steps.length}`;
-    $('#step-bar').style.width = `${((i + 1) / steps.length) * 100}%`;
-    $('#step-name').textContent = steps[i].dataset.name;
-  }
-  steps.forEach((s, i) => s.addEventListener('click', () => { clearInterval(auto); show(i); }));
-  if (!reduce && steps.length) auto = setInterval(() => show((si + 1) % steps.length), 3200);
 
   // reveals
-  const rio = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('seen'); rio.unobserve(e.target); } }), { threshold: 0.12 });
-  $$('.reveal').forEach((el) => rio.observe(el));
+  const rio = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('seen'); rio.unobserve(e.target); } }), { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  const watch = () => $$('.reveal:not(.seen)').forEach((el) => rio.observe(el));
+  watch();
 
   // data
   const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -136,10 +108,10 @@
     const rv = $('#reverts');
     if (rv && d.reverts) {
       rv.innerHTML = d.reverts.map((r) => `
-        <a class="revert" href="${esc(r.revert_url || r.pr_url)}" target="_blank" rel="noopener">
+        <a class="rv" href="${esc(r.revert_url || r.pr_url)}" target="_blank" rel="noopener">
+          <span class="n">${esc(r.repo.split('/')[1] || r.repo)}</span>
+          <span class="r">${esc(r.short || r.title)}<br>CI: ${esc(r.ci)}</span>
           <span class="x">REVERTED</span>
-          <span><span class="t">${esc(r.repo)} · ${esc(r.title)}</span>
-          <span class="m">CI on the bot PR: ${esc(r.ci)} · merged ${esc(r.merged)} · reverted ${esc(r.reverted)}</span></span>
         </a>`).join('');
     }
     const st = $('#stats');
@@ -155,17 +127,22 @@
     }
     if (d.proofIntro) $('#proof-intro').textContent = d.proofIntro;
     const cs = $('#cases');
+    const lightLabel = { green: 'green', red: 'red → fixed', amber: 'amber' };
     if (cs && d.cases) {
       cs.innerHTML = d.cases.map((c) => `
-        <div class="case reveal seen">
-          <h4>${esc(c.title)}</h4>
-          <div class="src">${esc(c.source)}</div>
-          <div class="lab">Bump</div><div class="row"><span>⬆</span><span>${esc(c.bump)}</span></div>
-          <div class="lab">CI</div><div class="row"><span class="ok">✓</span><span>${esc(c.ci)}</span></div>
-          <div class="lab">Kane</div><div class="row"><span class="${c.kaneClass || 'bad'}">${c.kaneClass === 'ok' ? '✓' : c.kaneClass === 'y' ? '…' : '✗'}</span><span>${esc(c.kane)}</span></div>
-          ${c.fix ? `<div class="lab">Fix</div><div class="row"><span class="ok">✓</span><span>${esc(c.fix)}</span></div>` : ''}
-          ${c.links?.length ? `<div class="row" style="margin-top:14px"><span>↗</span><span>${c.links.map((l) => `<a href="${esc(l.href)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join(' · ')}</span></div>` : ''}
+        <div class="case reveal">
+          <div class="case-h"><div><h4>${esc(c.title)}</h4><div class="src">${esc(c.source)}</div></div>
+            <span class="light-tag"><i class="lt ${c.light === 'green' ? 'g' : c.light === 'amber' ? 'a' : 'r'}"></i>${esc(lightLabel[c.light] || c.light || '')}</span></div>
+          <dl>
+            <dt>Bump</dt><dd>${esc(c.bump)}</dd>
+            <dt>CI</dt><dd>${esc(c.ci)}</dd>
+            <dt>Kane</dt><dd>${esc(c.kane)}</dd>
+            ${c.fix ? `<dt>Fix</dt><dd>${esc(c.fix)}</dd>` : ''}
+            ${c.result ? `<dt>Merge</dt><dd>${esc(c.result)}</dd>` : ''}
+          </dl>
+          ${c.links?.length ? `<div class="lnk">${c.links.map((l) => `<a href="${esc(l.href)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`).join('')}</div>` : ''}
         </div>`).join('');
+      watch();
     }
   }
 })();

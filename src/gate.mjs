@@ -53,6 +53,14 @@ function flatten(runs, key) {
   return runs.flatMap((r) => (Array.isArray(r[key]) ? r[key] : []));
 }
 
+/** Items (after `map`) present in every run's `key` list. One run: that run's list. */
+function seenInEvery(runs, key, map = (x) => x) {
+  if (!runs.length) return [];
+  const list = (r) => (Array.isArray(r[key]) ? r[key] : []).map(map);
+  const sets = runs.map((r) => new Set(list(r).map(normaliseMessage)));
+  return list(runs[0]).filter((m) => sets.every((s) => s.has(normaliseMessage(m))));
+}
+
 /**
  * Decide one journey.
  * @returns {{light:'green'|'amber'|'red'|'grey', kind:string, base:string, bump:string, blocks:boolean, holds:boolean, reasons:string[]}}
@@ -91,10 +99,11 @@ export function decideJourney({ base = [], bump = [] }) {
 
   const passing = bump.filter((r) => r.status === 'passed');
   const healed = passing.some((r) => r.healed);
-  const newConsole = newOnBump(flatten(base, 'consoleErrors'), flatten(passing, 'consoleErrors'));
+  // A new error must show up in every passing bump run: one flaky third-party request is not drift.
+  const newConsole = newOnBump(flatten(base, 'consoleErrors'), seenInEvery(passing, 'consoleErrors'));
   const newNetwork = newOnBump(
     flatten(base, 'networkErrors').map(netKey),
-    flatten(passing, 'networkErrors').map(netKey),
+    seenInEvery(passing, 'networkErrors', netKey),
   );
   if (healed) reasons.push('Passed only after Kane self-healed a step: the UI changed under the same journey.');
   if (newConsole.length) reasons.push(`${newConsole.length} new console error(s) on the bump.`);
@@ -107,9 +116,14 @@ export function decideJourney({ base = [], bump = [] }) {
     reasons: ['Same journey, same result.'] };
 }
 
-function netKey(n) {
+// Compare requests by shape, not by ids: map tiles (/tile/11/758/972), record ids and content hashes
+// differ from run to run even when the app behaves the same.
+export function netKey(n) {
   if (typeof n === 'string') return n;
-  return `${n.status} ${n.method || 'GET'} ${n.url}`;
+  const url = String(n.url || '').replace(/[?#].*$/, '')
+    .replace(/\/\d+(?=[/._]|$)/g, '/N')
+    .replace(/\/[0-9a-f]{8,}(?=\/|$)/gi, '/H');
+  return `${n.status} ${n.method || 'GET'} ${url}`;
 }
 
 /**
@@ -179,6 +193,12 @@ export function needsConfirmation({ base = [], bump = [] }, confirmRuns = 3) {
   const bumpPasses = bump.filter((r) => r.status === 'passed').length;
   if (b === 'pass' && (bumpFails >= settled || bumpPasses >= settled)) return null;
   if (b === 'pass' && (h === 'fail' || h === 'flaky' || h === 'error') && bump.length < confirmRuns) return 'bump';
+  // Amber from new errors alone, seen in a single passing run: replay once more (free when it passes)
+  // so a flaky third-party request does not hold a safe bump. A self-heal needs no second run.
+  if (b === 'pass' && h === 'pass' && bumpPasses < 2 && bump.length < confirmRuns) {
+    const d = decideJourney({ base, bump });
+    if (d.light === 'amber' && d.kind === 'drift' && !d.healed) return 'bump';
+  }
   if (b !== 'pass' && h === 'pass' && base.length < Math.min(2, confirmRuns)) return 'base';
   if (b === 'error' && base.length < 2) return 'base';
   return null;

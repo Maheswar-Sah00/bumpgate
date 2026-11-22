@@ -175,3 +175,41 @@ test('release notes: each new major x.0.0 comes first; status mapping', async ()
   assert.equal(statusFor('amber', result, 'review').state, 'pending');
   assert.equal(statusFor('inconclusive', result, 'block').state, 'error');
 });
+
+test('evidence: a cancelled image/tile load is not a failed request; a failed API call still is', async () => {
+  const { mkdtempSync, writeFileSync } = await import('node:fs');
+  const dir = mkdtempSync(path.join(os.tmpdir(), 'bg-net-'));
+  const pack = path.join(dir, 'net.evidence');
+  writeFileSync(pack, makeZip({
+    'run.yaml': 'status: finalized\n',
+    'tests/t/logs/0-network.har': JSON.stringify({ log: { entries: [
+      { request: { method: 'GET', url: 'https://services.arcgisonline.com/x/MapServer/tile/11/758/972' }, response: { status: 0 } },
+      { request: { method: 'GET', url: 'https://tilecache.example/radar/0_0.png' }, response: { status: 0 } },
+      { request: { method: 'GET', url: 'https://cdn.example/font.woff2' }, response: { status: 0 }, _resourceType: 'font' },
+      { request: { method: 'GET', url: 'https://api.example.com/v1/marine?lat=1' }, response: { status: 0 } },
+      { request: { method: 'POST', url: 'http://localhost:4319/api/order' }, response: { status: 500 } },
+    ] } }),
+  }));
+  const p = readPack(pack);
+  assert.deepEqual(p.networkErrors.map((n) => n.status + ' ' + n.method + ' ' + n.url.split('?')[0]),
+    ['0 GET https://api.example.com/v1/marine', '500 POST http://localhost:4319/api/order']);
+});
+
+test('evidence: the main run wins over heal sub-runs for failure and screenshots', async () => {
+  const { mkdtempSync, writeFileSync } = await import('node:fs');
+  const dir = mkdtempSync(path.join(os.tmpdir(), 'bg-heal-'));
+  const pack = path.join(dir, 'heal.evidence');
+  writeFileSync(pack, makeZip({
+    'run.yaml': 'status: finalized\n',
+    'tests/t/result.yaml': 'status: failed\n',
+    'tests/t/steps/1-0-1/screenshot.jpg': 'blank page',
+    'tests/t/steps/1-0-1/failure.yaml': 'step: 0-1\nstatus: failed\n',
+    'tests/t/steps/2-0-2/screenshot.jpg': 'still blank',
+    'tests/t/1/steps/1-0-1/screenshot.jpg': 'kane start page',
+    'tests/t/1/steps/2-0-2/failure.yaml': 'step: 0-2\n',
+  }));
+  const p = readPack(pack);
+  assert.equal(p.failure.entry, 'tests/t/steps/1-0-1/failure.yaml');
+  assert.equal(p.failure.screenshot, 'tests/t/steps/1-0-1/screenshot.jpg');
+  assert.deepEqual(p.screenshots, ['tests/t/steps/1-0-1/screenshot.jpg', 'tests/t/steps/2-0-2/screenshot.jpg']);
+});
