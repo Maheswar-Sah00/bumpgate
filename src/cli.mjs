@@ -153,10 +153,10 @@ async function doctor(log) {
   else { ok = false; log.fail('kane-cli not found: npm i -g @testmuai/kane-cli'); }
   if (kv.code === 0) {
     const info = await kaneInfo();
-    const loggedIn = info.whoamiCode === 0 && !/not logged in/i.test(info.whoami);
+    const loggedIn = info.whoamiCode === 0 && !/not logged in|not authenticated|method\s+none/i.test(info.whoami + info.balance);
     if (loggedIn || (process.env.LT_USERNAME && process.env.LT_ACCESS_KEY)) log.ok('kane-cli authenticated');
     else { ok = false; log.fail('kane-cli is not logged in: kane-cli login --oauth (or set LT_USERNAME / LT_ACCESS_KEY)'); }
-    const bal = (info.balance.match(/"(?:balance|credits|available)[^"]*"\s*:\s*([\d.]+)/i) || [])[1];
+    const bal = (info.balance.match(/(?:balance|credits?|available)\D{0,40}?(\d[\d,]*(?:\.\d+)?)/i) || [])[1];
     if (bal) log.info(`credits: ${bal}`);
   }
   for (const [bin, name] of [['codex', 'Codex'], ['claude', 'Claude Code']]) {

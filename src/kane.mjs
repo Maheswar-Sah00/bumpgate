@@ -241,9 +241,10 @@ export function adoptRecording(runResult, seedDir, journeyRel) {
   return true;
 }
 
-/** `kane-cli whoami --agent` / `balance --agent`, best effort. */
+/** `kane-cli whoami` / `balance` (neither takes --agent), best effort. */
 export async function kaneInfo() {
-  const who = await run('kane-cli', ['whoami', '--agent'], { timeoutMs: 30000 });
-  const bal = await run('kane-cli', ['balance', '--agent'], { timeoutMs: 30000 });
-  return { whoami: who.stdout.trim(), whoamiCode: who.code, balance: bal.stdout.trim(), balanceCode: bal.code };
+  const who = await run('kane-cli', ['whoami'], { timeoutMs: 30000 });
+  const bal = await run('kane-cli', ['balance'], { timeoutMs: 30000 });
+  const text = (r) => `${r.stdout || ''}\n${r.stderr || ''}`.trim();
+  return { whoami: text(who), whoamiCode: who.code, balance: text(bal), balanceCode: bal.code };
 }
