@@ -127,7 +127,7 @@
     }
     if (d.proofIntro) $('#proof-intro').textContent = d.proofIntro;
     const cs = $('#cases');
-    const lightLabel = { green: 'green', red: 'red → fixed', amber: 'amber' };
+    const lightLabel = { green: 'green', red: 'red → fixed', amber: 'amber', blocked: 'red · blocked' };
     if (cs && d.cases) {
       cs.innerHTML = d.cases.map((c) => `
         <div class="case reveal">

@@ -1,20 +1,21 @@
 {
   "reverts": [
-    { "repo": "earthhistoryviz/tsconline", "title": "Bump react-router-dom from 6.30.3 to 6.30.6", "short": "react-router-dom 6.30.3 → 6.30.6", "ci": "9 checks passed", "merged": "2 Oct 2026", "reverted": "2 Oct 2026", "pr_url": "https://github.com/earthhistoryviz/tsconline/pull/847", "revert_url": "https://github.com/earthhistoryviz/tsconline/pull/869" },
+    { "repo": "anis-mondal/tic-tac-toe", "title": "Bump react from 19.2.8 to 19.3.0", "short": "react 19.2.8 → 19.3.0", "ci": "5 checks passed", "merged": "16 Sep 2026", "reverted": "17 Sep 2026", "pr_url": "https://github.com/anis-mondal/tic-tac-toe/pull/36", "revert_url": "https://github.com/anis-mondal/tic-tac-toe/commit/e5eda1693a66175ece347220b688dc6b9c2b89da" },
     { "repo": "earthhistoryviz/tsconline", "title": "Bump react-router from 6.30.3 to 7.18.2", "short": "react-router 6.30.3 → 7.18.2", "ci": "9 checks passed", "merged": "13 Aug 2026", "reverted": "3 Sep 2026", "pr_url": "https://github.com/earthhistoryviz/tsconline/pull/818", "revert_url": "https://github.com/earthhistoryviz/tsconline/pull/846" },
     { "repo": "kikeelectronico/Homeware-LAN", "title": "Bump @mui/material from 7.3.11 to 9.5.0", "short": "@mui/material 7.3.11 → 9.5.0", "ci": "4 checks passed", "merged": "31 Oct 2026", "reverted": "31 Oct 2026", "pr_url": "https://github.com/kikeelectronico/Homeware-LAN/pull/1432", "revert_url": "https://github.com/kikeelectronico/Homeware-LAN/pull/1449" },
     { "repo": "davidschlachter/lychnos", "title": "Bump @mui/material from 7.3.9 to 9.0.0", "short": "@mui/material 7.3.9 → 9.0.0", "ci": "passed", "merged": "1 May 2026", "reverted": "1 May 2026", "pr_url": "https://github.com/davidschlachter/lychnos/pull/550", "revert_url": "https://github.com/davidschlachter/lychnos/commit/5bde9391eb" }
   ],
   "backtest": null,
   "stats": [
-    { "v": "3/3", "l": "Dependabot PRs on the demo shop passed CI" },
-    { "v": "2", "l": "of them broke the app; Kane CLI blocked both before merge" },
-    { "v": "2/2", "l": "migrated by Claude Code, re-verified by Kane, merged with no human" }
+    { "v": "3/3", "l": "Dependabot PRs on the demo shop passed CI. Two of them broke the app" },
+    { "v": "2/2", "l": "broken PRs blocked by Kane CLI, migrated by Claude Code, re-verified and merged with no human" },
+    { "v": "5 ✓", "l": "CI checks passed on a real React 19.3.0 PR that left the app blank. In the backtest, Kane blocked it at step 1" }
   ],
-  "proofIntro": "Real Dependabot PRs on a demo shop, real Kane CLI runs, real migrations. Backtest on reverted bumps from public repos is running.",
+  "proofIntro": "Real Dependabot PRs on a demo shop, and a backtest on real upgrades a public repo had to undo. Every result is a real Kane CLI run.",
   "cases": [
-    { "title": "Checkout errors vanish", "source": "bumpgatedemo · Dependabot PR", "light": "red", "bump": "zod 3.25.76 → 4.6.7", "ci": "build passes", "kane": "“Checkout explains what is wrong” broke on the bump (confirmed 2/2)", "fix": "Claude Code: error.errors → error.issues · Kane 3/3", "links": [{ "label": "Pull requests", "href": "https://github.com/Maheswar-Sah00/bumpgatedemo/pulls?q=is%3Apr" }] },
-    { "title": "The whole shop goes blank", "source": "bumpgatedemo · Dependabot PR", "light": "red", "bump": "@tanstack/react-query 4.44.0 → 5.108.2", "ci": "build passes", "kane": "All 3 journeys broke on the bump", "fix": "Claude Code: useQuery object syntax + isPending · Kane 3/3", "links": [{ "label": "Pull requests", "href": "https://github.com/Maheswar-Sah00/bumpgatedemo/pulls?q=is%3Apr" }] },
-    { "title": "A safe bump, merged", "source": "bumpgatedemo · Dependabot PR", "light": "green", "bump": "clsx 1 → 2", "ci": "build passes", "kane": "3/3 journeys pass on main and the bump", "result": "Auto-merged in 77 s", "links": [{ "label": "Pull requests", "href": "https://github.com/Maheswar-Sah00/bumpgatedemo/pulls?q=is%3Apr" }] }
+    { "title": "Checkout errors vanish", "source": "bumpgatedemo · Dependabot PR #3", "light": "red", "bump": "zod 3.25.76 → 4.6.7", "ci": "build passes", "kane": "“Checkout explains what is wrong” broke on the bump (2/2 runs)", "fix": "Claude Code: error.errors → error.issues · Kane 3/3", "result": "Merged with no human", "links": [{ "label": "PR #3", "href": "https://github.com/Maheswar-Sah00/bumpgatedemo/pull/3" }] },
+    { "title": "The whole shop goes blank", "source": "bumpgatedemo · Dependabot PR #2", "light": "red", "bump": "@tanstack/react-query 4.44.0 → 5.108.0", "ci": "build passes", "kane": "All 3 journeys broke on the bump (2/2 runs)", "fix": "Claude Code: useQuery object syntax + isPending · Kane 3/3", "result": "Merged with no human", "links": [{ "label": "PR #2", "href": "https://github.com/Maheswar-Sah00/bumpgatedemo/pull/2" }] },
+    { "title": "A real React upgrade, blank page", "source": "anis-mondal/tic-tac-toe · reverted by the maintainer", "light": "blocked", "bump": "react 19.2.8 → 19.3.0 (react-dom left at 19.2.8)", "ci": "5 checks passed", "kane": "Blank page at step 1, React error #527. Bug verdict: “React version mismatch leaves game setup page blank”", "result": "Blocked before merge", "links": [{ "label": "Backtest", "href": "https://github.com/Maheswar-Sah00/bumpgate/blob/main/backtest/RESULTS.md" }, { "label": "Original PR", "href": "https://github.com/anis-mondal/tic-tac-toe/pull/36" }] },
+    { "title": "A safe bump, merged", "source": "bumpgatedemo · Dependabot PR #1", "light": "green", "bump": "clsx 1.2.1 → 2.1.1", "ci": "build passes", "kane": "3/3 journeys pass on main and on the bump", "result": "Merged itself in 77 s", "links": [{ "label": "PR #1", "href": "https://github.com/Maheswar-Sah00/bumpgatedemo/pull/1" }] }
   ]
 }

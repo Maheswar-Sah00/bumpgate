@@ -1,0 +1,107 @@
+[
+  {
+    "id": "tictactoe-react",
+    "repo": "anis-mondal/tic-tac-toe",
+    "pr": 36,
+    "upgrade": "Bump react from 19.2.8 to 19.3.0",
+    "ci": "passed",
+    "verdict": "red",
+    "headline": "2 journeys broke on the bump",
+    "journeys": [
+      {
+        "journey": "two_players_test.md",
+        "light": "red",
+        "base": [
+          "passed",
+          "passed"
+        ],
+        "bump": [
+          "failed",
+          "failed"
+        ],
+        "failedStep": "Start a two-player game",
+        "kane": "The game setup page crashes on opening, so the “2 Players” button never appears.",
+        "bug": {
+          "confirmed": true,
+          "title": "React version mismatch leaves game setup page blank",
+          "severity": "major",
+          "confidence": 0.98,
+          "category": "script_error",
+          "step": 1
+        },
+        "consoleOnBump": [
+          "Minified React error #527; visit https://react.dev/errors/527?args[]=19.3.0&args[]=19.2.8 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ]
+      },
+      {
+        "journey": "vs_computer_test.md",
+        "light": "red",
+        "base": [
+          "passed",
+          "passed"
+        ],
+        "bump": [
+          "failed",
+          "failed"
+        ],
+        "failedStep": "Make the first move",
+        "kane": "The game never loaded because the application crashed during startup, leaving a blank page with no player selector or board.",
+        "bug": {
+          "confirmed": true,
+          "title": "Application crashes to a blank page on launch",
+          "severity": "major",
+          "confidence": 0.98,
+          "category": "script_error",
+          "step": 1
+        },
+        "consoleOnBump": [
+          "Minified React error #527; visit https://react.dev/errors/527?args[]=19.3.0&args[]=19.2.8 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "meteomapgal-tailwind",
+    "repo": "Bateas/MeteoMapGal",
+    "pr": 19,
+    "upgrade": "Bump @tailwindcss/vite from 4.3.1 to 4.3.3",
+    "ci": "passed",
+    "verdict": "green",
+    "headline": "All 2 journeys behave the same",
+    "journeys": [
+      {
+        "journey": "guide_test.md",
+        "light": "green",
+        "base": [
+          "passed",
+          "passed"
+        ],
+        "bump": [
+          "passed"
+        ],
+        "failedStep": null,
+        "kane": null,
+        "bug": null,
+        "consoleOnBump": []
+      },
+      {
+        "journey": "zones_test.md",
+        "light": "green",
+        "base": [
+          "passed",
+          "passed"
+        ],
+        "bump": [
+          "passed",
+          "passed"
+        ],
+        "failedStep": null,
+        "kane": null,
+        "bug": null,
+        "consoleOnBump": []
+      }
+    ]
+  }
+]
