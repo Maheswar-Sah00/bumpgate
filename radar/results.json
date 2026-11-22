@@ -1,0 +1,1241 @@
+{
+  "summary": {
+    "openChecked": 10,
+    "openRed": 2,
+    "openGreen": 7,
+    "openAmber": 1,
+    "controls": 4,
+    "falseAlarms": 0,
+    "controlAmber": 0,
+    "buildBlocked": 7,
+    "journeysDrafted": 42,
+    "journeysKept": 33
+  },
+  "open": [
+    {
+      "id": "radar-react",
+      "kind": "open",
+      "repo": "wfh45678/radar",
+      "pr": 112,
+      "url": "https://github.com/wfh45678/radar/pull/112",
+      "stars": 1622,
+      "pkg": "react",
+      "from": "18.3.1",
+      "to": "19.3.1",
+      "title": "chore(deps): bump react from 18.3.1 to 19.3.1 in /frontend",
+      "verdict": "red",
+      "headline": "3 journeys broke on the bump",
+      "notes": [],
+      "peerConflict": "react@19.3.1 conflicts with its peers",
+      "init": {
+        "kept": [
+          "login_form_validation_test.md",
+          "register_password_mismatch_test.md",
+          "register_required_fields_test.md"
+        ],
+        "parked": []
+      },
+      "journeys": [
+        {
+          "title": "Login page loads and checks each required field in order",
+          "file": "login_form_validation_test.md",
+          "light": "red",
+          "rejudged": {
+            "onAppFail": 2,
+            "offApp": 0,
+            "pass": 0,
+            "error": 0
+          },
+          "reasons": [
+            "Passes on base, fails on the bump."
+          ],
+          "healStep": null,
+          "base": [
+            "passed"
+          ],
+          "bump": [
+            "failed",
+            "failed"
+          ],
+          "failedStep": "Open the login page",
+          "reason": "The site reached the requested URL but did not render the login page or any of its required controls.",
+          "console": [
+            "Cannot read properties of undefined (reading 'ReactCurrentBatchConfig')",
+            "Failed to load resource: the server responded with a status of 404 (Not Found)"
+          ],
+          "bug": {
+            "title": "Login page fails to render after home navigation",
+            "severity": "major"
+          }
+        },
+        {
+          "title": "Sign-up dialog catches mismatched passwords and closes cleanly",
+          "file": "register_password_mismatch_test.md",
+          "light": "red",
+          "rejudged": {
+            "onAppFail": 2,
+            "offApp": 0,
+            "pass": 0,
+            "error": 0
+          },
+          "reasons": [
+            "Passes on base, fails on the bump."
+          ],
+          "healStep": null,
+          "base": [
+            "passed"
+          ],
+          "bump": [
+            "failed",
+            "failed"
+          ],
+          "failedStep": "Open the sign-up dialog",
+          "reason": "The login page stays blank because it crashes while loading, so the 注册 button and 注册账号 dialog cannot be reached.",
+          "console": [
+            "Cannot read properties of undefined (reading 'ReactCurrentBatchConfig')",
+            "Failed to load resource: the server responded with a status of 404 (Not Found)"
+          ],
+          "bug": {
+            "title": "Login page crashes before rendering registration controls",
+            "severity": "major"
+          }
+        },
+        {
+          "title": "Sign-up dialog opens and blocks an empty or too-short account",
+          "file": "register_required_fields_test.md",
+          "light": "red",
+          "rejudged": {
+            "onAppFail": 2,
+            "offApp": 0,
+            "pass": 0,
+            "error": 0
+          },
+          "reasons": [
+            "Passes on base, fails on the bump."
+          ],
+          "healStep": null,
+          "base": [
+            "passed"
+          ],
+          "bump": [
+            "failed",
+            "failed"
+          ],
+          "failedStep": "Open the sign-up dialog",
+          "reason": "The login page did not render, so the 注册 button and registration dialog could not be checked.",
+          "console": [
+            "Cannot read properties of undefined (reading 'ReactCurrentBatchConfig')",
+            "Failed to load resource: the server responded with a status of 404 (Not Found)"
+          ],
+          "bug": {
+            "title": "Login page crashes before rendering",
+            "severity": "major"
+          }
+        }
+      ],
+      "merged": null,
+      "checkedAt": "2026-11-22"
+    },
+    {
+      "id": "voxel-rpg-game-react",
+      "kind": "open",
+      "repo": "Box47-games/voxel-rpg-game",
+      "pr": 606,
+      "url": "https://github.com/Box47-games/voxel-rpg-game/pull/606",
+      "stars": 2,
+      "pkg": "react",
+      "from": "18.3.1",
+      "to": "19.3.1",
+      "title": "Bump react from 18.3.1 to 19.3.1",
+      "verdict": "red",
+      "headline": "3 journeys broke on the bump",
+      "notes": [
+        "npm refused this bump's dependency tree (@react-three/drei@9.122.0 conflicts with react@19.3.1). Bumpgate forced the install with --legacy-peer-deps so Kane could show what a forced install ships."
+      ],
+      "peerConflict": "@react-three/drei@9.122.0 conflicts with react@19.3.1",
+      "init": {
+        "kept": [
+          "feedback_form_validation_test.md",
+          "save_and_continue_test.md",
+          "start_new_game_test.md"
+        ],
+        "parked": []
+      },
+      "journeys": [
+        {
+          "title": "The feedback form refuses an empty message and counts what the player types",
+          "file": "feedback_form_validation_test.md",
+          "light": "red",
+          "rejudged": {
+            "onAppFail": 2,
+            "offApp": 0,
+            "pass": 0,
+            "error": 0
+          },
+          "reasons": [
+            "Passes on base, fails on the bump."
+          ],
+          "healStep": null,
+          "base": [
+            "passed"
+          ],
+          "bump": [
+            "failed",
+            "failed"
+          ],
+          "failedStep": "Open the feedback form",
+          "reason": "The game never leaves its loading screen, so the Send Feedback dialog cannot be opened.",
+          "console": [
+            "Cannot read properties of undefined (reading 'ReactCurrentBatchConfig')"
+          ],
+          "bug": {
+            "title": "Riftholm title screen blocked by React runtime exception",
+            "severity": "major"
+          }
+        },
+        {
+          "title": "A player saves their game from the pause menu and can continue it after reloading",
+          "file": "save_and_continue_test.md",
+          "light": "red",
+          "rejudged": {
+            "onAppFail": 2,
+            "offApp": 0,
+            "pass": 0,
+            "error": 0
+          },
+          "reasons": [
+            "Passes on base, fails on the bump."
+          ],
+          "healStep": null,
+          "base": [
+            "passed"
+          ],
+          "bump": [
+            "failed",
+            "failed"
+          ],
+          "failedStep": "Start a game",
+          "reason": "The game never finished loading, so the title screen and New Game button could not appear.",
+          "console": [
+            "Cannot read properties of undefined (reading 'ReactCurrentBatchConfig')"
+          ],
+          "bug": {
+            "title": "Game remains indefinitely on Loading Riftholm screen",
+            "severity": "major"
+          }
+        },
+        {
+          "title": "A new player starts a game from the title screen and opens the build catalog",
+          "file": "start_new_game_test.md",
+          "light": "inconclusive",
+          "rejudged": {
+            "onAppFail": 1,
+            "offApp": 1,
+            "pass": 0,
+            "error": 1
+          },
+          "reasons": [
+            "Passes on base, fails on the bump."
+          ],
+          "healStep": null,
+          "base": [
+            "passed"
+          ],
+          "bump": [
+            "error",
+            "failed",
+            "failed"
+          ],
+          "failedStep": "Check the title screen",
+          "reason": "The run opened a login and registration application instead of the requested game title screen.",
+          "console": [
+            "Cannot read properties of undefined (reading 'ReactCurrentBatchConfig')"
+          ],
+          "bug": null
+        }
+      ],
+      "merged": null,
+      "checkedAt": "2026-11-22"
+    },
+    {
+      "id": "3d507-zustand",
+      "kind": "open",
+      "repo": "y33tkid/3D507",
+      "pr": 13,
+      "url": "https://github.com/y33tkid/3D507/pull/13",
+      "stars": 0,
+      "pkg": "zustand",
+      "from": "4.5.5",
+      "to": "5.1.0",
+      "title": "build(deps): Bump zustand from 4.5.5 to 5.1.0",
+      "verdict": "green",
+      "headline": "All 2 journeys behave the same",
+      "notes": [],
+      "peerConflict": null,
+      "init": {
+        "kept": [
+          "playback_controls_test.md",
+          "search_no_match_and_category_filter_test.md"
+        ],
+        "parked": [
+          "search_and_open_mechanism.draft.md"
+        ]
+      },
+      "journeys": [
+        {
+          "title": "Control the animation: jump to a key position and reverse the motion",
+          "file": "playback_controls_test.md",
+          "light": "green",
+          "rejudged": null,
+          "reasons": [
+            "Same journey, same result."
+          ],
+          "healStep": null,
+          "base": [
+            "passed"
+          ],
+          "bump": [
+            "passed"
+          ],
+          "failedStep": null,
+          "reason": null,
+          "console": [],
+          "bug": null
+        },
+        {
+          "title": "Searching for something that does not exist shows a clear empty message, and category filters still work",
+          "file": "search_no_match_and_category_filter_test.md",
+          "light": "green",
+          "rejudged": null,
+          "reasons": [
+            "Same journey, same result."
+          ],
+          "healStep": null,
+          "base": [
+            "passed"
+          ],
+          "bump": [
+            "passed"
+          ],
+          "failedStep": null,
+          "reason": null,
+          "console": [],
+          "bug": null
+        }
+      ],
+      "merged": null,
+      "checkedAt": "2026-11-22"
+    },
+    {
+      "id": "uhrenheld-zustand",
+      "kind": "open",
+      "repo": "bernhardmayr/Uhrenheld",
+      "pr": 21,
+      "url": "https://github.com/bernhardmayr/Uhrenheld/pull/21",
+      "stars": 0,
+      "pkg": "zustand",
+      "from": "4.5.7",
+      "to": "5.1.0",
+      "title": "build(deps): Bump zustand from 4.5.7 to 5.1.0",
+      "verdict": "green",
+      "headline": "All 1 journeys behave the same",
+      "notes": [],
+      "peerConflict": null,
+      "init": {
+        "kept": [
+          "wrong_answer_feedback_test.md"
+        ],
+        "parked": [
+          "read_clock_correct_answer.draft.md",
+          "round_progress_saved.draft.md"
+        ]
+      },
+      "journeys": [
+        {
+          "title": "An invalid or wrong time is blocked or explained kindly",
+          "file": "wrong_answer_feedback_test.md",
+          "light": "green",
+          "rejudged": null,
+          "reasons": [
+            "Same journey, same result."
+          ],
+          "healStep": null,
+          "base": [
+            "passed"
+          ],
+          "bump": [
+            "passed"
+          ],
+          "failedStep": null,
+          "reason": null,
+          "console": [],
+          "bug": null
+        }
+      ],
+      "merged": null,
+      "checkedAt": "2026-11-22"
+    },
+    {
+      "id": "algoverse-zustand",
+      "kind": "open",
+      "repo": "Vijay-3812/AlgoVerse",
+      "pr": 17,
+      "url": "https://github.com/Vijay-3812/AlgoVerse/pull/17",
+      "stars": 0,
+      "pkg": "zustand",
+      "from": "4.5.7",
+      "to": "5.1.0",
+      "title": "chore(deps): Bump zustand from 4.5.7 to 5.1.0",
+      "verdict": "green",
+      "headline": "All 2 journeys behave the same",
+      "notes": [],
+      "peerConflict": null,
+      "init": {
+        "kept": [
+          "search_algorithm_test.md",
+          "sort_custom_values_test.md"
+        ],
+        "parked": [
+          "custom_input_error.draft.md"
+        ]
+      },
+      "journeys": [
+        {
+          "title": "Search for Dijkstra from the home page and run it",
+          "file": "search_algorithm_test.md",
+          "light": "green",
+          "rejudged": null,
+          "reasons": [
+            "Same journey, same result."
+          ],
+          "healStep": null,
+          "base": [
+            "passed"
+          ],
+          "bump": [
+            "passed"
+          ],
+          "failedStep": null,
+          "reason": null,
+          "console": [],
+          "bug": null
+        },
+        {
+          "title": "Browse to Bubble Sort, enter custom values and play the sort to the end",
+          "file": "sort_custom_values_test.md",
+          "light": "green",
+          "rejudged": null,
+          "reasons": [
+            "Same journey, same result."
+          ],
+          "healStep": null,
+          "base": [
+            "passed"
+          ],
+          "bump": [
+            "passed"
+          ],
+          "failedStep": null,
+          "reason": null,
+          "console": [],
+          "bug": null
+        }
+      ],
+      "merged": null,
+      "checkedAt": "2026-11-22"
+    },
+    {
+      "id": "ntfy-react-i18next",
+      "kind": "open",
+      "repo": "binwiederhier/ntfy",
+      "pr": 2206,
+      "url": "https://github.com/binwiederhier/ntfy/pull/2206",
+      "stars": 35682,
+      "pkg": "react-i18next",
+      "from": "17.1.13",
+      "to": "18.0.1",
+      "title": "Bump react-i18next from 17.1.13 to 18.0.1 in /web",
+      "verdict": "green",
+      "headline": "All 3 journeys behave the same",
+      "notes": [],
+      "peerConflict": "react-i18next@18.0.1 conflicts with its peers",
+      "init": {
+        "kept": [
+          "add_user_validation_test.md",
+          "subscribe_to_topic_test.md",
+          "switch_language_test.md"
+        ],
+        "parked": []
+      },
+      "journeys": [
+        {
+          "title": "Add a user for a protected server, rejecting an invalid service URL first",
+          "file": "add_user_validation_test.md",
+          "light": "green",
+          "rejudged": null,
+          "reasons": [
+            "Same journey, same result."
+          ],
+          "healStep": null,
+          "base": [
+            "passed"
+          ],
+          "bump": [
+            "passed",
+            "passed"
+          ],
+          "failedStep": null,
+          "reason": null,
+          "console": [
+            "Failed to load resource: the server responded with a status of 404 (Not Found)",
+            "Manifest fetch from http://localhost:4372/manifest.webmanifest failed, code 404"
+          ],
+          "bug": null
+        },
+        {
+          "title": "Subscribe to a topic from the home page and open it",
+          "file": "subscribe_to_topic_test.md",
+          "light": "green",
+          "rejudged": null,
+          "reasons": [
+            "Same journey, same result."
+          ],
+          "healStep": null,
+          "base": [
+            "passed"
+          ],
+          "bump": [
+            "passed"
+          ],
+          "failedStep": null,
+          "reason": null,
+          "console": [
+            "Failed to load resource: the server responded with a status of 404 (Not Found)",
+            "Manifest fetch from http://localhost:4372/manifest.webmanifest failed, code 404"
+          ],
+          "bug": null
+        },
+        {
+          "title": "Switch the app language to German and back to English",
+          "file": "switch_language_test.md",
+          "light": "green",
+          "rejudged": null,
+          "reasons": [
+            "Same journey, same result."
+          ],
+          "healStep": null,
+          "base": [
+            "passed"
+          ],
+          "bump": [
+            "passed"
+          ],
+          "failedStep": null,
+          "reason": null,
+          "console": [
+            "Failed to load resource: the server responded with a status of 404 (Not Found)",
+            "Manifest fetch from http://localhost:4372/manifest.webmanifest failed, code 404"
+          ],
+          "bug": null
+        }
+      ],
+      "merged": null,
+      "checkedAt": "2026-11-22"
+    },
+    {
+      "id": "hime-react-i18next",
+      "kind": "open",
+      "repo": "thinkwee/HiMe",
+      "pr": 66,
+      "url": "https://github.com/thinkwee/HiMe/pull/66",
+      "stars": 73,
+      "pkg": "react-i18next",
+      "from": "14.1.3",
+      "to": "17.0.15",
+      "title": "Bump react-i18next from 14.1.3 to 17.0.15 in /frontend",
+      "verdict": "green",
+      "headline": "All 2 journeys behave the same",
+      "notes": [
+        "npm refused this bump's dependency tree (react-i18next@17.0.15 conflicts with i18next@25.10.10). Bumpgate forced the install with --legacy-peer-deps so Kane could show what a forced install ships."
+      ],
+      "peerConflict": "react-i18next@17.0.15 conflicts with i18next@25.10.10",
+      "init": {
+        "kept": [
+          "language_switch_test.md",
+          "sidebar_navigation_test.md"
+        ],
+        "parked": [
+          "new_skill_validation.draft.md"
+        ]
+      },
+      "journeys": [
+        {
+          "title": "Switch the dashboard to Chinese, keep it after a reload, and switch back to English",
+          "file": "language_switch_test.md",
+          "light": "green",
+          "rejudged": null,
+          "reasons": [
+            "Same journey, same result."
+          ],
+          "healStep": null,
+          "base": [
+            "passed"
+          ],
+          "bump": [
+            "passed"
+          ],
+          "failedStep": null,
+          "reason": null,
+          "console": [
+            "WebSocket connection to 'ws://localhost:4371/api/stream/data' failed: Error during WebSocket handshake: Unexpected response code: 200"
+          ],
+          "bug": null
+        },
+        {
+          "title": "Move between the main pages from the sidebar menu",
+          "file": "sidebar_navigation_test.md",
+          "light": "green",
+          "rejudged": null,
+          "reasons": [
+            "Same journey, same result."
+          ],
+          "healStep": null,
+          "base": [
+            "passed"
+          ],
+          "bump": [
+            "passed"
+          ],
+          "failedStep": null,
+          "reason": null,
+          "console": [
+            "WebSocket connection to 'ws://localhost:4371/api/stream/data' failed: Error during WebSocket handshake: Unexpected response code: 200"
+          ],
+          "bug": null
+        }
+      ],
+      "merged": null,
+      "checkedAt": "2026-11-22"
+    },
+    {
+      "id": "edmox-material",
+      "kind": "open",
+      "repo": "crbzxy/edmox",
+      "pr": 10,
+      "url": "https://github.com/crbzxy/edmox/pull/10",
+      "stars": 0,
+      "pkg": "@mui/material",
+      "from": "6.5.0",
+      "to": "9.5.0",
+      "title": "chore(deps): bump @mui/material from 6.5.0 to 9.5.0",
+      "verdict": "green",
+      "headline": "All 2 journeys behave the same",
+      "notes": [],
+      "peerConflict": null,
+      "init": {
+        "kept": [
+          "load_more_and_pager_test.md",
+          "view_piece_detail_test.md"
+        ],
+        "parked": [
+          "filter_by_status_sold_piece.draft.md"
+        ]
+      },
+      "journeys": [
+        {
+          "title": "Load the full archive and step between pieces with the pager",
+          "file": "load_more_and_pager_test.md",
+          "light": "green",
+          "rejudged": null,
+          "reasons": [
+            "Same journey, same result."
+          ],
+          "healStep": null,
+          "base": [
+            "passed"
+          ],
+          "bump": [
+            "passed"
+          ],
+          "failedStep": null,
+          "reason": null,
+          "console": [],
+          "bug": null
+        },
+        {
+          "title": "Browse the archive and open a piece's detail page",
+          "file": "view_piece_detail_test.md",
+          "light": "green",
+          "rejudged": null,
+          "reasons": [
+            "Same journey, same result."
+          ],
+          "healStep": null,
+          "base": [
+            "passed"
+          ],
+          "bump": [
+            "passed"
+          ],
+          "failedStep": null,
+          "reason": null,
+          "console": [],
+          "bug": null
+        }
+      ],
+      "merged": null,
+      "checkedAt": "2026-11-22"
+    },
+    {
+      "id": "assettosesionviwer-material",
+      "kind": "open",
+      "repo": "javirs200/AssettoSesionViwer",
+      "pr": 18,
+      "url": "https://github.com/javirs200/AssettoSesionViwer/pull/18",
+      "stars": 0,
+      "pkg": "@mui/material",
+      "from": "5.18.0",
+      "to": "9.5.0",
+      "title": "Bump @mui/material from 5.18.0 to 9.5.0",
+      "verdict": "green",
+      "headline": "All 3 journeys behave the same",
+      "notes": [],
+      "peerConflict": null,
+      "init": {
+        "kept": [
+          "find_session_files_help_test.md",
+          "load_another_session_test.md",
+          "load_demo_session_test.md"
+        ],
+        "parked": []
+      },
+      "journeys": [
+        {
+          "title": "Show where to find session files before any file is loaded",
+          "file": "find_session_files_help_test.md",
+          "light": "green",
+          "rejudged": null,
+          "reasons": [
+            "Same journey, same result."
+          ],
+          "healStep": null,
+          "base": [
+            "passed"
+          ],
+          "bump": [
+            "passed"
+          ],
+          "failedStep": null,
+          "reason": null,
+          "console": [],
+          "bug": null
+        },
+        {
+          "title": "Clear a loaded session with \"LOAD ANOTHER\" so no old lap data is left on screen",
+          "file": "load_another_session_test.md",
+          "light": "green",
+          "rejudged": null,
+          "reasons": [
+            "Same journey, same result."
+          ],
+          "healStep": null,
+          "base": [
+            "passed"
+          ],
+          "bump": [
+            "passed"
+          ],
+          "failedStep": null,
+          "reason": null,
+          "console": [],
+          "bug": null
+        },
+        {
+          "title": "Load the demo session and see the lap time report",
+          "file": "load_demo_session_test.md",
+          "light": "green",
+          "rejudged": null,
+          "reasons": [
+            "Same journey, same result."
+          ],
+          "healStep": null,
+          "base": [
+            "passed"
+          ],
+          "bump": [
+            "passed"
+          ],
+          "failedStep": null,
+          "reason": null,
+          "console": [],
+          "bug": null
+        }
+      ],
+      "merged": null,
+      "checkedAt": "2026-11-22"
+    },
+    {
+      "id": "szakal-2-material",
+      "kind": "open",
+      "repo": "AeTher97/szakal-2",
+      "pr": 503,
+      "url": "https://github.com/AeTher97/szakal-2/pull/503",
+      "stars": 2,
+      "pkg": "@mui/material",
+      "from": "7.3.6",
+      "to": "9.5.0",
+      "title": "Bump @mui/material from 7.3.6 to 9.5.0 in /frontend",
+      "verdict": "amber",
+      "headline": "Works, but 1 journey changed",
+      "notes": [
+        "npm refused this bump's dependency tree (@mui/icons-material@7.3.4 conflicts with @mui/material@9.5.0). Bumpgate forced the install with --legacy-peer-deps so Kane could show what a forced install ships."
+      ],
+      "peerConflict": "@mui/icons-material@7.3.4 conflicts with @mui/material@9.5.0",
+      "init": {
+        "kept": [
+          "login_screen_test.md",
+          "password_reset_form_test.md",
+          "sign_up_password_mismatch_test.md"
+        ],
+        "parked": []
+      },
+      "journeys": [
+        {
+          "title": "Home page shows the login form and links to sign-up and back",
+          "file": "login_screen_test.md",
+          "light": "amber",
+          "rejudged": null,
+          "reasons": [
+            "Passed only after Kane self-healed a step: the UI changed under the same journey."
+          ],
+          "healStep": null,
+          "base": [
+            "passed"
+          ],
+          "bump": [
+            "passed"
+          ],
+          "failedStep": "Go to the sign-up form",
+          "reason": "opened the login page on localhost",
+          "console": [],
+          "bug": null
+        },
+        {
+          "title": "Forgotten-password link opens the password reset form",
+          "file": "password_reset_form_test.md",
+          "light": "green",
+          "rejudged": null,
+          "reasons": [
+            "Same journey, same result."
+          ],
+          "healStep": null,
+          "base": [
+            "passed"
+          ],
+          "bump": [
+            "passed"
+          ],
+          "failedStep": null,
+          "reason": null,
+          "console": [],
+          "bug": null
+        },
+        {
+          "title": "Sign-up form warns when passwords do not match and clears the warning once they do",
+          "file": "sign_up_password_mismatch_test.md",
+          "light": "green",
+          "rejudged": null,
+          "reasons": [
+            "Same journey, same result."
+          ],
+          "healStep": null,
+          "base": [
+            "passed"
+          ],
+          "bump": [
+            "passed"
+          ],
+          "failedStep": null,
+          "reason": null,
+          "console": [],
+          "bug": null
+        }
+      ],
+      "merged": null,
+      "checkedAt": "2026-11-22"
+    }
+  ],
+  "controls": [
+    {
+      "id": "ctl-json-tool-react-icons",
+      "kind": "control",
+      "repo": "marabesi/json-tool",
+      "pr": 175,
+      "url": "https://github.com/marabesi/json-tool/pull/175",
+      "stars": 9,
+      "pkg": "react-icons",
+      "from": "4.12.0",
+      "to": "5.7.0",
+      "title": "chore(deps): bump react-icons from 4.12.0 to 5.7.0",
+      "verdict": "green",
+      "headline": "All 2 journeys behave the same",
+      "notes": [],
+      "peerConflict": null,
+      "init": {
+        "kept": [
+          "format_json_test.md",
+          "invalid_json_error_test.md"
+        ],
+        "parked": [
+          "clean_spaces_and_delete.draft.md"
+        ]
+      },
+      "journeys": [
+        {
+          "title": "Paste raw JSON into the left editor and get it formatted in the right editor",
+          "file": "format_json_test.md",
+          "light": "green",
+          "rejudged": null,
+          "reasons": [
+            "Same journey, same result."
+          ],
+          "healStep": null,
+          "base": [
+            "passed"
+          ],
+          "bump": [
+            "passed"
+          ],
+          "failedStep": null,
+          "reason": null,
+          "console": [],
+          "bug": null
+        },
+        {
+          "title": "Typing broken JSON shows an \"invalid json\" warning that clears once the JSON is fixed",
+          "file": "invalid_json_error_test.md",
+          "light": "green",
+          "rejudged": null,
+          "reasons": [
+            "Same journey, same result."
+          ],
+          "healStep": null,
+          "base": [
+            "passed"
+          ],
+          "bump": [
+            "passed"
+          ],
+          "failedStep": null,
+          "reason": null,
+          "console": [
+            "error from worker:  Expected double-quoted property name in JSON at position 21 (line 1 column 22)"
+          ],
+          "bug": null
+        }
+      ],
+      "merged": "2026-09-07",
+      "checkedAt": "2026-11-22"
+    },
+    {
+      "id": "ctl-cline-todo-material",
+      "kind": "control",
+      "repo": "skatcat31/cline-todo",
+      "pr": 11,
+      "url": "https://github.com/skatcat31/cline-todo/pull/11",
+      "stars": 0,
+      "pkg": "@mui/material",
+      "from": "7.3.11",
+      "to": "9.3.1",
+      "title": "chore(deps): bump @mui/material from 7.3.11 to 9.3.1",
+      "verdict": "green",
+      "headline": "All 2 journeys behave the same",
+      "notes": [],
+      "peerConflict": null,
+      "init": {
+        "kept": [
+          "add_task_test.md",
+          "complete_and_filter_task_test.md"
+        ],
+        "parked": [
+          "delete_and_undo_task.draft.md"
+        ]
+      },
+      "journeys": [
+        {
+          "title": "Add a new task, rejecting a blank title, and keep it after a reload",
+          "file": "add_task_test.md",
+          "light": "green",
+          "rejudged": null,
+          "reasons": [
+            "Same journey, same result."
+          ],
+          "healStep": null,
+          "base": [
+            "passed"
+          ],
+          "bump": [
+            "passed"
+          ],
+          "failedStep": null,
+          "reason": null,
+          "console": [],
+          "bug": null
+        },
+        {
+          "title": "Mark a task as done and filter the list by Active and Completed",
+          "file": "complete_and_filter_task_test.md",
+          "light": "green",
+          "rejudged": null,
+          "reasons": [
+            "Same journey, same result."
+          ],
+          "healStep": null,
+          "base": [
+            "passed"
+          ],
+          "bump": [
+            "passed"
+          ],
+          "failedStep": null,
+          "reason": null,
+          "console": [],
+          "bug": null
+        }
+      ],
+      "merged": "2026-08-29",
+      "checkedAt": "2026-11-22"
+    },
+    {
+      "id": "ctl-robocodejs-com-react-icons",
+      "kind": "control",
+      "repo": "LeeAdcock/robocodeJs.com",
+      "pr": 36,
+      "url": "https://github.com/LeeAdcock/robocodeJs.com/pull/36",
+      "stars": 1,
+      "pkg": "react-icons",
+      "from": "4.7.1",
+      "to": "5.7.0",
+      "title": "build(deps): Bump react-icons from 4.7.1 to 5.7.0 in /ui",
+      "verdict": "green",
+      "headline": "Works, but 1 journey changed",
+      "notes": [],
+      "peerConflict": null,
+      "init": {
+        "kept": [
+          "error_codes_test.md",
+          "learn_course_test.md"
+        ],
+        "parked": [
+          "home_docs_theme.draft.md"
+        ]
+      },
+      "journeys": [
+        {
+          "title": "A player whose bot crashed looks up the meaning of error code E017",
+          "file": "error_codes_test.md",
+          "light": "green",
+          "rejudged": null,
+          "reasons": [
+            "Same journey, same result."
+          ],
+          "healStep": null,
+          "base": [
+            "passed"
+          ],
+          "bump": [
+            "passed"
+          ],
+          "failedStep": null,
+          "reason": null,
+          "console": [
+            "Cannot read properties of undefined (reading 'time')",
+            "EventSource's response has a MIME type (\"text/html\") that is not \"text/event-stream\". Aborting the connection."
+          ],
+          "bug": null
+        },
+        {
+          "title": "A newcomer opens the Learn to Code course and moves from lesson 1 to lesson 2",
+          "file": "learn_course_test.md",
+          "light": "green",
+          "rejudged": null,
+          "reasons": [
+            "Same journey, same result.",
+            "Kane also had to self-heal this journey on base, so the heal is not counted against the bump. Re-record it."
+          ],
+          "healStep": null,
+          "base": [
+            "passed"
+          ],
+          "bump": [
+            "failed",
+            "passed",
+            "passed"
+          ],
+          "failedStep": "Start lesson 1",
+          "reason": "returned to the lesson index on the Learn to Code with Robots site",
+          "console": [
+            "Cannot read properties of undefined (reading 'time')",
+            "EventSource's response has a MIME type (\"text/html\") that is not \"text/event-stream\". Aborting the connection."
+          ],
+          "bug": null
+        }
+      ],
+      "merged": "2026-07-06",
+      "checkedAt": "2026-11-22"
+    },
+    {
+      "id": "ctl-notoli-material",
+      "kind": "control",
+      "repo": "VanillaIceCube/Notoli",
+      "pr": 748,
+      "url": "https://github.com/VanillaIceCube/Notoli/pull/748",
+      "stars": 0,
+      "pkg": "@mui/material",
+      "from": "7.3.9",
+      "to": "9.4.0",
+      "title": "Bump @mui/material from 7.3.9 to 9.4.0 in /frontend",
+      "verdict": "green",
+      "headline": "All 3 journeys behave the same",
+      "notes": [],
+      "peerConflict": null,
+      "init": {
+        "kept": [
+          "account_recovery_navigation_test.md",
+          "register_password_mismatch_test.md",
+          "sign_in_screen_test.md"
+        ],
+        "parked": []
+      },
+      "journeys": [
+        {
+          "title": "A user can move between sign-in, password reset and sign-up screens",
+          "file": "account_recovery_navigation_test.md",
+          "light": "green",
+          "rejudged": null,
+          "reasons": [
+            "Same journey, same result."
+          ],
+          "healStep": null,
+          "base": [
+            "passed"
+          ],
+          "bump": [
+            "passed"
+          ],
+          "failedStep": null,
+          "reason": null,
+          "console": [],
+          "bug": null
+        },
+        {
+          "title": "Sign-up form blocks registration when the two passwords do not match",
+          "file": "register_password_mismatch_test.md",
+          "light": "green",
+          "rejudged": null,
+          "reasons": [
+            "Same journey, same result."
+          ],
+          "healStep": null,
+          "base": [
+            "passed"
+          ],
+          "bump": [
+            "passed"
+          ],
+          "failedStep": null,
+          "reason": null,
+          "console": [],
+          "bug": null
+        },
+        {
+          "title": "A signed-out visitor is sent to the sign-in form and can fill it in",
+          "file": "sign_in_screen_test.md",
+          "light": "green",
+          "rejudged": null,
+          "reasons": [
+            "Same journey, same result."
+          ],
+          "healStep": null,
+          "base": [
+            "passed"
+          ],
+          "bump": [
+            "passed"
+          ],
+          "failedStep": null,
+          "reason": null,
+          "console": [],
+          "bug": null
+        }
+      ],
+      "merged": "2026-10-10",
+      "checkedAt": "2026-11-22"
+    }
+  ],
+  "buildBlocked": [
+    {
+      "repo": "YUHUANGSHANDIAN/WealthGrowthTracker",
+      "pr": 21,
+      "url": "https://github.com/YUHUANGSHANDIAN/WealthGrowthTracker/pull/21",
+      "pkg": "zustand",
+      "from": "4.5.7",
+      "to": "5.1.0",
+      "step": "build"
+    },
+    {
+      "repo": "Soarezzsemj/StackStudy",
+      "pr": 17,
+      "url": "https://github.com/Soarezzsemj/StackStudy/pull/17",
+      "pkg": "react-i18next",
+      "from": "15.2.0",
+      "to": "18.0.2",
+      "step": "build"
+    },
+    {
+      "repo": "MIKE08-CODE/Quincaillerie-Laurentienne-Projet-A",
+      "pr": 47,
+      "url": "https://github.com/MIKE08-CODE/Quincaillerie-Laurentienne-Projet-A/pull/47",
+      "pkg": "react-i18next",
+      "from": "15.7.4",
+      "to": "18.0.2",
+      "step": "build"
+    },
+    {
+      "repo": "ductran1302/hrms",
+      "pr": 16,
+      "url": "https://github.com/ductran1302/hrms/pull/16",
+      "pkg": "antd",
+      "from": "5.29.3",
+      "to": "6.6.7",
+      "step": "build"
+    },
+    {
+      "repo": "TheMRVX/sarab",
+      "pr": 43,
+      "url": "https://github.com/TheMRVX/sarab/pull/43",
+      "pkg": "@mui/material",
+      "from": "6.5.0",
+      "to": "9.5.0",
+      "step": "build"
+    },
+    {
+      "repo": "lithastra/kubeatlas",
+      "pr": 107,
+      "url": "https://github.com/lithastra/kubeatlas/pull/107",
+      "pkg": "@mui/material",
+      "from": "5.18.0",
+      "to": "9.5.0",
+      "step": "build"
+    },
+    {
+      "repo": "Cruzyhubby/e-card",
+      "pr": 7,
+      "url": "https://github.com/Cruzyhubby/e-card/pull/7",
+      "pkg": "tailwindcss",
+      "from": "3.4.19",
+      "to": "4.3.5",
+      "step": "build"
+    }
+  ]
+}

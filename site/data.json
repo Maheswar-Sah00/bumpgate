@@ -44,20 +44,58 @@
   "backtest": null,
   "stats": [
     {
-      "v": "3/3",
-      "l": "Dependabot PRs on the demo shop passed CI. Two of them broke the app"
+      "v": "2/10",
+      "l": "open Dependabot PRs in other people's repos ship a blank page once the install is forced. Kane proved both before merge"
+    },
+    {
+      "v": "0/4",
+      "l": "false alarms on bot bumps that were merged and never reverted"
     },
     {
       "v": "2/2",
-      "l": "broken PRs blocked by Kane CLI, migrated by Claude Code, re-verified and merged with no human"
-    },
-    {
-      "v": "4/4",
-      "l": "CI checks passed on a real React 19.3.0 PR, deploy included, and the app went blank. In the backtest, Kane blocked it at step 1"
+      "l": "broken demo PRs migrated by Claude Code, re-verified by Kane and merged with no human"
     }
   ],
-  "proofIntro": "Real Dependabot PRs on a demo shop, and a backtest on real upgrades a public repo had to undo. Every result is a real Kane CLI run.",
+  "proofIntro": "Real Dependabot PRs: on our demo shop, on 10 open PRs in other people's repos, and on upgrades a public repo had to undo. Every result is a real Kane CLI run.",
   "cases": [
+    {
+      "title": "An open PR blanks a 1.6k★ app",
+      "source": "wfh45678/radar · open Dependabot PR #112",
+      "light": "blocked",
+      "bump": "react 18.3.1 → 19.3.1 (react-dom left at 18)",
+      "ci": "red: npm refused the tree",
+      "kane": "3/3 journeys broke: blank login page, ReactCurrentBatchConfig. Kane: “Login page crashes before rendering” (major)",
+      "result": "Blocked before merge",
+      "links": [
+        {
+          "label": "Radar case",
+          "href": "https://github.com/Maheswar-Sah00/bumpgate/tree/main/radar/cases/radar-react"
+        },
+        {
+          "label": "PR #112",
+          "href": "https://github.com/wfh45678/radar/pull/112"
+        }
+      ]
+    },
+    {
+      "title": "A UI-kit major moves the UI",
+      "source": "AeTher97/szakal-2 · open Dependabot PR #503",
+      "light": "amber",
+      "bump": "@mui/material 7.3.6 → 9.5.0",
+      "ci": "red: npm peer conflict",
+      "kane": "Works, but Kane had to self-heal the sign-up link step; the other 2 journeys are unchanged",
+      "result": "One look before merging",
+      "links": [
+        {
+          "label": "Radar case",
+          "href": "https://github.com/Maheswar-Sah00/bumpgate/tree/main/radar/cases/szakal-2-material"
+        },
+        {
+          "label": "PR #503",
+          "href": "https://github.com/AeTher97/szakal-2/pull/503"
+        }
+      ]
+    },
     {
       "title": "Checkout errors vanish",
       "source": "bumpgatedemo · Dependabot PR #4",

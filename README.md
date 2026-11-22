@@ -11,11 +11,30 @@ Built for the [Kane CLI Hackathon](https://www.kaneclihack.sh/) by TestMu AI. Ag
 | What | Where | Time |
 |---|---|---|
 | Real Dependabot PRs going through the gate: two blocked, migrated by Claude Code and merged; one green auto-merge | [bumpgatedemo pull requests](https://github.com/Maheswar-Sah00/bumpgatedemo/pulls?q=is%3Apr) | 2 min |
+| **Radar:** Bumpgate on 10 *open* Dependabot PRs in other people's repos. 2 blank pages caught, 1 UI drift flagged amber, 7 correctly green. 0 false alarms on 4 bumps that were merged and never reverted | [`radar/RESULTS.md`](radar/RESULTS.md) | 2 min |
 | Backtest on real upgrades public repos had to undo: a React PR passed all 4 CI checks, including the deploy to GitHub Pages, and left the app blank, and Kane blocked it at step 1 | [`backtest/RESULTS.md`](backtest/RESULTS.md) | 1 min |
 | The merge rule, in code (no prompt decides a merge) | [`src/gate.mjs`](src/gate.mjs) and its tests in [`test/gate.test.mjs`](test/gate.test.mjs) | 1 min |
 | The guardrails the fix agent cannot get past | [`src/fix.mjs`](src/fix.mjs) (`guardrails`) | 1 min |
 | Run it yourself | [below](#run-it-yourself) | 5 min |
 | Site with an animated walkthrough | [maheswar-sah00.github.io/bumpgate](https://maheswar-sah00.github.io/bumpgate/) | 1 min |
+
+## Check our claims
+
+Every number on this page and the site comes from a real Kane CLI run. Here is where to check each one.
+
+| Claim | Evidence | Check it yourself |
+|---|---|---|
+| zod 3→4 broke the demo shop's checkout (`error.errors` is gone in zod 4); Claude Code migrated it and Kane re-verified 3/3 | [bumpgatedemo #4](https://github.com/Maheswar-Sah00/bumpgatedemo/pull/4): Bumpgate's comment with the base and bump screenshots, the fix commit and its commit status | `bumpgate check --base main --head origin/dependabot/npm_and_yarn/zod-4.6.7` in the demo repo |
+| react-query 4→5 blanked the whole shop; migrated and re-verified | [bumpgatedemo #6](https://github.com/Maheswar-Sah00/bumpgatedemo/pull/6) | same, on the react-query branch |
+| A safe bump merges itself | [bumpgatedemo #5](https://github.com/Maheswar-Sah00/bumpgatedemo/pull/5) (clsx 1→2, green, auto-merged) | |
+| An open react 19 PR in [wfh45678/radar](https://github.com/wfh45678/radar) (1.6k★) ships a blank login page | [radar/cases/radar-react](radar/cases/radar-react/): the journeys `init` wrote, base and bump screenshots, the PR comment Bumpgate would post | Check out [PR #112](https://github.com/wfh45678/radar/pull/112), `cd frontend && npm ci --legacy-peer-deps && npm run build`, open `dist/`: blank page, `ReactCurrentBatchConfig` in the console |
+| A UI-kit major (MUI 7→9) moved the UI under a journey without breaking it: amber, not red | [radar/cases/szakal-2-material](radar/cases/szakal-2-material/) | [szakal-2 #503](https://github.com/AeTher97/szakal-2/pull/503) |
+| 0 false alarms on 4 bumps that were merged and never reverted | [Controls table](radar/RESULTS.md#controls-bot-bumps-that-were-merged-and-never-reverted) | Each control links to its merged PR |
+| `bumpgate init` writes journeys for code it has never seen: 42 drafted, 33 kept | [radar/cases/*/journeys](radar/cases/) (parked drafts are `*.draft.md`) | `npx github:Maheswar-Sah00/bumpgate init --agent claude` in any web app |
+| A React 19.3.0 bump passed all 4 CI checks and left the app blank (backtest) | [backtest/RESULTS.md](backtest/RESULTS.md) with both screenshots | [tic-tac-toe #36](https://github.com/anis-mondal/tic-tac-toe/pull/36) and its revert |
+| No prompt decides a merge | [`src/gate.mjs`](src/gate.mjs), 53 unit tests in [`test/`](test/) | `npm test` |
+
+Kane's raw evidence packs and recordings are not published: they contain the Kane account's identifiers. Screenshots, journeys, verdicts and PR comments are.
 
 ## Why this only works on Kane CLI
 

@@ -1,0 +1,518 @@
+[
+ {
+  "id": "radar-react",
+  "repo": "wfh45678/radar",
+  "pr": 112,
+  "pkg": "react",
+  "from": "18.3.1",
+  "to": "19.3.1",
+  "dir": "/frontend",
+  "stars": 1622,
+  "desc": "实时风控引擎(Risk Engine)，自定义规则引擎（Rule Script），完美支持中文，适用于反欺诈(Anti-fraud)应用场景，开箱即用！！！移动互联网时代的风险管理利器，你 Get 到"
+ },
+ {
+  "id": "restaurantpicker-react-dom",
+  "repo": "chasev13/RestaurantPicker",
+  "pr": 4,
+  "pkg": "react-dom",
+  "from": "18.3.1",
+  "to": "19.3.1",
+  "dir": "/",
+  "stars": 0,
+  "desc": "Pick a random restaurant near you"
+ },
+ {
+  "id": "voxel-rpg-game-react",
+  "repo": "Box47-games/voxel-rpg-game",
+  "pr": 606,
+  "pkg": "react",
+  "from": "18.3.1",
+  "to": "19.3.1",
+  "dir": "/",
+  "stars": 2,
+  "desc": "A top-down voxel RPG with magic, dungeons, and base building"
+ },
+ {
+  "id": "voxel-rpg-game-zustand",
+  "repo": "Box47-games/voxel-rpg-game",
+  "pr": 604,
+  "pkg": "zustand",
+  "from": "4.5.7",
+  "to": "5.1.0",
+  "dir": "/",
+  "stars": 2,
+  "desc": "A top-down voxel RPG with magic, dungeons, and base building"
+ },
+ {
+  "id": "3d507-zustand",
+  "repo": "y33tkid/3D507",
+  "pr": 13,
+  "pkg": "zustand",
+  "from": "4.5.5",
+  "to": "5.1.0",
+  "dir": "/",
+  "stars": 0,
+  "desc": "Interactive 3D models of Henry T. Brown's 507 Mechanical Movements"
+ },
+ {
+  "id": "uhrenheld-zustand",
+  "repo": "bernhardmayr/Uhrenheld",
+  "pr": 21,
+  "pkg": "zustand",
+  "from": "4.5.7",
+  "to": "5.1.0",
+  "dir": "/",
+  "stars": 0,
+  "desc": ""
+ },
+ {
+  "id": "greenprint-zustand",
+  "repo": "ibcsprojects/GreenPrint",
+  "pr": 11,
+  "pkg": "zustand",
+  "from": "4.5.7",
+  "to": "5.1.0",
+  "dir": "/",
+  "stars": 0,
+  "desc": "Find and fix print waste in Google Docs and Word: wordy text, big fonts, highlights, blank pages. Fr"
+ },
+ {
+  "id": "algoverse-zustand",
+  "repo": "Vijay-3812/AlgoVerse",
+  "pr": 17,
+  "pkg": "zustand",
+  "from": "4.5.7",
+  "to": "5.1.0",
+  "dir": "/",
+  "stars": 0,
+  "desc": "A basic DSA Visualiser website"
+ },
+ {
+  "id": "seatai1-zustand",
+  "repo": "ward3107/seatai1",
+  "pr": 128,
+  "pkg": "zustand",
+  "from": "4.5.7",
+  "to": "5.1.0",
+  "dir": "/",
+  "stars": 0,
+  "desc": ""
+ },
+ {
+  "id": "tpt-vertex-zustand",
+  "repo": "tpt-solutions/tpt-vertex",
+  "pr": 65,
+  "pkg": "zustand",
+  "from": "4.5.7",
+  "to": "5.1.0",
+  "dir": "/frontend",
+  "stars": 1,
+  "desc": "A parametric 3D CAD platform built for the collaborative era. WebGPU-powered rendering, real-time mu"
+ },
+ {
+  "id": "wealthgrowthtracker-zustand",
+  "repo": "YUHUANGSHANDIAN/WealthGrowthTracker",
+  "pr": 21,
+  "pkg": "zustand",
+  "from": "4.5.7",
+  "to": "5.1.0",
+  "dir": "/",
+  "stars": 0,
+  "desc": "WealthGrowthTracker — local-first personal wealth management and monthly finance workspace"
+ },
+ {
+  "id": "easey-campd-ui-zustand",
+  "repo": "US-EPA-CAMD/easey-campd-ui",
+  "pr": 1203,
+  "pkg": "zustand",
+  "from": "4.5.6",
+  "to": "5.1.0",
+  "dir": "/",
+  "stars": 0,
+  "desc": "EPA Clean Air Markets Program Data (CAMPD) website application"
+ },
+ {
+  "id": "ntfy-react-i18next",
+  "repo": "binwiederhier/ntfy",
+  "pr": 2206,
+  "pkg": "react-i18next",
+  "from": "17.1.13",
+  "to": "18.0.1",
+  "dir": "/web",
+  "stars": 35682,
+  "desc": "Send push notifications to your phone or desktop using PUT/POST"
+ },
+ {
+  "id": "woodworkingshop-react-i18next",
+  "repo": "RajwanYair/WoodworkingShop",
+  "pr": 301,
+  "pkg": "react-i18next",
+  "from": "17.1.13",
+  "to": "18.0.1",
+  "dir": "/",
+  "stars": 35,
+  "desc": "Free online cabinet planner and woodworking cut-list optimizer with CNC exports and offline support"
+ },
+ {
+  "id": "local-ai-chat-frontend-react-i18next",
+  "repo": "hidao80/local-ai-chat-frontend",
+  "pr": 44,
+  "pkg": "react-i18next",
+  "from": "17.1.13",
+  "to": "18.0.2",
+  "dir": "/",
+  "stars": 1,
+  "desc": "A privacy-first, browser-based chat interface for local LLMs and cloud providers."
+ },
+ {
+  "id": "stackstudy-react-i18next",
+  "repo": "Soarezzsemj/StackStudy",
+  "pr": 17,
+  "pkg": "react-i18next",
+  "from": "15.2.0",
+  "to": "18.0.2",
+  "dir": "/frontend",
+  "stars": 0,
+  "desc": "StackStudy é o cockpit definitivo para estudantes. Uma plataforma minimalista que centraliza gestão "
+ },
+ {
+  "id": "quincaillerie-laurentienne-projet-a-reac",
+  "repo": "MIKE08-CODE/Quincaillerie-Laurentienne-Projet-A",
+  "pr": 47,
+  "pkg": "react-i18next",
+  "from": "15.7.4",
+  "to": "18.0.2",
+  "dir": "/web",
+  "stars": 0,
+  "desc": ""
+ },
+ {
+  "id": "hime-react-i18next",
+  "repo": "thinkwee/HiMe",
+  "pr": 66,
+  "pkg": "react-i18next",
+  "from": "14.1.3",
+  "to": "17.0.15",
+  "dir": "/frontend",
+  "stars": 73,
+  "desc": "One-Stop Personal Health AI Agent \"Say Hi to Healthy Me\""
+ },
+ {
+  "id": "fojin-antd",
+  "repo": "xr843/fojin",
+  "pr": 1409,
+  "pkg": "antd",
+  "from": "5.29.3",
+  "to": "6.6.8",
+  "dir": "/frontend",
+  "stars": 362,
+  "desc": "Buddhist Digital Text Platform — 10,500+ texts, 613 sources, trilingual cross-canon, AI Q&A (RAG), k"
+ },
+ {
+  "id": "toolbox-antd",
+  "repo": "mkokes/toolbox",
+  "pr": 25,
+  "pkg": "antd",
+  "from": "5.29.3",
+  "to": "6.7.0",
+  "dir": "/",
+  "stars": 2,
+  "desc": "A webapp comprised of handy tools for mopeds"
+ },
+ {
+  "id": "hrms-antd",
+  "repo": "ductran1302/hrms",
+  "pr": 16,
+  "pkg": "antd",
+  "from": "5.29.3",
+  "to": "6.6.7",
+  "dir": "/frontend",
+  "stars": 2,
+  "desc": ""
+ },
+ {
+  "id": "edmox-material",
+  "repo": "crbzxy/edmox",
+  "pr": 10,
+  "pkg": "@mui/material",
+  "from": "6.5.0",
+  "to": "9.5.0",
+  "dir": "/",
+  "stars": 0,
+  "desc": ""
+ },
+ {
+  "id": "assettosesionviwer-material",
+  "repo": "javirs200/AssettoSesionViwer",
+  "pr": 18,
+  "pkg": "@mui/material",
+  "from": "5.18.0",
+  "to": "9.5.0",
+  "dir": "/",
+  "stars": 0,
+  "desc": ""
+ },
+ {
+  "id": "sarab-material",
+  "repo": "TheMRVX/sarab",
+  "pr": 43,
+  "pkg": "@mui/material",
+  "from": "6.5.0",
+  "to": "9.5.0",
+  "dir": "/gui",
+  "stars": 10,
+  "desc": "GPS location spoofer for Windows 10/11"
+ },
+ {
+  "id": "kubeatlas-material",
+  "repo": "lithastra/kubeatlas",
+  "pr": 107,
+  "pkg": "@mui/material",
+  "from": "5.18.0",
+  "to": "9.5.0",
+  "dir": "/web",
+  "stars": 1,
+  "desc": "Kubernetes resource dependency analysis & visualization"
+ },
+ {
+  "id": "szakal-2-material",
+  "repo": "AeTher97/szakal-2",
+  "pr": 503,
+  "pkg": "@mui/material",
+  "from": "7.3.6",
+  "to": "9.5.0",
+  "dir": "/frontend",
+  "stars": 2,
+  "desc": "Szakal 2 App created for IAESTE AGH <3 by Michał Woźniak"
+ },
+ {
+  "id": "netatmo-weather-display-rewrite-react-qu",
+  "repo": "mikkosiikaniemi/netatmo-weather-display-rewrite",
+  "pr": 16,
+  "pkg": "@tanstack/react-query",
+  "from": "4.44.0",
+  "to": "5.106.1",
+  "dir": "/frontend",
+  "stars": 0,
+  "desc": "A weather display web application for presenting temperature information gathered by locally install"
+ },
+ {
+  "id": "e-card-tailwindcss",
+  "repo": "Cruzyhubby/e-card",
+  "pr": 7,
+  "pkg": "tailwindcss",
+  "from": "3.4.19",
+  "to": "4.3.5",
+  "dir": "/admin",
+  "stars": 0,
+  "desc": ""
+ },
+ {
+  "id": "ctl-algoviz-react-router-dom",
+  "kind": "control",
+  "repo": "2003Mohammed/AlgoViz",
+  "pr": 78,
+  "pkg": "react-router-dom",
+  "from": "6.27.0",
+  "to": "7.18.4",
+  "dir": "/",
+  "bump": "5d1f45918fb8c00b927143a764cc2a1c5e703cb0",
+  "merged": "2026-10-18",
+  "checks": {
+   "SUCCESS": 2
+  },
+  "stars": 2,
+  "desc": "“AlgoViz – A Visualizer for Data Structures and Algorithms with interactive animations, examples, an"
+ },
+ {
+  "id": "ctl-algoviz-date-fns",
+  "kind": "control",
+  "repo": "2003Mohammed/AlgoViz",
+  "pr": 72,
+  "pkg": "date-fns",
+  "from": "3.6.0",
+  "to": "4.4.0",
+  "dir": "/",
+  "bump": "598a087823fc99c59ea351ffba9bb649e85d0360",
+  "merged": "2026-09-20",
+  "checks": {
+   "SUCCESS": 2
+  },
+  "stars": 2,
+  "desc": "“AlgoViz – A Visualizer for Data Structures and Algorithms with interactive animations, examples, an"
+ },
+ {
+  "id": "ctl-json-tool-react-icons",
+  "kind": "control",
+  "repo": "marabesi/json-tool",
+  "pr": 175,
+  "pkg": "react-icons",
+  "from": "4.12.0",
+  "to": "5.7.0",
+  "dir": "/",
+  "bump": "fbcec5a6b253fe86a7baf163802680f78d5d271b",
+  "merged": "2026-09-07",
+  "checks": {
+   "SUCCESS": 7,
+   "SKIPPED": 2
+  },
+  "stars": 9,
+  "desc": "json-tool the privacy first tool that allows you to quick format json, everything runs locally."
+ },
+ {
+  "id": "ctl-cline-todo-material",
+  "kind": "control",
+  "repo": "skatcat31/cline-todo",
+  "pr": 11,
+  "pkg": "@mui/material",
+  "from": "7.3.11",
+  "to": "9.3.1",
+  "dir": "/",
+  "bump": "35a09a2fad8e450285d57e55d499fe2751bbc444",
+  "merged": "2026-08-29",
+  "checks": {
+   "SUCCESS": 2,
+   "SKIPPED": 1
+  },
+  "stars": 0,
+  "desc": "A To Do app with sub tasks and descriptions made using Agentic AI using CLINE and Ollama running gpt"
+ },
+ {
+  "id": "ctl-calendar-app-web-material",
+  "kind": "control",
+  "repo": "i-s-23/calendar-app-web",
+  "pr": 592,
+  "pkg": "@mui/material",
+  "from": "7.3.11",
+  "to": "9.4.0",
+  "dir": "/",
+  "bump": "8f1e9be8758e657c17d27a262c82868cb6fda716",
+  "merged": "2026-09-11",
+  "checks": {
+   "SUCCESS": 1
+  },
+  "stars": 0,
+  "desc": "React+TypeScript calendar WebApplication"
+ },
+ {
+  "id": "ctl-robocodejs-com-react-icons",
+  "kind": "control",
+  "repo": "LeeAdcock/robocodeJs.com",
+  "pr": 36,
+  "pkg": "react-icons",
+  "from": "4.7.1",
+  "to": "5.7.0",
+  "dir": "/ui",
+  "bump": "2d56bc0b1dc9d11f8b859fb724ccca0bedf58582",
+  "merged": "2026-07-06",
+  "checks": {
+   "SUCCESS": 2
+  },
+  "stars": 1,
+  "desc": "A browser-based programming game. Write JavaScript \"bots\" and set them loose in a shared arena to fi"
+ },
+ {
+  "id": "ctl-sqllineage-material",
+  "kind": "control",
+  "repo": "reata/sqllineage",
+  "pr": 818,
+  "pkg": "@mui/material",
+  "from": "7.3.10",
+  "to": "9.3.1",
+  "dir": "/sqllineagejs",
+  "bump": "8de78c78d1b5af55553e21cbc4b939ccf1ff79f0",
+  "merged": "2026-08-23",
+  "checks": {
+   "SUCCESS": 32
+  },
+  "stars": 1688,
+  "desc": "SQL Lineage Analysis Tool powered by Python"
+ },
+ {
+  "id": "ctl-data-expert-zustand",
+  "kind": "control",
+  "repo": "Power-Howdy/data-expert",
+  "pr": 20,
+  "pkg": "zustand",
+  "from": "4.5.7",
+  "to": "5.0.15",
+  "dir": "/frontend",
+  "bump": "a9fa33c4bc08f99864634f0d315b98035a95ba51",
+  "merged": "2026-10-17",
+  "checks": {
+   "SUCCESS": 2
+  },
+  "stars": 7,
+  "desc": "Date expert is an application for data engineers"
+ },
+ {
+  "id": "ctl-syncflow-zustand",
+  "kind": "control",
+  "repo": "killerdasher/syncflow",
+  "pr": 17,
+  "pkg": "zustand",
+  "from": "4.5.7",
+  "to": "5.0.15",
+  "dir": "/",
+  "bump": "cd1cdc61f489144bc2ba4d1a06f1311942dfa530",
+  "merged": "2026-10-02",
+  "checks": {
+   "SUCCESS": 6
+  },
+  "stars": 3,
+  "desc": "Peer-to-peer file transfer, sync folders and chat for your local network — real end-to-end encryptio"
+ },
+ {
+  "id": "ctl-daily-helper-react-markdown",
+  "kind": "control",
+  "repo": "Aliamondo/daily-helper",
+  "pr": 65,
+  "pkg": "react-markdown",
+  "from": "9.1.0",
+  "to": "10.1.0",
+  "dir": "/",
+  "bump": "34e30d05300e94610c03224c6de085aac0602561",
+  "merged": "2026-10-07",
+  "checks": {
+   "SUCCESS": 3
+  },
+  "stars": 0,
+  "desc": "Daily Helper"
+ },
+ {
+  "id": "ctl-portfolio-design-system-material",
+  "kind": "control",
+  "repo": "Markj89/portfolio-design-system",
+  "pr": 73,
+  "pkg": "@mui/material",
+  "from": "7.3.11",
+  "to": "9.2.0",
+  "dir": "/",
+  "bump": "aa18de82be5375ae113c04f93a13fecdb8ff8e2d",
+  "merged": "2026-07-10",
+  "checks": {
+   "SUCCESS": 1
+  },
+  "stars": 0,
+  "desc": "A Design System for my Portfolio"
+ },
+ {
+  "id": "ctl-notoli-material",
+  "kind": "control",
+  "repo": "VanillaIceCube/Notoli",
+  "pr": 748,
+  "pkg": "@mui/material",
+  "from": "7.3.9",
+  "to": "9.4.0",
+  "dir": "/frontend",
+  "bump": "c20800be851bbef106974c01388cd499f9d91228",
+  "merged": "2026-10-10",
+  "checks": {
+   "SUCCESS": 15,
+   "SKIPPED": 4,
+   "NEUTRAL": 1
+  },
+  "stars": 0,
+  "desc": "Notoli: Notion Todo List"
+ }
+]
