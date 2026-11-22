@@ -13,7 +13,7 @@ inputs:
     description: TestMu AI access key for Kane CLI
     required: true
   agent:
-    description: The agent that migrates code when a journey breaks: claude, codex or none
+    description: "The agent that migrates code when a journey breaks (claude, codex or none)"
     required: false
     default: claude
   openai-api-key:

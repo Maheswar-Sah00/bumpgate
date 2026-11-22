@@ -40,8 +40,9 @@ Fail-closed rules: if Kane can't run a journey, nothing merges. A journey alread
 name: Bumpgate
 on:
   pull_request:
-    types: [opened, synchronize, reopened, labeled]
+    types: [opened, synchronize, reopened]
 permissions: { contents: write, pull-requests: write, issues: write }
+concurrency: { group: "bumpgate-${{ github.event.pull_request.number }}", cancel-in-progress: true }
 jobs:
   gate:
     if: github.event.pull_request.user.login == 'dependabot[bot]' || github.event.pull_request.user.login == 'renovate[bot]'

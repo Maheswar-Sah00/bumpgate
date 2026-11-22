@@ -149,3 +149,16 @@ test('arg parsing', () => {
   assert.equal(a.agent, 'claude');
   assert.equal(a.maxRuns, '12');
 });
+
+test('action.yml: no unquoted ": " inside a plain scalar (GitHub refuses to load the action)', async () => {
+  const { readFileSync } = await import('node:fs');
+  const lines = readFileSync(new URL('../action.yml', import.meta.url), 'utf8').split(/\r?\n/);
+  const bad = lines.filter((l) => {
+    const m = l.match(/^\s*[\w-]+:\s+(.*)$/);
+    if (!m) return false;
+    const v = m[1];
+    if (/^["'|>]/.test(v) || v.startsWith('${{')) return false;
+    return /:\s/.test(v);
+  });
+  assert.deepEqual(bad, []);
+});
