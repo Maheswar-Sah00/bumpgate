@@ -11,7 +11,7 @@ Built for the [Kane CLI Hackathon](https://www.kaneclihack.sh/) by TestMu AI. Ag
 | What | Where | Time |
 |---|---|---|
 | Real Dependabot PRs going through the gate: two blocked, migrated by Claude Code and merged; one green auto-merge | [bumpgatedemo pull requests](https://github.com/Maheswar-Sah00/bumpgatedemo/pulls?q=is%3Apr) | 2 min |
-| Backtest on real upgrades public repos had to undo: a React PR with 5 green CI checks left the app blank, and Kane blocked it at step 1 | [`backtest/RESULTS.md`](backtest/RESULTS.md) | 1 min |
+| Backtest on real upgrades public repos had to undo: a React PR passed all 4 CI checks, including the deploy to GitHub Pages, and left the app blank, and Kane blocked it at step 1 | [`backtest/RESULTS.md`](backtest/RESULTS.md) | 1 min |
 | The merge rule, in code (no prompt decides a merge) | [`src/gate.mjs`](src/gate.mjs) and its tests in [`test/gate.test.mjs`](test/gate.test.mjs) | 1 min |
 | The guardrails the fix agent cannot get past | [`src/fix.mjs`](src/fix.mjs) (`guardrails`) | 1 min |
 | Run it yourself | [below](#run-it-yourself) | 5 min |

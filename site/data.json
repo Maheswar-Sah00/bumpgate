@@ -4,7 +4,7 @@
       "repo": "anis-mondal/tic-tac-toe",
       "title": "Bump react from 19.2.8 to 19.3.0",
       "short": "react 19.2.8 → 19.3.0",
-      "ci": "5 checks passed",
+      "ci": "all 4 CI checks passed",
       "merged": "16 Sep 2026",
       "reverted": "17 Sep 2026",
       "pr_url": "https://github.com/anis-mondal/tic-tac-toe/pull/36",
@@ -24,7 +24,7 @@
       "repo": "kikeelectronico/Homeware-LAN",
       "title": "Bump @mui/material from 7.3.11 to 9.5.0",
       "short": "@mui/material 7.3.11 → 9.5.0",
-      "ci": "4 checks passed",
+      "ci": "3 checks passed",
       "merged": "31 Oct 2026",
       "reverted": "31 Oct 2026",
       "pr_url": "https://github.com/kikeelectronico/Homeware-LAN/pull/1432",
@@ -52,8 +52,8 @@
       "l": "broken PRs blocked by Kane CLI, migrated by Claude Code, re-verified and merged with no human"
     },
     {
-      "v": "5 ✓",
-      "l": "CI checks passed on a real React 19.3.0 PR that left the app blank. In the backtest, Kane blocked it at step 1"
+      "v": "4/4",
+      "l": "CI checks passed on a real React 19.3.0 PR, deploy included, and the app went blank. In the backtest, Kane blocked it at step 1"
     }
   ],
   "proofIntro": "Real Dependabot PRs on a demo shop, and a backtest on real upgrades a public repo had to undo. Every result is a real Kane CLI run.",
@@ -95,7 +95,7 @@
       "source": "anis-mondal/tic-tac-toe · reverted by the maintainer",
       "light": "blocked",
       "bump": "react 19.2.8 → 19.3.0 (react-dom left at 19.2.8)",
-      "ci": "5 checks passed",
+      "ci": "all 4 CI checks passed, including the deploy to GitHub Pages",
       "kane": "Blank page at step 1, React error #527. Bug verdict: “React version mismatch leaves game setup page blank”",
       "result": "Blocked before merge",
       "links": [
@@ -116,7 +116,7 @@
       "bump": "clsx 1.2.1 → 2.1.1",
       "ci": "build passes",
       "kane": "3/3 journeys pass on main and on the bump",
-      "result": "Merged itself in 77 s",
+      "result": "Merged itself in under 2 minutes",
       "links": [
         {
           "label": "PR #5",
