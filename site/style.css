@@ -71,6 +71,8 @@ b { font-weight: 600; }
 .h2 { font: 400 clamp(30px, 4.4vw, 50px)/1.1 var(--mono); letter-spacing: -.03em; margin: 0; }
 .sub { color: var(--mut); margin: 14px auto 0; max-width: 560px; font-size: 16px; }
 .fine { color: var(--mut); font-size: 12.5px; margin: 26px 0 0; }
+.vid-link { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line-2); white-space: nowrap; }
+.vid-link:hover { text-decoration-color: var(--ink); }
 
 /* buttons */
 .btn {
