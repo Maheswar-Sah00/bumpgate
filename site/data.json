@@ -4,7 +4,7 @@
       "repo": "anis-mondal/tic-tac-toe",
       "title": "Bump react from 19.2.8 to 19.3.0",
       "short": "react 19.2.8 → 19.3.0",
-      "ci": "all 4 CI checks passed",
+      "ci": "passed on the PR and on the merge, incl. the Pages deploy",
       "merged": "16 Sep 2026",
       "reverted": "17 Sep 2026",
       "pr_url": "https://github.com/anis-mondal/tic-tac-toe/pull/36",
@@ -44,55 +44,36 @@
   "backtest": null,
   "stats": [
     {
+      "v": "2/2",
+      "l": "broken demo PRs (zod 3→4, react-query 4→5) migrated by Claude Code, re-verified by Kane and merged with no human"
+    },
+    {
       "v": "2/10",
-      "l": "open Dependabot PRs in other people's repos ship a blank page once the install is forced. Kane proved both before merge"
+      "l": "open Dependabot PRs in other people's repos ship a blank page once the install is forced (their own CI was red). Kane proved both before merge"
     },
     {
       "v": "0/4",
       "l": "false alarms on bot bumps that were merged and never reverted"
-    },
-    {
-      "v": "2/2",
-      "l": "broken demo PRs migrated by Claude Code, re-verified by Kane and merged with no human"
     }
   ],
   "proofIntro": "Real Dependabot PRs: on our demo shop, on 10 open PRs in other people's repos, and on upgrades a public repo had to undo. Every result is a real Kane CLI run.",
   "cases": [
     {
-      "title": "An open PR blanks a 1.6k★ app",
-      "source": "wfh45678/radar · open Dependabot PR #112",
+      "title": "A real React upgrade, blank page",
+      "source": "anis-mondal/tic-tac-toe · reverted by the maintainer",
       "light": "blocked",
-      "bump": "react 18.3.1 → 19.3.1 (react-dom left at 18)",
-      "ci": "red: npm refused the tree",
-      "kane": "3/3 journeys broke: blank login page, ReactCurrentBatchConfig. Kane: “Login page crashes before rendering” (major)",
+      "bump": "react 19.2.8 → 19.3.0 (react-dom left at 19.2.8)",
+      "ci": "passed on the PR; the merge passed every check, including the deploy to GitHub Pages",
+      "kane": "Blank page at step 1, React error #527. Bug verdict: “React version mismatch leaves game setup page blank”",
       "result": "Blocked before merge",
       "links": [
         {
-          "label": "Radar case",
-          "href": "https://github.com/Maheswar-Sah00/bumpgate/tree/main/radar/cases/radar-react"
+          "label": "Backtest",
+          "href": "https://github.com/Maheswar-Sah00/bumpgate/blob/main/backtest/RESULTS.md"
         },
         {
-          "label": "PR #112",
-          "href": "https://github.com/wfh45678/radar/pull/112"
-        }
-      ]
-    },
-    {
-      "title": "A UI-kit major moves the UI",
-      "source": "AeTher97/szakal-2 · open Dependabot PR #503",
-      "light": "amber",
-      "bump": "@mui/material 7.3.6 → 9.5.0",
-      "ci": "red: npm peer conflict",
-      "kane": "Works, but Kane had to self-heal the sign-up link step; the other 2 journeys are unchanged",
-      "result": "One look before merging",
-      "links": [
-        {
-          "label": "Radar case",
-          "href": "https://github.com/Maheswar-Sah00/bumpgate/tree/main/radar/cases/szakal-2-material"
-        },
-        {
-          "label": "PR #503",
-          "href": "https://github.com/AeTher97/szakal-2/pull/503"
+          "label": "Original PR",
+          "href": "https://github.com/anis-mondal/tic-tac-toe/pull/36"
         }
       ]
     },
@@ -129,21 +110,40 @@
       ]
     },
     {
-      "title": "A real React upgrade, blank page",
-      "source": "anis-mondal/tic-tac-toe · reverted by the maintainer",
+      "title": "An open PR blanks a 1.6k★ app",
+      "source": "wfh45678/radar · open Dependabot PR #112",
       "light": "blocked",
-      "bump": "react 19.2.8 → 19.3.0 (react-dom left at 19.2.8)",
-      "ci": "all 4 CI checks passed, including the deploy to GitHub Pages",
-      "kane": "Blank page at step 1, React error #527. Bug verdict: “React version mismatch leaves game setup page blank”",
+      "bump": "react 18.3.1 → 19.3.1 (react-dom left at 18)",
+      "ci": "red: npm refused the tree",
+      "kane": "3/3 journeys broke: blank login page, ReactCurrentBatchConfig. Kane: “Login page crashes before rendering” (major)",
       "result": "Blocked before merge",
       "links": [
         {
-          "label": "Backtest",
-          "href": "https://github.com/Maheswar-Sah00/bumpgate/blob/main/backtest/RESULTS.md"
+          "label": "Radar case",
+          "href": "https://github.com/Maheswar-Sah00/bumpgate/tree/main/radar/cases/radar-react"
         },
         {
-          "label": "Original PR",
-          "href": "https://github.com/anis-mondal/tic-tac-toe/pull/36"
+          "label": "PR #112",
+          "href": "https://github.com/wfh45678/radar/pull/112"
+        }
+      ]
+    },
+    {
+      "title": "A UI-kit major moves the UI",
+      "source": "AeTher97/szakal-2 · open Dependabot PR #503",
+      "light": "amber",
+      "bump": "@mui/material 7.3.6 → 9.5.0",
+      "ci": "red: npm peer conflict",
+      "kane": "Works, but Kane had to self-heal the sign-up link step; the other 2 journeys are unchanged",
+      "result": "One look before merging",
+      "links": [
+        {
+          "label": "Radar case",
+          "href": "https://github.com/Maheswar-Sah00/bumpgate/tree/main/radar/cases/szakal-2-material"
+        },
+        {
+          "label": "PR #503",
+          "href": "https://github.com/AeTher97/szakal-2/pull/503"
         }
       ]
     },

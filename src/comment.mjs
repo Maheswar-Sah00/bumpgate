@@ -117,7 +117,7 @@ function renderFix(fix, ctx) {
   for (const a of fix.attempts) {
     const guard = a.rejected ? `❌ ${esc(a.rejected)}` : '✅ journeys untouched, bump kept';
     const kane = a.verdict ? `${LIGHT[a.verdict] || ''} ${a.verdict}${a.failedJourney ? `: ${esc(a.failedJourney)}` : ''}` : '–';
-    out.push(`| ${a.n} | ${esc(trim(a.summary || '(no summary)', 220))} | ${guard} | ${kane} |`);
+    out.push(`| ${a.n} | ${esc(trim(a.summary || '(no summary)', 400))} | ${guard} | ${kane} |`);
   }
   if (fix.ok && fix.result) {
     const r = fix.result;
@@ -191,11 +191,22 @@ function esc(s) {
   return String(s ?? '').replace(/\|/g, '\\|').replace(/\r?\n/g, ' ').replace(/</g, '&lt;');
 }
 
-function trim(s, n) {
+// Cut at the last full sentence when one ends past the halfway mark, so a summary never stops mid-word.
+export function trim(s, n) {
   s = String(s ?? '');
-  return s.length > n ? s.slice(0, n - 1) + '…' : s;
+  if (s.length <= n) return s;
+  const cut = s.slice(0, n);
+  const end = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('.\n'));
+  return end >= n / 2 ? cut.slice(0, end + 1) : cut.slice(0, n - 1) + '…';
 }
 
-function shortUrl(u) {
-  return String(u).replace(/^https?:\/\/(www\.)?/, '').replace(/^github\.com\//, '').slice(0, 60);
+// "TanStack/query/releases/tag/%40tanstack%2Freact-query%405.108.0" → "query @tanstack/react-query@5.108.0"
+export function shortUrl(u) {
+  const m = String(u).match(/github\.com\/[^/]+\/([^/]+)\/releases\/tag\/([^?#]+)/);
+  if (m) {
+    let tag = m[2];
+    try { tag = decodeURIComponent(tag); } catch { /* keep the raw tag */ }
+    return `${m[1]} ${tag}`;
+  }
+  return String(u).replace(/^https?:\/\/(www\.)?/, '').replace(/^github\.com\//, '').replace(/\/$/, '');
 }

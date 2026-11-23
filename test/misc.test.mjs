@@ -267,3 +267,12 @@ test('peerConflictLine names the clash from npm ERESOLVE output', () => {
   assert.equal(peerConflictLine(out), 'react-dom@18.3.1 conflicts with react@19.3.1');
   assert.equal(peerConflictLine('nothing useful'), 'npm ERESOLVE');
 });
+
+test('comment text: trims at a sentence end and decodes release tags', async () => {
+  const { trim, shortUrl } = await import('../src/comment.mjs');
+  assert.equal(trim('First sentence here. Second one runs on and on and on.', 36), 'First sentence here.');
+  assert.equal(trim('abcdefghij', 5), 'abcd…');
+  assert.equal(trim('short', 50), 'short');
+  assert.equal(shortUrl('https://github.com/TanStack/query/releases/tag/%40tanstack/react-query%405.108.0'), 'query @tanstack/react-query@5.108.0');
+  assert.equal(shortUrl('https://github.com/colinhacks/zod'), 'colinhacks/zod');
+});

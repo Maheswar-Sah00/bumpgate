@@ -47,7 +47,7 @@
       <h1 class="display">Verified<br>Dependency Upgrades</h1>
       <p class="lede">Bumpgate replays your app's critical journeys on every Dependabot and Renovate PR. It merges what still works, and fixes what broke.</p>
       <div class="cmd" role="group" aria-label="Install">
-        <code><span class="mut">uses:</span> Maheswar-Sah00/bumpgate@main</code>
+        <code><span class="mut">uses:</span> Maheswar-Sah00/bumpgate@v1</code>
         <button class="btn btn-sm" id="copy-hero">Copy workflow <span class="arr">→</span></button>
       </div>
       <a class="proof-link" href="https://github.com/Maheswar-Sah00/bumpgatedemo/pulls?q=is%3Apr"><i class="lt g"></i>Live on real Dependabot PRs · 3 merged, 2 fixed by Claude Code <span>↗</span></a>
@@ -71,7 +71,7 @@
         </aside>
         <div class="app-main">
           <div class="app-top">
-            <span><span class="mut">#3</span> Bump zod from 3.25.76 to 4.6.7</span>
+            <span><span class="mut">#4</span> Bump zod from 3.25.76 to 4.6.7</span>
             <span class="state" id="pr-state">open</span>
           </div>
           <div class="thread" id="thread">
@@ -133,7 +133,7 @@
             </div>
           </div>
           <div class="composer">
-            <span class="mut">Comment on #3…</span>
+            <span class="mut">Comment on #4…</span>
             <button class="send" id="replay" aria-label="Replay the demo" title="Replay">↻</button>
           </div>
         </div>
@@ -152,7 +152,7 @@
       </div>
       <div class="eyebrow center gap">Reverted by hand, after green CI</div>
       <div class="reverts" id="reverts"></div>
-      <p class="fine center">Real bot PRs from public GitHub repos. Each one passed CI, merged, and a human reverted it.</p>
+      <p class="fine center">Real bot PRs from public GitHub repos. Each one passed CI, merged, and a human reverted it. Kane CLI replayed the first (tic-tac-toe, blocked at step 1); the other three are shown for context and were not run through Kane.</p>
     </div>
   </section>
 
@@ -192,10 +192,10 @@
             <p>No model votes on the merge. Every journey that passes on main must pass on the bump. Disagreements re-run until two of three agree; if Kane can't run, nothing merges.</p>
           </div>
           <div class="panel">
-            <div class="p-h"><b>The rule, in code</b><span class="mut">src/gate.mjs · 35 unit tests</span></div>
+            <div class="p-h"><b>The rule, in code</b><span class="mut">src/gate.mjs · 15 tests on this rule</span></div>
             <div class="p-sub">zod 4.6.7 changed what the app does</div>
             <div class="nums">
-              <div><span class="mut">Pass on main</span><b>3/3</b><span class="mut">base a743b37</span></div>
+              <div><span class="mut">Pass on main</span><b>3/3</b><span class="mut">base 48060a8</span></div>
               <div><span class="mut">Pass on bump</span><b class="red">2/3</b><span class="mut">confirmed 2/2</span></div>
               <div><span class="mut">New console error</span><b class="red">+1</b><span class="mut">TypeError · forEach</span></div>
             </div>
@@ -239,7 +239,7 @@
           <div class="out">
             <div class="out-c">
               <div class="p-lab">Outcome</div>
-              <div class="pr sm"><span class="pr-ic">✓</span><div><b>bumpgatedemo #3</b><span class="mut">zod 4.6.7 · migrated</span></div></div>
+              <div class="pr sm"><span class="pr-ic">✓</span><div><b>bumpgatedemo #4</b><span class="mut">zod 4.6.7 · migrated</span></div></div>
               <div class="mut s">no human needed · 1 attempt</div>
             </div>
             <span class="out-arr">→</span>
@@ -262,16 +262,20 @@
       <div class="rule-grid reveal">
         <div class="win">
           <div class="win-h"><i></i><i></i><i></i><span>src/gate.mjs</span></div>
-<pre class="code"><span class="c">// the whole merge decision</span>
-<span class="k">const</span> comparable = rows.filter(r =&gt; majority(r.base) === <span class="s">'pass'</span>);
+<pre class="code"><span class="c">// excerpt from decide(rows): the whole merge decision</span>
+<span class="k">const</span> red = decided.filter((r) =&gt; r.decision.light === <span class="s">'red'</span>);
+<span class="k">const</span> comparable = decided.filter((r) =&gt; r.decision.base === <span class="s">'pass'</span>);
+
+<span class="k">if</span> (red.length) { verdict = <span class="s">'red'</span>; action = <span class="s">'block'</span>; }
+<span class="c">// fail closed: nothing to compare, no merge</span>
+<span class="k">else if</span> (held.length || comparable.length === <span class="s">0</span>) { verdict = <span class="s">'inconclusive'</span>; action = <span class="s">'hold'</span>; }
+
+<span class="c">// the rule itself, as a boolean the tests pin down</span>
 <span class="k">const</span> everyBasePassStillPasses = comparable.every(
-  r =&gt; [<span class="s">'green'</span>, <span class="s">'amber'</span>].includes(decideJourney(r).light));
+  (r) =&gt; [<span class="s">'green'</span>, <span class="s">'amber'</span>].includes(r.decision.light));
 
-<span class="c">// fail closed: no comparison, no merge</span>
-<span class="k">if</span> (comparable.length === <span class="s">0</span>) <span class="k">return</span> <span class="s">'hold'</span>;
-
-<span class="c">// the fix agent can't touch the exam or undo the bump</span>
-guardrails({ files, journeysDir: <span class="s">'.kane'</span>, bumps, headPkg, newPkg });</pre>
+<span class="c">// src/fix.mjs: the fix agent can't touch the exam or undo the bump</span>
+guardrails({ files, journeysDir, bumps, headPkg, newPkg, headLock, newLock });</pre>
         </div>
         <div class="facts">
           <div><b>Fail closed</b><p>If Kane can't run a journey, nothing merges.</p></div>
@@ -311,7 +315,7 @@ guardrails({ files, journeysDir: <span class="s">'.kane'</span>, bumps, headPkg,
       <p class="sub center">On the PR, in your terminal, in CI. Pick whichever fits the day.</p>
       <div class="surf">
         <div class="sf reveal">
-          <div class="sf-top"><span class="sf-ic">◎</span><code>bumpgate commented on #3</code></div>
+          <div class="sf-top"><span class="sf-ic">◎</span><code>bumpgate commented on #4</code></div>
           <div class="sf-body">
             <div class="sfl"><b class="green"><i class="lt g"></i> Fixed and re-verified</b></div>
             <div class="sfl mut">Checkout explains what is wrong</div>
@@ -333,7 +337,7 @@ guardrails({ files, journeysDir: <span class="s">'.kane'</span>, bumps, headPkg,
         <div class="sf reveal">
           <div class="sf-top"><span class="sf-ic">⚙</span><code>.github/workflows/bumpgate.yml</code></div>
           <div class="sf-body term">
-            <div><span class="mut">- uses:</span> Maheswar-Sah00/bumpgate@main</div>
+            <div><span class="mut">- uses:</span> Maheswar-Sah00/bumpgate@v1</div>
             <div><span class="mut">  with:</span></div>
             <div><span class="mut">    lt-username:</span> ${{ secrets… }}</div>
             <div><span class="mut">    agent:</span> claude</div>
@@ -351,7 +355,7 @@ guardrails({ files, journeysDir: <span class="s">'.kane'</span>, bumps, headPkg,
       <div class="judge">
         <a class="jc reveal" href="https://github.com/Maheswar-Sah00/bumpgatedemo/pulls?q=is%3Apr"><span class="t">01 · 2 min</span><b>Real Dependabot PRs</b><p>A shop with real bot PRs: two blocked, migrated by Claude Code and merged; one green auto-merge.</p><span class="go">Open PRs ↗</span></a>
         <a class="jc reveal" href="https://github.com/Maheswar-Sah00/bumpgate/blob/main/src/gate.mjs"><span class="t">02 · 1 min</span><b>Read the rule</b><p>The merge decision is plain code with unit tests. No prompt decides a merge.</p><span class="go">src/gate.mjs ↗</span></a>
-        <a class="jc reveal" href="https://github.com/Maheswar-Sah00/bumpgate#run-it-yourself"><span class="t">03 · 2 min</span><b>Run it yourself</b><p>Clone the demo, then run <code>bumpgate check</code> against a bump branch.</p><span class="go">README ↗</span></a>
+        <a class="jc reveal" href="https://github.com/Maheswar-Sah00/bumpgate#run-it-yourself"><span class="t">03 · 2 min</span><b>Run it yourself</b><p>Clone the demo, then run <code>bumpgate check</code> on the zod bump from PR #4. Needs a Kane CLI login.</p><span class="go">README ↗</span></a>
       </div>
 
       <div class="win install reveal" id="install">
@@ -372,7 +376,7 @@ jobs:
         with: { fetch-depth: 0 }
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
-      - uses: Maheswar-Sah00/bumpgate@main
+      - uses: Maheswar-Sah00/bumpgate@v1
         with:
           lt-username: ${{ secrets.LT_USERNAME }}
           lt-access-key: ${{ secrets.LT_ACCESS_KEY }}
