@@ -47,6 +47,8 @@ export async function buildSide(dir, cfg, { onLog, skipInstall = false } = {}) {
   let peerConflict = null;
   const env = { CI: 'true', NODE_ENV: undefined, BROWSER: 'none', NEXT_TELEMETRY_DISABLED: '1', HUSKY: '0', COREPACK_ENABLE_DOWNLOAD_PROMPT: '0' };
   delete env.NODE_ENV;
+  // Secrets are scrubbed from install and build (src/sh.mjs). A private registry token can be let through by name.
+  for (const k of cfg.passEnv || []) if (process.env[k] !== undefined) env[k] = process.env[k];
   if (!skipInstall || !existsSync(path.join(dir, 'node_modules'))) {
     onLog?.(`install: ${commands.install}`);
     let r = await sh(commands.install, { cwd: dir, env, timeoutMs: 15 * 60 * 1000 });

@@ -51,6 +51,11 @@ export async function ci({ log, overrides = {} }) {
   }
 
   gitOk(['fetch', '--no-tags', 'origin', pr.base.sha, pr.head.sha], repoDir);
+  // actions/checkout leaves the job token in .git/config, where the bump's install scripts could read it.
+  // Take it out before any untrusted code runs; the one push below passes it on the command line instead.
+  const authKey = 'http.https://github.com/.extraheader';
+  const savedAuth = gitOk(['config', '--local', '--get', authKey], repoDir).out;
+  if (savedAuth) gitOk(['config', '--local', '--unset-all', authKey], repoDir);
   const mergeBase = gitOk(['merge-base', pr.base.sha, pr.head.sha], repoDir).out || pr.base.sha;
   const cfg = configAtBase(repoDir, mergeBase, overrides);
   const outDir = path.join(process.env.RUNNER_TEMP || repoDir, 'bumpgate-out');
@@ -80,7 +85,9 @@ export async function ci({ log, overrides = {} }) {
       process.env.GIT_COMMITTER_EMAIL ||= process.env.GIT_AUTHOR_EMAIL;
       fix = await fixLoop(session, { agent: cfg.agent, maxAttempts: cfg.maxFixAttempts, log });
       if (fix.ok) {
-        git(['push', 'origin', `${fix.commit}:refs/heads/${pr.head.ref}`], repoDir);
+        const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
+        const auth = token ? `AUTHORIZATION: basic ${Buffer.from(`x-access-token:${token}`).toString('base64')}` : savedAuth;
+        git([...(auth ? ['-c', `${authKey}=${auth}`] : []), 'push', 'origin', `${fix.commit}:refs/heads/${pr.head.ref}`], repoDir);
         log.ok(`Pushed ${fix.commit.slice(0, 7)} to ${pr.head.ref}`);
       }
     }
@@ -136,7 +143,13 @@ export async function ci({ log, overrides = {} }) {
   const verifiedSha = fix?.ok && fix.commit ? fix.commit : pr.head.sha;
   await safe('status', () => setStatus(repo, verifiedSha, { ...statusFor(state, final, action), targetUrl: runUrl }));
 
-  if (action === 'merge' && cfg.autoMerge !== false) {
+  // An agent-written migration merges on Kane's re-verification unless the repo asks for a person (mergeFixes: "review").
+  const humanFirst = state === 'fixed' && cfg.mergeFixes === 'review';
+  if (humanFirst) {
+    log.info(`PR #${pr.number}: fixed and re-verified by Kane; waiting for a person to approve the migration (mergeFixes: review).`);
+    await safe('labels', () => setLabels(repo, pr.number, ['bumpgate: fixed', 'needs-review']));
+  }
+  if (action === 'merge' && cfg.autoMerge !== false && !humanFirst) {
     const how = await safe('merge', () => mergeWhenGreen(repo, pr.number));
     if (how) log.ok(`PR #${pr.number}: ${how}`);
   }

@@ -4,7 +4,7 @@ import net from 'node:net';
 import { createReadStream, existsSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
-import { killTree } from './sh.mjs';
+import { killTree, scrubEnv } from './sh.mjs';
 
 const MIME = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8',
@@ -84,7 +84,7 @@ export async function serveCommand(command, { cwd, port, path: urlPath = '/', en
     shell: true,
     windowsHide: true,
     detached: process.platform !== 'win32',
-    env: { ...process.env, PORT: String(port), BROWSER: 'none', CI: 'true', ...env },
+    env: { ...scrubEnv(), PORT: String(port), BROWSER: 'none', CI: 'true', ...env },
   });
   let log = '';
   child.stdout.on('data', (d) => { log += d; if (log.length > 20000) log = log.slice(-20000); });

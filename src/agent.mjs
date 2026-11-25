@@ -93,14 +93,14 @@ export async function runAgent(kind, { cwd, taskFile, outDir, attempt, images = 
     for (const img of images) if (img && existsSync(img)) args.push('-i', img);
     if (process.env.BUMPGATE_CODEX_MODEL) args.push('-m', process.env.BUMPGATE_CODEX_MODEL);
     args.push(prompt);
-    res = await run('codex', args, { cwd, timeoutMs, onLine });
+    res = await run('codex', args, { cwd, timeoutMs, onLine, keepSecrets: ['OPENAI_API_KEY', 'CODEX_API_KEY'] });
   } else if (kind === 'claude') {
     const args = ['-p', prompt, '--output-format', 'stream-json', '--verbose',
       '--permission-mode', 'acceptEdits',
       '--allowedTools', 'Read,Edit,Write,Glob,Grep,Bash(npm run *),Bash(npm ci*),Bash(npx tsc*),Bash(git diff*),Bash(git status*),Bash(cat *),Bash(ls *)',
       '--add-dir', path.dirname(taskFile)];
     if (process.env.BUMPGATE_CLAUDE_MODEL) args.push('--model', process.env.BUMPGATE_CLAUDE_MODEL);
-    res = await run('claude', args, { cwd, timeoutMs, onLine });
+    res = await run('claude', args, { cwd, timeoutMs, onLine, keepSecrets: ['ANTHROPIC_API_KEY', 'CLAUDE_CODE_OAUTH_TOKEN'] });
   } else {
     throw new Error(`unknown agent "${kind}" (use codex, claude or none)`);
   }

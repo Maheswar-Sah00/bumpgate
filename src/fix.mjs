@@ -1,6 +1,6 @@
 // The closed loop: Kane fails → agent migrates → code checks the guardrails → Kane re-verifies.
 // Up to N attempts, then a human. The agent proposes; code and Kane decide.
-import { mkdirSync, writeFileSync, copyFileSync, existsSync } from 'node:fs';
+import { mkdirSync, writeFileSync, copyFileSync, existsSync, readFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { git, gitOk } from './sh.mjs';
@@ -41,7 +41,8 @@ export function parsePorcelainZ(out) {
  * The code-enforced rules on an agent's change. Returns a reason string to reject, or null.
  * Pure: everything it needs is passed in, so tests can pin it down.
  */
-export function guardrails({ files, journeysDir = '.kane', protect = [], bumps = [], headPkg = {}, newPkg = {}, headLock = null, newLock = null }) {
+export function guardrails({ files, journeysDir = '.kane', protect = [], bumps = [], headPkg = {}, newPkg = {}, headLock = null, newLock = null,
+  added = [], removed = [], asserted = [], maxChangedLines = 400 }) {
   if (!files.length) return 'the agent made no changes';
   const norm = (p) => p.replace(/\\/g, '/').replace(/^\.\//, '');
   const jd = norm(journeysDir).replace(/\/$/, '') + '/';
@@ -64,7 +65,47 @@ export function guardrails({ files, journeysDir = '.kane', protect = [], bumps =
       return `it changed the installed ${b.name} (${headLock[b.name]} → ${newLock[b.name] ?? 'removed'}); the bump must stay`;
     }
   }
+  // Teaching to the test: a text the journeys verify must come from the app's logic, not be pasted in
+  // by the fix. Moving an existing string is fine (it is on a removed line too); a new copy is not.
+  const count = (lines, t) => lines.reduce((n, l) => n + (l.includes(t) ? 1 : 0), 0);
+  for (const t of asserted) {
+    if (t.length < 4) continue;
+    if (count(added, t) > count(removed, t)) return `it added the text "${t}" that a journey checks for; the app must produce it, not hard-code it`;
+  }
+  const changed = added.length + removed.length;
+  if (changed > maxChangedLines) return `it changed ${changed} lines (limit ${maxChangedLines}); a migration this large needs a human`;
   return null;
+}
+
+/** Quoted texts the journeys verify ("Verify the message "X" is shown"). */
+export function assertedTexts(journeys = []) {
+  const out = new Set();
+  for (const j of journeys) {
+    for (const line of String(j.text || '').split(/\r?\n/)) {
+      if (!/\b(verify|check|assert|expect|see|shown|visible)\b/i.test(line)) continue;
+      for (const m of line.matchAll(/["“]([^"”]{4,120})["”]/g)) out.add(m[1]);
+    }
+  }
+  return [...out];
+}
+
+/** Added and removed lines of the agent's change (tracked diff plus new untracked files). Lockfiles are skipped. */
+export function diffLines(dir) {
+  const added = [];
+  const removed = [];
+  const d = spawnSync('git', ['diff', '-U0', '--no-color', 'HEAD', '--', '.', ...LOCKFILES.map((f) => `:(exclude,glob)**/${f}`)],
+    { cwd: dir, encoding: 'utf8', windowsHide: true, maxBuffer: 64 * 1024 * 1024 });
+  for (const l of (d.stdout || '').split('\n')) {
+    if (l.startsWith('+++') || l.startsWith('---')) continue;
+    if (l.startsWith('+')) added.push(l.slice(1));
+    else if (l.startsWith('-')) removed.push(l.slice(1));
+  }
+  const u = spawnSync('git', ['ls-files', '--others', '--exclude-standard', '-z'], { cwd: dir, encoding: 'utf8', windowsHide: true });
+  for (const f of (u.stdout || '').split('\0').filter(Boolean)) {
+    if (LOCKFILES.includes(path.basename(f))) continue;
+    try { added.push(...readFileSync(path.join(dir, f), 'utf8').split('\n')); } catch { /* binary or gone */ }
+  }
+  return { added, removed };
 }
 
 function resetWorktree(dir, sha) {
@@ -137,6 +178,15 @@ export async function fixLoop(session, { agent = 'claude', maxAttempts = 3, log,
     const taskFile = path.join(taskDir, 'task.md');
     writeFileSync(taskFile, task);
     log?.step(`${meta.name}, attempt ${n}/${maxAttempts}: migrating from Kane's evidence`);
+    // Show what Kane handed the agent: the failed step, Kane's reason and verdict, console errors.
+    for (const l of task.split('\n').filter((x) => /^It passes on base|^Kane's (reason|bug verdict)|^Console errors|^Cannot |^TypeError|^Error/.test(x)).slice(0, 8)) {
+      log?.dim(`  ${l.replace(/\*\*/g, '')}`);
+    }
+    if (process.env.GITHUB_ACTIONS) {
+      log?.raw(`::group::Full task handed to ${meta.name} (Kane's evidence + release notes)`);
+      log?.raw(task.length > 20000 ? `${task.slice(0, 20000)}\n…(truncated; full text in the bumpgate artifact)` : task);
+      log?.raw('::endgroup::');
+    }
     onAttempt?.({ n, phase: 'agent' });
 
     const images = failures.flatMap((f) => [f.shots.bump, f.shots.base]).filter(Boolean);
@@ -149,6 +199,7 @@ export async function fixLoop(session, { agent = 'claude', maxAttempts = 3, log,
       onLine: (l) => { if (process.env.BUMPGATE_DEBUG) log?.dim(l.slice(0, 200)); },
     });
     const files = changedFiles(dir);
+    const { added, removed } = diffLines(dir);
     const newPkg = readJson(path.join(app, 'package.json')) || {};
     const newLockJson = readJson(path.join(app, 'package-lock.json'));
     let rejected = guardrails({
@@ -160,6 +211,10 @@ export async function fixLoop(session, { agent = 'claude', maxAttempts = 3, log,
       newPkg,
       headLock,
       newLock: newLockJson ? lockVersions(newLockJson) : null,
+      added,
+      removed,
+      asserted: assertedTexts(session.journeys),
+      maxChangedLines: session.cfg.maxFixLines ?? 400,
     });
     if (!rejected && !res.ok && !files.length) rejected = `the agent exited (code ${res.code}${res.timedOut ? ', timed out' : ''})`;
     const attempt = { n, summary: res.summary, files, transcript: path.relative(session.outDir, res.transcriptPath), taskFile };
@@ -174,6 +229,9 @@ export async function fixLoop(session, { agent = 'claude', maxAttempts = 3, log,
     }
 
     log?.ok(`${meta.name} changed ${files.length} file(s): ${files.slice(0, 6).join(', ')}`);
+    if (res.summary) log?.dim(`  ${meta.name}: ${res.summary.replace(/\s+/g, ' ').slice(0, 400)}`);
+    log?.ok('Code checks passed: journeys untouched, the bump kept, no checked text hard-coded');
+    log?.step('Handing back to Kane: re-run every journey on the migrated bump');
     onAttempt?.({ n, phase: 'kane' });
     const pkgTouched = files.some((f) => path.basename(f) === 'package.json' || LOCKFILES.includes(path.basename(f)));
     const v = await session.reverify({ reinstall: reinstall || pkgTouched });

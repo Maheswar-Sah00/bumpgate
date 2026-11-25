@@ -5,6 +5,18 @@ import path from 'node:path';
 
 const IS_WIN = process.platform === 'win32';
 
+// The repo's own install, build and serve commands run code from the bump (npm install scripts),
+// and the fix agent runs commands too. Neither gets Bumpgate's secrets: the TestMu key, the GitHub
+// token, other agents' keys or the Actions runtime tokens.
+const SECRET = /(TOKEN|SECRET|PASSWORD|PASSWD|ACCESS_KEY|API_KEY|PRIVATE_KEY|CREDENTIAL)|^LT_|^ACTIONS_ID_TOKEN|^ACTIONS_RUNTIME|^ACTIONS_CACHE/i;
+
+/** process.env minus anything that looks like a secret, except the names in `keep`. */
+export function scrubEnv(env = process.env, keep = []) {
+  const out = {};
+  for (const [k, v] of Object.entries(env)) if (keep.includes(k) || !SECRET.test(k)) out[k] = v;
+  return out;
+}
+
 /**
  * Run a shell command string (used for the repo's own install/build/serve commands).
  * Resolves with { code, stdout, stderr, timedOut }. Never rejects on a non-zero exit.
@@ -13,7 +25,7 @@ export function sh(command, { cwd, env, timeoutMs = 0, onLine, quiet = true } = 
   return new Promise((resolve) => {
     const child = spawn(command, {
       cwd,
-      env: { ...process.env, ...env },
+      env: { ...scrubEnv(), ...env },
       shell: true,
       windowsHide: true,
       detached: !IS_WIN,
@@ -26,15 +38,17 @@ export function sh(command, { cwd, env, timeoutMs = 0, onLine, quiet = true } = 
  * Run a binary with an argument array (no shell). On Windows, npm shims (.cmd) are
  * resolved to their node entry point so arguments are never re-parsed by cmd.exe.
  */
-export function run(bin, args, { cwd, env, timeoutMs = 0, onLine, input, quiet = true } = {}) {
+export function run(bin, args, { cwd, env, timeoutMs = 0, onLine, input, quiet = true, keepSecrets = null } = {}) {
   return new Promise((resolve) => {
+    // keepSecrets: null = full environment (kane-cli, git); an array = scrubbed, keeping only those names.
+    const base = Array.isArray(keepSecrets) ? scrubEnv(process.env, keepSecrets) : process.env;
     const [file, pre] = resolveBin(bin);
     const viaCmd = IS_WIN && /\.(cmd|bat)$/i.test(file);
     const all = [...pre, ...args];
     const child = viaCmd
       // Last resort for shims we could not unwrap: quote every argument for cmd.exe.
-      ? spawn(`"${file}" ${all.map(cmdQuote).join(' ')}`, { cwd, env: { ...process.env, ...env }, shell: true, windowsHide: true })
-      : spawn(file, all, { cwd, env: { ...process.env, ...env }, shell: false, windowsHide: true, detached: !IS_WIN });
+      ? spawn(`"${file}" ${all.map(cmdQuote).join(' ')}`, { cwd, env: { ...base, ...env }, shell: true, windowsHide: true })
+      : spawn(file, all, { cwd, env: { ...base, ...env }, shell: false, windowsHide: true, detached: !IS_WIN });
     if (input != null) {
       child.stdin.end(input);
     } else {

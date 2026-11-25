@@ -14,6 +14,11 @@ export const DEFAULTS = {
   amber: 'review',            // what a yellow light does: review | merge | block
   agent: 'claude',            // claude | codex | none
   maxFixAttempts: 3,
+  maxFixLines: 400,           // an agent change bigger than this goes to a human
+  mergeFixes: 'auto',         // auto: a fix Kane re-verifies merges itself | review: a person approves it first
+  autoMerge: true,            // false: never merge, only label and comment
+  ignoreScripts: false,
+  passEnv: [],                // secrets install/build may see, by name (e.g. ["NPM_TOKEN"] for a private registry)       // true: install with --ignore-scripts (untrusted install scripts never run)
   kane: { timeout: 300, maxSteps: 30, maxRuns: 30, local: true, headed: false, policies: [] },
   protect: [],                // extra paths the fix agent may never touch
   publishPacks: false,        // raw packs carry the Kane account email: opt in to publish them
@@ -46,12 +51,13 @@ export function resolveCommands(cfg, sideDir) {
   const scripts = pkg.scripts || {};
   const pm = detectPackageManager(sideDir);
   const bin = pmBin(pm);
-  const install = cfg.install || {
+  const noScripts = cfg.ignoreScripts ? ' --ignore-scripts' : '';
+  const install = cfg.install || ({
     npm: 'npm ci --no-audit --no-fund',
     pnpm: `${bin} install --frozen-lockfile`,
     yarn: `${bin} install --frozen-lockfile`,
     bun: 'bun install --frozen-lockfile',
-  }[pm];
+  }[pm] + noScripts);
   const runner = pm === 'npm' ? 'npm run' : bin;
   const build = cfg.build ?? (scripts.build ? `${runner} build` : null);
   let serve = cfg.serve;

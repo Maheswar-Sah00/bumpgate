@@ -36,6 +36,18 @@ inputs:
     description: What a yellow light does (review, merge or block). Overrides bumpgate.config.json.
     required: false
     default: ''
+  merge-fixes:
+    description: "auto: a migration Kane re-verifies merges itself. review: it waits for a person to approve. Overrides bumpgate.config.json."
+    required: false
+    default: ''
+  ignore-scripts:
+    description: "true: install both sides with --ignore-scripts, so the bump's install scripts never run"
+    required: false
+    default: 'false'
+  claude-code-version:
+    description: Claude Code version to install (agent = claude)
+    required: false
+    default: 2.1.330
   publish-packs:
     description: Also publish Kane's raw evidence packs (they include the Kane account's email and org ids). Screenshots and findings are always published.
     required: false
@@ -58,7 +70,9 @@ runs:
   steps:
     - name: Install Kane CLI
       shell: bash
-      run: npm install -g "@testmuai/kane-cli@${{ inputs.kane-cli-version }}" --no-audit --no-fund
+      env:
+        KANE_CLI_VERSION: ${{ inputs.kane-cli-version }}
+      run: npm install -g "@testmuai/kane-cli@${KANE_CLI_VERSION}" --no-audit --no-fund
 
     - name: Install Codex
       if: inputs.agent == 'codex' && inputs.openai-api-key != ''
@@ -72,7 +86,9 @@ runs:
     - name: Install Claude Code
       if: inputs.agent == 'claude' && inputs.anthropic-api-key != ''
       shell: bash
-      run: npm install -g @anthropic-ai/claude-code --no-audit --no-fund
+      env:
+        CLAUDE_CODE_VERSION: ${{ inputs.claude-code-version }}
+      run: npm install -g "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}" --no-audit --no-fund
 
     - name: Bumpgate
       id: gate
@@ -87,12 +103,20 @@ runs:
         BUMPGATE_FORCE: ${{ inputs.force }}
         BUMPGATE_WORK: ${{ runner.temp }}/bumpgate-work
         BUMPGATE_PUBLISH_PACKS: ${{ inputs.publish-packs }}
+        # Inputs reach the shell only as environment variables, never spliced into the script.
+        IN_AGENT: ${{ inputs.agent }}
+        IN_AMBER: ${{ inputs.amber }}
+        IN_MERGE_FIXES: ${{ inputs.merge-fixes }}
+        IN_IGNORE_SCRIPTS: ${{ inputs.ignore-scripts }}
       run: |
         if [ -x /usr/bin/google-chrome ] && [ -z "$KANE_CLI_CHROME_PATH" ]; then export KANE_CLI_CHROME_PATH=/usr/bin/google-chrome; fi
-        args=(ci --agent "${{ inputs.agent }}")
-        if [ -n "${{ inputs.amber }}" ]; then args+=(--amber "${{ inputs.amber }}"); fi
-        if [ "${{ inputs.agent }}" = "codex" ] && [ -z "$OPENAI_API_KEY" ]; then args=(ci --agent none); fi
-        if [ "${{ inputs.agent }}" = "claude" ] && [ -z "$ANTHROPIC_API_KEY" ]; then args=(ci --agent none); fi
+        agent="$IN_AGENT"
+        if [ "$agent" = "codex" ] && [ -z "$OPENAI_API_KEY" ]; then agent=none; fi
+        if [ "$agent" = "claude" ] && [ -z "$ANTHROPIC_API_KEY" ]; then agent=none; fi
+        args=(ci --agent "$agent")
+        if [ -n "$IN_AMBER" ]; then args+=(--amber "$IN_AMBER"); fi
+        if [ -n "$IN_MERGE_FIXES" ]; then args+=(--merge-fixes "$IN_MERGE_FIXES"); fi
+        if [ "$IN_IGNORE_SCRIPTS" = "true" ]; then args+=(--ignore-scripts true); fi
         node "$GITHUB_ACTION_PATH/bin/bumpgate.mjs" "${args[@]}"
 
     - name: Keep the verdict and Kane's streams
