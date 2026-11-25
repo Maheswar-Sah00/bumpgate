@@ -1,5 +1,7 @@
 # Backtest: bot upgrades that passed CI and still had to be undone
 
+> **Update, 25 Nov:** five more React bumps of this kind, from five other public repos, are in [blank-page/RESULTS.md](blank-page/RESULTS.md). Kane blocks all five, so 6 of 6 in total.
+
 **Question:** when a Dependabot PR passed CI, got merged, and the maintainer later reverted it, would Bumpgate have stopped it?
 
 **Answer on the cases that can still be run:** Kane blocked the one upgrade that broke the app (React 19.3.0: CI passed on the PR, the merge commit passed all 4 checks including the deploy to GitHub Pages, and the page was blank) and passed the one where no journey broke. Two more reverted upgrades, in repos with no CI, do not even build; Bumpgate blocks those before Kane runs.

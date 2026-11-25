@@ -1,0 +1,143 @@
+{
+  "summary": {
+    "reverted": 5,
+    "ciPassed": 5,
+    "stopped": 5,
+    "flagged": 0,
+    "controls": 0,
+    "falseAlarms": 0,
+    "controlAmber": 0,
+    "inconclusive": 0,
+    "headline": "CI passed 5 of 5 real bot bumps that maintainers later reverted. Kane would have stopped 5.",
+    "controlLine": "0 bumps that were never reverted: 0 false alarms."
+  },
+  "cases": [
+    {
+      "id": "tubetrend-react",
+      "kind": "reverted",
+      "repo": "fo0/tubetrend",
+      "pr": 598,
+      "package": "react",
+      "from": "19.3.0",
+      "to": "19.3.1",
+      "ci": "passed",
+      "broke": "Revert #610: \"react 19.3.1 was merged without react-dom (still 19.3.0). react-dom ... throws at module load ('Minified React error #527') so the built bundle fails before the first render. Format check, lint, typecheck and build stay green, which is why the chain did not catch it.\" https://github.co",
+      "verdict": "red",
+      "headline": "1 journey broke on the bump",
+      "counts": {
+        "green": 0,
+        "amber": 0,
+        "red": 1,
+        "grey": 0
+      },
+      "kaneRuns": 3,
+      "shots": [
+        "shots/tubetrend-react-app_loads-base.jpg",
+        "shots/tubetrend-react-app_loads-bump.jpg"
+      ]
+    },
+    {
+      "id": "airplanecards-react",
+      "kind": "reverted",
+      "repo": "kleinnconrad/app.family.airplanecards",
+      "pr": 7,
+      "package": "react",
+      "from": "19.3.0",
+      "to": "19.3.1",
+      "ci": "passed",
+      "broke": "\"Dependabot bumped react to 19.3.1 (#7) but left react-dom at 19.3.0. React refuses to start when the two versions differ (minified React error #527), so the deployed page stayed empty with the error only visible in the browser console.\" https://github.com/kleinnconrad/app.family.airplanecards/commi",
+      "verdict": "red",
+      "headline": "2 journeys broke on the bump",
+      "counts": {
+        "green": 0,
+        "amber": 0,
+        "red": 2,
+        "grey": 0
+      },
+      "kaneRuns": 6,
+      "shots": [
+        "shots/airplanecards-react-add_player-base.jpg",
+        "shots/airplanecards-react-add_player-bump.jpg",
+        "shots/airplanecards-react-app_loads-base.jpg",
+        "shots/airplanecards-react-app_loads-bump.jpg"
+      ]
+    },
+    {
+      "id": "personal-dashboard-react",
+      "kind": "reverted",
+      "repo": "wps0/personal-dashboard",
+      "pr": 214,
+      "package": "react",
+      "from": "19.3.0",
+      "to": "19.3.1",
+      "ci": "passed",
+      "broke": "PR #221 'Fix the blank page': \"Dependabot bumped react to 19.3.1 (#214) but not react-dom, which stayed at 19.3.0. React refuses to run with different versions of the two (Minified React error #527), so the deployed app showed nothing.\" https://github.com/wps0/personal-dashboard/pull/221",
+      "verdict": "red",
+      "headline": "2 journeys broke on the bump",
+      "counts": {
+        "green": 0,
+        "amber": 0,
+        "red": 2,
+        "grey": 0
+      },
+      "kaneRuns": 6,
+      "shots": [
+        "shots/personal-dashboard-react-app_loads-base.jpg",
+        "shots/personal-dashboard-react-app_loads-bump.jpg",
+        "shots/personal-dashboard-react-sample_data-base.jpg",
+        "shots/personal-dashboard-react-sample_data-bump.jpg"
+      ]
+    },
+    {
+      "id": "puzzle-workshop-react",
+      "kind": "reverted",
+      "repo": "ap0ught/puzzle-workshop",
+      "pr": 9,
+      "package": "react",
+      "from": "19.2.6",
+      "to": "19.3.0",
+      "ci": "passed",
+      "broke": "PR #40 (from branch copilot/fix-production-crash-react-versions): \"Production error #527 stems from mismatched runtime versions: React 19.3.0 and React DOM 19.2.6. This change aligns both to 19.2.6.\" https://github.com/ap0ught/puzzle-workshop/pull/40",
+      "verdict": "red",
+      "headline": "1 journey broke on the bump",
+      "counts": {
+        "green": 0,
+        "amber": 0,
+        "red": 1,
+        "grey": 0
+      },
+      "kaneRuns": 3,
+      "shots": [
+        "shots/puzzle-workshop-react-app_loads-base.jpg",
+        "shots/puzzle-workshop-react-app_loads-bump.jpg"
+      ]
+    },
+    {
+      "id": "lifegame-react",
+      "kind": "reverted",
+      "repo": "NobuoJt/lifeGame_0",
+      "pr": 19,
+      "package": "react",
+      "from": "19.2.x",
+      "to": "19.3.0",
+      "ci": "passed",
+      "broke": "PR #22 'Align react and react-dom to eliminate production React error #527': production threw minified React error #527; package.json had react ^19.3.0 vs react-dom ^19.0.0 (lock 19.3.0 vs 19.1.0). https://github.com/NobuoJt/lifeGame_0/pull/22",
+      "verdict": "red",
+      "headline": "2 journeys broke on the bump",
+      "counts": {
+        "green": 0,
+        "amber": 0,
+        "red": 2,
+        "grey": 0
+      },
+      "kaneRuns": 6,
+      "shots": [
+        "shots/lifegame-react-app_loads-base.jpg",
+        "shots/lifegame-react-app_loads-bump.jpg",
+        "shots/lifegame-react-info-base.jpg",
+        "shots/lifegame-react-info-bump.jpg"
+      ]
+    }
+  ],
+  "note": "Kane CLI 0.10.7, 25 Nov 2026. Raw evidence packs are kept private: they embed the Kane account's email."
+}

@@ -111,7 +111,7 @@
         <a class="rv" href="${esc(r.revert_url || r.pr_url)}" target="_blank" rel="noopener">
           <span class="n">${esc(r.repo.split('/')[1] || r.repo)}</span>
           <span class="r">${esc(r.short || r.title)}<br>CI: ${esc(r.ci)}</span>
-          <span class="x">REVERTED</span>
+          <span class="x">${esc(r.x || 'REVERTED')}</span>
         </a>`).join('');
     }
     const st = $('#stats');

@@ -33,7 +33,7 @@ Built for the [Kane CLI Hackathon](https://www.kaneclihack.sh/) by TestMu AI. Ag
 
 <table>
 <tr>
-<td align="center" width="25%"><h2>CI green</h2>on a public repo's React bump that deployed a <b>blank page</b> and was reverted. <b>Kane blocks it at step 1</b></td>
+<td align="center" width="25%"><h2>6 / 6</h2>real React bumps in public repos that <b>passed CI</b>, deployed a <b>blank page</b> and had to be undone. <b>Kane blocks all 6</b> at step 1</td>
 <td align="center" width="25%"><h2>3 / 3</h2>live demo PRs (#4–#6) merged: 1 green on its own, <b>2 fixed by Claude Code</b> (zod 3→4, react-query 4→5) and re-verified by Kane</td>
 <td align="center" width="25%"><h2>2 / 10</h2>open Dependabot PRs in strangers' repos ship a <b>blank page</b> once the install is forced (their own CI was red). Bumpgate caught both</td>
 <td align="center" width="25%"><h2>0 / 4</h2><b>false alarms</b> on bot bumps that were merged and never reverted</td>
@@ -67,7 +67,7 @@ Built for the [Kane CLI Hackathon](https://www.kaneclihack.sh/) by TestMu AI. Ag
 | Bar / dimension | Where to look |
 |---|---|
 | Works end to end | The full Actions logs of [PR #4](https://github.com/Maheswar-Sah00/bumpgatedemo/actions/runs/44982436782), [#5](https://github.com/Maheswar-Sah00/bumpgatedemo/actions/runs/44982442331) and [#6](https://github.com/Maheswar-Sah00/bumpgatedemo/actions/runs/44987478853): build both sides, Kane on both, verdict, fix, Kane again, merge |
-| Kane caught something | A React bump that passed CI, deployed a blank page and was reverted: Kane fails it at step 1 ([backtest](backtest/RESULTS.md)). zod 3→4 and react-query 4→5 on the demo shop |
+| Kane caught something | 6 real React bumps in 6 public repos that passed CI, deployed a blank page and had to be undone: Kane fails all 6 at step 1 ([backtest](backtest/RESULTS.md), [5 more](backtest/blank-page/RESULTS.md)). zod 3→4 and react-query 4→5 on the demo shop |
 | Agent and Kane talk | Kane's failed step, reason, bug verdict and console error become Claude Code's task ([replay/pr4/task.md](replay/pr4/task.md)); Kane re-runs every journey on its change |
 | Closed loop | Up to 3 tries; code guardrails between the agent and Kane; `needs-human` after that ([`src/fix.mjs`](src/fix.mjs)) |
 | Craft | One workflow file, zero runtime dependencies, 64 tests run on Linux and Windows in [CI](.github/workflows/test.yml) |
@@ -76,7 +76,7 @@ Built for the [Kane CLI Hackathon](https://www.kaneclihack.sh/) by TestMu AI. Ag
 |---|---|:---:|
 | The demo film: the problem, the gate on real PRs, and what breaks without Kane CLI | [YouTube](https://youtu.be/DokOgngtECc) | 3 min |
 | Real Dependabot PRs going through the gate: two blocked, migrated by Claude Code and merged; one green auto-merge | [bumpgatedemo pull requests](https://github.com/Maheswar-Sah00/bumpgatedemo/pulls?q=is%3Apr) | 2 min |
-| Backtest on a real upgrade a public repo had to undo: a React PR passed CI, its merge passed every check including the deploy to GitHub Pages, and the app went blank. Kane blocks it at step 1 | [`backtest/RESULTS.md`](backtest/RESULTS.md) | 1 min |
+| Backtest on 6 real upgrades public repos had to undo: each React PR passed CI, merged, and the deployed app went blank. Kane blocks all 6 at step 1, each failure confirmed by a second run | [`backtest/blank-page/RESULTS.md`](backtest/blank-page/RESULTS.md) (5) and [`backtest/RESULTS.md`](backtest/RESULTS.md) (1) | 1 min |
 | **Radar:** Bumpgate on 10 *open* Dependabot PRs in other people's repos. 2 blank pages caught (both PRs' own CI was red from npm peer conflicts, so the claim is "a forced install ships a blank page"), 1 UI drift flagged amber, 7 green. 0 false alarms on 4 bumps that were merged and never reverted | [`radar/RESULTS.md`](radar/RESULTS.md) | 2 min |
 | The merge rule, in code (no prompt decides a merge) | [`src/gate.mjs`](src/gate.mjs) and its tests in [`test/gate.test.mjs`](test/gate.test.mjs) | 1 min |
 | The guardrails the fix agent cannot get past | [`src/fix.mjs`](src/fix.mjs) (`guardrails`) | 1 min |
@@ -202,9 +202,18 @@ Zero runtime dependencies. `npm test` runs 64 unit tests (15 of them on the merg
 
 ## Proof on real repos
 
-### Backtest: a bump a public repo had to revert
+### Backtest: 6 bumps public repos had to undo
 
-[anis-mondal/tic-tac-toe #36](https://github.com/anis-mondal/tic-tac-toe/pull/36) moved `react` to 19.3.0 and left `react-dom` behind. Its CI passed on the PR, the merge passed every check including the deploy to GitHub Pages, and the repo reverted it later. That is the failure Bumpgate exists for: CI green, app blank. Kane fails it at step 1 on 2 of 2 journeys.
+Six Dependabot PRs in six public repos moved `react` and left `react-dom` behind. In each, CI passed (type check, lint, build, and in four the deploy itself), the PR merged, the live app went blank, and the maintainer reverted or fixed it by hand. One revert says it plainly: *"Format check, lint, typecheck and build stay green, which is why the chain did not catch it."* That is the failure Bumpgate exists for: CI green, app blank.
+
+**Kane CLI blocks all 6 at step 1**, each failure confirmed by a second run, and its bug verdict names the cause: *"React version mismatch leaves the app blank."* The base passed every journey in all 6.
+
+<p align="center">
+  <img src="docs/screenshots/blank-page-5.jpg" alt="Five public apps: on main each renders; on Dependabot's react bump each page is empty" width="80%">
+  <br><sub>Kane CLI screenshots, base and bump. Details and limits (all six are the same bug class, chosen by search): <a href="backtest/blank-page/RESULTS.md">backtest/blank-page/RESULTS.md</a></sub>
+</p>
+
+The first case, [anis-mondal/tic-tac-toe #36](https://github.com/anis-mondal/tic-tac-toe/pull/36), with its two game journeys:
 
 <p align="center">
   <img src="docs/screenshots/tictactoe-react1930.jpg" alt="tic-tac-toe: on main the game renders; on the react 19.3.0 bump the page is blank" width="70%">
@@ -245,7 +254,7 @@ Every number on this page and on the site comes from a real Kane CLI run. Here i
 | A UI-kit major (MUI 7→9) moved the UI under a journey without breaking it: amber, not red | [radar/cases/szakal-2-material](radar/cases/szakal-2-material/) | [szakal-2 #503](https://github.com/AeTher97/szakal-2/pull/503) |
 | 0 false alarms on 4 bumps that were merged and never reverted | [Controls table](radar/RESULTS.md#controls-bot-bumps-that-were-merged-and-never-reverted) | Each control links to its merged PR |
 | `bumpgate init` writes journeys for code it has never seen: 42 drafted, 33 kept | [radar/cases/*/journeys](radar/cases/) (parked drafts are `*.draft.md`) | `npx github:Maheswar-Sah00/bumpgate init --agent claude` in any web app |
-| A React 19.3.0 bump passed CI (the merge passed every check, including the Pages deploy) and left the app blank (backtest) | [backtest/RESULTS.md](backtest/RESULTS.md) with both screenshots | [tic-tac-toe #36](https://github.com/anis-mondal/tic-tac-toe/pull/36) and its revert |
+| 6 React bumps in 6 public repos passed CI, deployed a blank page and were undone; Kane blocks all 6 | [backtest/blank-page/RESULTS.md](backtest/blank-page/RESULTS.md) (5) and [backtest/RESULTS.md](backtest/RESULTS.md) (1), with base and bump screenshots | Each row links the bot PR and the maintainer's revert or fix. Build the bump, open it: blank page, React error #527 in the console |
 | No prompt decides a merge | [`src/gate.mjs`](src/gate.mjs), 64 unit tests in [`test/`](test/) | `npm test`, or `bumpgate replay` for the real PR #4 streams |
 
 > [!NOTE]
@@ -399,7 +408,7 @@ bumpgate/
 ├── test/                 64 unit tests + offline e2e with a stub kane-cli
 ├── replay/pr4/           Kane's recorded streams, Claude Code's task and fix from the real PR #4 run (bumpgate replay)
 ├── radar/                10 open Dependabot PRs in public repos + 4 controls (journeys, shots, comments)
-├── backtest/             real bot bumps that repos reverted
+├── backtest/             real bot bumps that repos reverted (blank-page/: 5 more)
 ├── site/                 the GitHub Pages site
 └── docs/
     ├── diagrams/         *.png + editable *.excalidraw sources
