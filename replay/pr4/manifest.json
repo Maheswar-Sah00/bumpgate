@@ -1,0 +1,41 @@
+{
+  "title": "Bumpgate on bumpgatedemo PR #4: Dependabot bumps zod 3.25.76 → 4.6.7",
+  "pr": "https://github.com/Maheswar-Sah00/bumpgatedemo/pull/4",
+  "run": "https://github.com/Maheswar-Sah00/bumpgatedemo/actions/runs/44982436782",
+  "recorded": "2026-11-22, GitHub Actions ubuntu-latest, kane-cli 0.10.7",
+  "bump": { "name": "zod", "from": "3.25.76", "to": "4.6.7" },
+  "base": "48060a8",
+  "head": "9ca1874",
+  "fixCommit": "3e3d3f6",
+  "journeys": {
+    "browse_test.md": "Find a product and add it to the cart",
+    "checkout_errors_test.md": "Checkout explains what is wrong",
+    "checkout_test.md": "Buy something with valid details"
+  },
+  "phases": [
+    {
+      "name": "Gate: Kane on main, then on the bump",
+      "runs": {
+        "browse_test.md": { "base": ["base-browse-1-1"], "bump": ["bump-browse-1-1"] },
+        "checkout_errors_test.md": { "base": ["base-checkout_errors-1-1"], "bump": ["bump-checkout_errors-1-1", "bump-checkout_errors-2-2"] },
+        "checkout_test.md": { "base": ["base-checkout-1-1"], "bump": ["bump-checkout-1-1"] }
+      },
+      "expect": "red"
+    },
+    {
+      "name": "Re-verify: Kane on the bump after Claude Code's fix",
+      "runs": {
+        "browse_test.md": { "base": ["base-browse-1-1"], "bump": ["bump-browse-fix-1"] },
+        "checkout_errors_test.md": { "base": ["base-checkout_errors-1-1"], "bump": ["bump-checkout_errors-fix-1"] },
+        "checkout_test.md": { "base": ["base-checkout-1-1"], "bump": ["bump-checkout-fix-1"] }
+      },
+      "expect": "green"
+    }
+  ],
+  "fix": {
+    "task": "task.md",
+    "summary": "claude-summary.txt",
+    "diff": "fix.diff",
+    "files": ["src/pages/Checkout.jsx"]
+  }
+}

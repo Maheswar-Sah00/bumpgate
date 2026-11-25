@@ -22,6 +22,8 @@ ${color.bold('bumpgate')} ${VERSION}. Dependabot says CI is green. Kane CLI chec
   bumpgate init [--agent codex|claude] [--count 3]  Write the app's top journeys, keep the ones Kane passes on main
   bumpgate ci                                     GitHub Action entry (bot PRs only)
   bumpgate backtest <cases.json> [--only <id>]    Replay real reverted bumps (the headline number)
+  bumpgate replay [<case dir>]                    Re-decide a recorded real PR run (PR #4) with the real gate code.
+                                                  No Kane, no keys, no credits: the judges' 10-second check
   bumpgate comment <verdict.json>                 Print the PR comment for a saved verdict
   bumpgate doctor                                 Check kane-cli, login, Chrome, git and the agent
 
@@ -61,6 +63,8 @@ export async function main(argv) {
   const overrides = {
     agent: args.agent,
     amber: args.amber,
+    mergeFixes: args.mergeFixes,
+    ignoreScripts: args.ignoreScripts === true || args.ignoreScripts === 'true' ? true : undefined,
     journeys: args.journeys,
     port: args.port ? Number(args.port) : undefined,
     kane: { ...(args.headed ? { headed: true } : {}), ...(args.maxRuns ? { maxRuns: Number(args.maxRuns) } : {}) },
@@ -79,6 +83,10 @@ export async function main(argv) {
     case 'init': {
       const { init } = await import('./init.mjs');
       return init(args, overrides, log);
+    }
+    case 'replay': {
+      const { replay } = await import('./replay.mjs');
+      return replay(args);
     }
     case 'backtest': {
       const { backtest } = await import('./backtest.mjs');

@@ -9,11 +9,13 @@
   "files": [
     "bin",
     "src",
+    "replay",
     "action.yml",
     "README.md"
   ],
   "scripts": {
-    "test": "node --test test/*.test.mjs"
+    "test": "node --test test/deps.test.mjs test/fix.test.mjs test/gate.test.mjs test/hardening.test.mjs test/kane.test.mjs test/misc.test.mjs test/replay.test.mjs",
+    "replay": "node bin/bumpgate.mjs replay"
   },
   "engines": {
     "node": ">=20"

@@ -1,0 +1,13 @@
+diff --git a/src/pages/Checkout.jsx b/src/pages/Checkout.jsx
+index 95b913a..ed6e052 100644
+--- a/src/pages/Checkout.jsx
++++ b/src/pages/Checkout.jsx
+@@ -39,7 +39,7 @@ export default function Checkout() {
+     const result = checkoutSchema.safeParse(form);
+     if (!result.success) {
+       const next = {};
+-      result.error.errors.forEach((issue) => {
++      result.error.issues.forEach((issue) => {
+         const field = issue.path[0];
+         if (!next[field]) next[field] = issue.message;
+       });

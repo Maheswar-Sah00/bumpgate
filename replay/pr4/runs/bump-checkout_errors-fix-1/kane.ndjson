@@ -1,0 +1,82 @@
+{"type":"stream_start","cli_version":"0.10.7","surface":"testmd","pid":5414,"v":1,"ts":"2026-11-22T05:00:23.031Z"}
+{"type":"test_md_step_start","step_index":1,"heading":"Add a product and go to checkout","ref":null,"v":1,"ts":"2026-11-22T05:00:26.494Z"}
+{"type":"run_start","objective":"Click \"Add to cart\" on the first product, click \"Cart\" in the header, then click \"Go to checkout\".","timestamp":1795323626,"environment":{"resolution":"1920x1080"},"override_start_url":"http://localhost:4319/","recorded_start_url":"http://localhost:4319/","override_applied":true,"v":1,"ts":"2026-11-22T05:00:26.593Z"}
+{"type":"step_event","index":0,"event":"replay_started","detail":"replaying 4 actions","recording_length":4,"v":1,"ts":"2026-11-22T05:00:26.597Z"}
+{"type":"step_start","index":1,"objective":"Step 1","v":1,"ts":"2026-11-22T05:00:26.597Z"}
+{"type":"step_event","index":1,"event":"screenshot","detail":"https://kaneai-playground.lambdatest.io/","v":1,"ts":"2026-11-22T05:00:26.724Z"}
+{"type":"step_event","index":1,"event":"action","detail":"Navigate to http://localhost:4319/","action_type":"navigate","success":true,"v":1,"ts":"2026-11-22T05:00:26.803Z"}
+{"type":"step_event","index":1,"event":"reasoning","detail":"Navigate to http://localhost:4319/","action_type":"navigate","v":1,"ts":"2026-11-22T05:00:26.804Z"}
+{"type":"step_end","index":1,"status":"passed","duration":0.2,"summary":"navigate: Navigate to http://localhost:4319/","ordinal":1,"id":"0-1","kind":"navigate","screenshot":"screenshot.jpg","action_id":"63f2dbdd-372a-4b49-a69c-55f88592a325","v":1,"ts":"2026-11-22T05:00:26.805Z"}
+{"type":"step_start","index":2,"objective":"Step 2","v":1,"ts":"2026-11-22T05:00:26.806Z"}
+{"type":"step_event","index":2,"event":"screenshot","detail":"http://localhost:4319/","v":1,"ts":"2026-11-22T05:00:26.933Z"}
+{"type":"step_event","index":2,"event":"action","detail":"Clicking Add to cart on the first product","action_type":"click","success":true,"v":1,"ts":"2026-11-22T05:00:27.593Z"}
+{"type":"step_event","index":2,"event":"reasoning","detail":"Clicking Add to cart on the first product","action_type":"click","v":1,"ts":"2026-11-22T05:00:27.593Z"}
+{"type":"step_end","index":2,"status":"passed","duration":0.8,"summary":"click: Clicking Add to cart on the first product","ordinal":2,"id":"0-2","kind":"click","screenshot":"screenshot.jpg","action_id":"dd296cf1-cbce-4c18-91e4-8abdc7910e81","v":1,"ts":"2026-11-22T05:00:27.649Z"}
+{"type":"step_start","index":3,"objective":"Step 3","v":1,"ts":"2026-11-22T05:00:27.649Z"}
+{"type":"step_event","index":3,"event":"screenshot","detail":"http://localhost:4319/","v":1,"ts":"2026-11-22T05:00:27.709Z"}
+{"type":"step_event","index":3,"event":"action","detail":"Clicking Cart in the header","action_type":"click","success":true,"v":1,"ts":"2026-11-22T05:00:28.275Z"}
+{"type":"step_event","index":3,"event":"reasoning","detail":"Clicking Cart in the header","action_type":"click","v":1,"ts":"2026-11-22T05:00:28.275Z"}
+{"type":"step_end","index":3,"status":"passed","duration":0.6,"summary":"click: Clicking Cart in the header","ordinal":3,"id":"0-3","kind":"click","screenshot":"screenshot.jpg","action_id":"58afe300-d646-4298-b2aa-faf9c2320dda","v":1,"ts":"2026-11-22T05:00:28.376Z"}
+{"type":"step_start","index":4,"objective":"Step 4","v":1,"ts":"2026-11-22T05:00:28.376Z"}
+{"type":"step_event","index":4,"event":"screenshot","detail":"http://localhost:4319/cart","v":1,"ts":"2026-11-22T05:00:28.435Z"}
+{"type":"step_event","index":4,"event":"action","detail":"Clicking Go to checkout button","action_type":"click","success":true,"v":1,"ts":"2026-11-22T05:00:28.973Z"}
+{"type":"step_event","index":4,"event":"reasoning","detail":"Clicking Go to checkout button","action_type":"click","v":1,"ts":"2026-11-22T05:00:28.973Z"}
+{"type":"step_end","index":4,"status":"passed","duration":0.6,"summary":"click: Clicking Go to checkout button","ordinal":4,"id":"0-4","kind":"click","screenshot":"screenshot.jpg","action_id":"8789295d-4921-4f82-a5b9-9577b2f10c6d","v":1,"ts":"2026-11-22T05:00:29.028Z"}
+{"type":"run_end","run_id":"run-0","status":"passed","summary":"","reason":"replay completed","duration":2.52,"final_url":"http://localhost:4319/checkout","actions_executed":4,"screenshot_path":"/home/runner/.testmuai/kaneai/sessions/e6eebb76-4e4d-4e2d-8b60-634a5fec3079/scratch/0/replay-test/screenshots/step_004.png","run_dir":"/home/runner/.testmuai/kaneai/sessions/e6eebb76-4e4d-4e2d-8b60-634a5fec3079/scratch/0/replay-test","total_runs":1,"context":{"memory":{},"variables":{},"pointer":""},"variables_out":{},"store_out":{},"result_code":100,"reason_code":"success.complete","v":1,"ts":"2026-11-22T05:00:29.031Z"}
+{"type":"test_md_step_end","step_index":1,"status":"passed","duration_s":2.52,"ref_kind":null,"unit_kind":null,"inlined_count":null,"failed_sub_step_index":null,"v":1,"ts":"2026-11-22T05:00:29.032Z"}
+{"type":"test_md_step_start","step_index":2,"heading":"Submit with a missing name and a bad email","ref":null,"v":1,"ts":"2026-11-22T05:00:29.032Z"}
+{"type":"run_start","objective":"Leave \"Full name\" empty, type \"not-an-email\" into \"Email\", then click the \"Place order\" button.","timestamp":1795323629,"environment":{"resolution":"1920x1080"},"v":1,"ts":"2026-11-22T05:00:29.044Z"}
+{"type":"step_event","index":0,"event":"replay_started","detail":"replaying 5 actions","recording_length":5,"v":1,"ts":"2026-11-22T05:00:29.044Z"}
+{"type":"step_start","index":1,"objective":"Step 1","v":1,"ts":"2026-11-22T05:00:29.047Z"}
+{"type":"step_event","index":1,"event":"screenshot","detail":"http://localhost:4319/checkout","v":1,"ts":"2026-11-22T05:00:29.100Z"}
+{"type":"step_event","index":1,"event":"action","detail":"Waiting for the queued plan to load","action_type":"wait","success":true,"v":1,"ts":"2026-11-22T05:00:30.105Z"}
+{"type":"step_event","index":1,"event":"reasoning","detail":"Waiting for the queued plan to load","action_type":"wait","v":1,"ts":"2026-11-22T05:00:30.105Z"}
+{"type":"step_end","index":1,"status":"passed","duration":1.1,"summary":"wait: Waiting for the queued plan to load","ordinal":5,"id":"1-1","kind":"wait","screenshot":"screenshot.jpg","action_id":"1cdc4272-e66d-4f2b-9c44-c14c478773f2","v":1,"ts":"2026-11-22T05:00:30.106Z"}
+{"type":"step_start","index":2,"objective":"Step 2","v":1,"ts":"2026-11-22T05:00:30.106Z"}
+{"type":"step_event","index":2,"event":"screenshot","detail":"http://localhost:4319/checkout","v":1,"ts":"2026-11-22T05:00:30.166Z"}
+{"type":"step_event","index":2,"event":"action","detail":"Type \"not-an-email\" into \"Email\"","action_type":"fill","success":true,"v":1,"ts":"2026-11-22T05:00:30.233Z"}
+{"type":"step_event","index":2,"event":"reasoning","detail":"Type \"not-an-email\" into \"Email\"","action_type":"fill","v":1,"ts":"2026-11-22T05:00:30.233Z"}
+{"type":"step_end","index":2,"status":"passed","duration":0.1,"summary":"fill: Type \"not-an-email\" into \"Email\"","ordinal":6,"id":"1-2","kind":"fill","screenshot":"screenshot.jpg","action_id":"bc2e239e-cd93-4dfe-9ae8-bfcbf8188d77","v":1,"ts":"2026-11-22T05:00:30.289Z"}
+{"type":"step_start","index":3,"objective":"Step 3","v":1,"ts":"2026-11-22T05:00:30.289Z"}
+{"type":"step_event","index":3,"event":"screenshot","detail":"http://localhost:4319/checkout","v":1,"ts":"2026-11-22T05:00:30.351Z"}
+{"type":"step_event","index":3,"event":"action","detail":"Click \"Place order · $70.00\"","action_type":"click","success":true,"v":1,"ts":"2026-11-22T05:00:30.888Z"}
+{"type":"step_event","index":3,"event":"reasoning","detail":"Click \"Place order · $70.00\"","action_type":"click","v":1,"ts":"2026-11-22T05:00:30.888Z"}
+{"type":"step_end","index":3,"status":"passed","duration":0.6,"summary":"click: Click \"Place order · $70.00\"","ordinal":7,"id":"1-3","kind":"click","screenshot":"screenshot.jpg","action_id":"93693321-9e94-4498-9270-44f96f3875e9","v":1,"ts":"2026-11-22T05:00:30.943Z"}
+{"type":"step_start","index":4,"objective":"Step 4","v":1,"ts":"2026-11-22T05:00:30.943Z"}
+{"type":"step_event","index":4,"event":"screenshot","detail":"http://localhost:4319/checkout","v":1,"ts":"2026-11-22T05:00:31.002Z"}
+{"type":"step_event","index":4,"event":"action","detail":"Waiting for invalid order form submission confirmation","action_type":"wait","success":true,"v":1,"ts":"2026-11-22T05:00:31.507Z"}
+{"type":"step_event","index":4,"event":"reasoning","detail":"Waiting for invalid order form submission confirmation","action_type":"wait","v":1,"ts":"2026-11-22T05:00:31.507Z"}
+{"type":"step_end","index":4,"status":"passed","duration":0.6,"summary":"wait: Waiting for invalid order form submission confirmation","ordinal":8,"id":"1-4","kind":"wait","screenshot":"screenshot.jpg","action_id":"f5725ce4-be0e-4aa6-a951-974aa40a2b98","v":1,"ts":"2026-11-22T05:00:31.507Z"}
+{"type":"step_start","index":5,"objective":"Step 5","v":1,"ts":"2026-11-22T05:00:31.507Z"}
+{"type":"step_event","index":5,"event":"screenshot","detail":"http://localhost:4319/checkout","v":1,"ts":"2026-11-22T05:00:31.569Z"}
+{"type":"step_event","index":5,"event":"action","detail":"Waiting for the Place order button to confirm submission state","action_type":"wait","success":true,"v":1,"ts":"2026-11-22T05:00:32.073Z"}
+{"type":"step_event","index":5,"event":"reasoning","detail":"Waiting for the Place order button to confirm submission state","action_type":"wait","v":1,"ts":"2026-11-22T05:00:32.074Z"}
+{"type":"step_end","index":5,"status":"passed","duration":0.6,"summary":"wait: Waiting for the Place order button to confirm submission state","ordinal":9,"id":"1-5","kind":"wait","screenshot":"screenshot.jpg","action_id":"731ba10d-36c8-4071-95eb-4e479fb2a283","v":1,"ts":"2026-11-22T05:00:32.074Z"}
+{"type":"run_end","run_id":"run-1","status":"passed","summary":"","reason":"replay completed","duration":3.04,"final_url":"http://localhost:4319/checkout","actions_executed":5,"screenshot_path":"/home/runner/.testmuai/kaneai/sessions/e6eebb76-4e4d-4e2d-8b60-634a5fec3079/scratch/1/replay-test/screenshots/step_005.png","run_dir":"/home/runner/.testmuai/kaneai/sessions/e6eebb76-4e4d-4e2d-8b60-634a5fec3079/scratch/1/replay-test","total_runs":1,"context":{"memory":{},"variables":{},"pointer":""},"variables_out":{},"store_out":{},"result_code":100,"reason_code":"success.complete","v":1,"ts":"2026-11-22T05:00:32.077Z"}
+{"type":"test_md_step_end","step_index":2,"status":"passed","duration_s":3.04,"ref_kind":null,"unit_kind":null,"inlined_count":null,"failed_sub_step_index":null,"v":1,"ts":"2026-11-22T05:00:32.077Z"}
+{"type":"test_md_step_start","step_index":3,"heading":"See the errors","ref":null,"v":1,"ts":"2026-11-22T05:00:32.077Z"}
+{"type":"run_start","objective":"Verify the message \"Please enter your name\" is shown.\nVerify the message \"Enter a valid email address\" is shown.","timestamp":1795323632,"environment":{"resolution":"1920x1080"},"v":1,"ts":"2026-11-22T05:00:32.086Z"}
+{"type":"step_event","index":0,"event":"replay_started","detail":"replaying 4 actions","recording_length":4,"v":1,"ts":"2026-11-22T05:00:32.086Z"}
+{"type":"step_start","index":1,"objective":"Step 1","v":1,"ts":"2026-11-22T05:00:32.089Z"}
+{"type":"step_event","index":1,"event":"screenshot","detail":"http://localhost:4319/checkout","v":1,"ts":"2026-11-22T05:00:32.151Z"}
+{"type":"step_event","index":1,"event":"action","detail":"Checking whether the name validation message is present","action_type":"analyze","success":true,"v":1,"ts":"2026-11-22T05:00:32.181Z"}
+{"type":"step_event","index":1,"event":"reasoning","detail":"Checking whether the name validation message is present","action_type":"analyze","v":1,"ts":"2026-11-22T05:00:32.181Z"}
+{"type":"step_end","index":1,"status":"passed","duration":0.1,"summary":"analyze: Checking whether the name validation message is present","ordinal":10,"id":"2-1","kind":"analyze","screenshot":"screenshot.jpg","action_id":"1bc23262-555e-4390-aaf5-39f60512a2d2","v":1,"ts":"2026-11-22T05:00:32.181Z"}
+{"type":"step_start","index":2,"objective":"Step 2","v":1,"ts":"2026-11-22T05:00:32.181Z"}
+{"type":"step_event","index":2,"event":"screenshot","detail":"http://localhost:4319/checkout","v":1,"ts":"2026-11-22T05:00:32.235Z"}
+{"type":"step_event","index":2,"event":"action","detail":"Checking whether the email validation message is present","action_type":"analyze","success":true,"v":1,"ts":"2026-11-22T05:00:32.262Z"}
+{"type":"step_event","index":2,"event":"reasoning","detail":"Checking whether the email validation message is present","action_type":"analyze","v":1,"ts":"2026-11-22T05:00:32.262Z"}
+{"type":"step_end","index":2,"status":"passed","duration":0.1,"summary":"analyze: Checking whether the email validation message is present","ordinal":11,"id":"2-2","kind":"analyze","screenshot":"screenshot.jpg","action_id":"6ac489b5-a369-4c80-b9f3-8bebad8af3ee","v":1,"ts":"2026-11-22T05:00:32.263Z"}
+{"type":"step_start","index":3,"objective":"Step 3","v":1,"ts":"2026-11-22T05:00:32.263Z"}
+{"type":"step_event","index":3,"event":"screenshot","detail":"http://localhost:4319/checkout","v":1,"ts":"2026-11-22T05:00:32.320Z"}
+{"type":"step_event","index":3,"event":"assertion","detail":"the message \"Please enter your name\" is shown","passed":true,"v":1,"ts":"2026-11-22T05:00:32.321Z"}
+{"type":"step_end","index":3,"status":"passed","duration":0.1,"summary":"assert: the message \"Please enter your name\" is shown","ordinal":12,"id":"2-3","kind":"assert","screenshot":"screenshot.jpg","action_id":"9fc35708-75ad-4e68-b06a-a3a21d9271de","v":1,"ts":"2026-11-22T05:00:32.322Z"}
+{"type":"step_start","index":4,"objective":"Step 4","v":1,"ts":"2026-11-22T05:00:32.322Z"}
+{"type":"step_event","index":4,"event":"screenshot","detail":"http://localhost:4319/checkout","v":1,"ts":"2026-11-22T05:00:32.385Z"}
+{"type":"step_event","index":4,"event":"assertion","detail":"the message \"Enter a valid email address\" is shown","passed":true,"v":1,"ts":"2026-11-22T05:00:32.386Z"}
+{"type":"step_end","index":4,"status":"passed","duration":0.1,"summary":"assert: the message \"Enter a valid email address\" is shown","ordinal":13,"id":"2-4","kind":"assert","screenshot":"screenshot.jpg","action_id":"a2449121-b631-4fd6-800d-fda693e5c592","v":1,"ts":"2026-11-22T05:00:32.387Z"}
+{"type":"run_end","run_id":"run-2","status":"passed","summary":"","reason":"replay completed","duration":0.31,"final_url":"http://localhost:4319/checkout","actions_executed":4,"screenshot_path":"/home/runner/.testmuai/kaneai/sessions/e6eebb76-4e4d-4e2d-8b60-634a5fec3079/scratch/2/replay-test/screenshots/step_004.png","run_dir":"/home/runner/.testmuai/kaneai/sessions/e6eebb76-4e4d-4e2d-8b60-634a5fec3079/scratch/2/replay-test","total_runs":1,"context":{"memory":{},"variables":{"please_enter_your_name_message_shown":{"syntax":"{{please_enter_your_name_message_shown}}","value":"true","secret":false},"valid_email_address_message_shown":{"syntax":"{{valid_email_address_message_shown}}","value":"true","secret":false}},"pointer":""},"variables_out":{"please_enter_your_name_message_shown":{"syntax":"{{please_enter_your_name_message_shown}}","value":"true","secret":false},"valid_email_address_message_shown":{"syntax":"{{valid_email_address_message_shown}}","value":"true","secret":false}},"store_out":{},"result_code":100,"reason_code":"success.complete","v":1,"ts":"2026-11-22T05:00:32.390Z"}
+{"type":"test_md_step_end","step_index":3,"status":"passed","duration_s":0.31,"ref_kind":null,"unit_kind":null,"inlined_count":null,"failed_sub_step_index":null,"v":1,"ts":"2026-11-22T05:00:32.390Z"}
+{"type":"test_md_summary","overall_status":"passed","duration_s":9,"steps":{"total":3,"passed":3,"failed":0,"skipped":0,"replay_decisions":3,"author_decisions":0},"adaptive_heal":{"triggered":false},"commit":{"committed":false,"reason":"readonly_fallback"},"artifacts":{"replaced":false},"upload":{"performed":false},"cancelled":false,"override_start_url":"http://localhost:4319/","v":1,"ts":"2026-11-22T05:00:32.921Z"}
+{"type":"coverage","status":"skipped","reason":"not_assurance_project","pack":"/home/runner/.testmuai/kaneai/sessions/e6eebb76-4e4d-4e2d-8b60-634a5fec3079/evidence/d5562c04-8447-4e7a-a384-406e0b1b8983.evidence","v":1,"ts":"2026-11-22T05:00:32.924Z"}
+{"type":"test_md_done","overall_status":"passed","duration_s":9,"session_id":"e6eebb76-4e4d-4e2d-8b60-634a5fec3079","coverage":{"status":"skipped"},"override_start_url":"http://localhost:4319/","v":1,"ts":"2026-11-22T05:00:32.924Z"}
