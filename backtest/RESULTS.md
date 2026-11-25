@@ -2,11 +2,11 @@
 
 **Question:** when a Dependabot PR passed CI, got merged, and the maintainer later reverted it, would Bumpgate have stopped it?
 
-**Answer on the cases that can still be run:** Kane blocked the one upgrade that broke the app (React 19.3.0, all 4 CI checks green including the deploy to GitHub Pages, a blank page) and passed the one where no journey broke. Two more reverted upgrades, in repos with no CI, do not even build; Bumpgate blocks those before Kane runs.
+**Answer on the cases that can still be run:** Kane blocked the one upgrade that broke the app (React 19.3.0: CI passed on the PR, the merge commit passed all 4 checks including the deploy to GitHub Pages, and the page was blank) and passed the one where no journey broke. Two more reverted upgrades, in repos with no CI, do not even build; Bumpgate blocks those before Kane runs.
 
 | Repo · PR | Upgrade | CI on the PR | Bumpgate | What Kane saw |
 |---|---|---|---|---|
-| [anis-mondal/tic-tac-toe #36](https://github.com/anis-mondal/tic-tac-toe/pull/36) | react 19.2.8 → 19.3.0 | ✅ all 4 CI checks passed, including the deploy to GitHub Pages | 🔴 **blocked**: 2 of 2 journeys broke (2/2 runs each) | A blank page at the first step. Dependabot raised `react` to 19.3.0 and left `react-dom` at 19.2.8; React refuses mismatched versions ([error #527](https://react.dev/errors/527)). Kane's bug verdict, confirmed: *"React version mismatch leaves game setup page blank"* (major). |
+| [anis-mondal/tic-tac-toe #36](https://github.com/anis-mondal/tic-tac-toe/pull/36) | react 19.2.8 → 19.3.0 | ✅ CI passed on the PR; the merge commit passed all 4 checks, including the deploy to GitHub Pages | 🔴 **blocked**: 2 of 2 journeys broke (2/2 runs each) | A blank page at the first step. Dependabot raised `react` to 19.3.0 and left `react-dom` at 19.2.8; React refuses mismatched versions ([error #527](https://react.dev/errors/527)). Kane's bug verdict, confirmed: *"React version mismatch leaves game setup page blank"* (major). |
 | [Bateas/MeteoMapGal #19](https://github.com/Bateas/MeteoMapGal/pull/19) | @tailwindcss/vite 4.3.1 → 4.3.3 | ✅ passed | 🟢 same: 2 of 2 journeys pass | No broken journey. The revert gives no reason; a Tailwind patch mostly changes styling, which these journeys do not check. |
 | [mitvis/website #130](https://github.com/mitvis/website/pull/130) | svelte 5.34.3 → 5.57.0 | no CI | 🔴 blocked at build | The upgrade does not build (mdsvex error). |
 | [thorpelawrence/thorpelawrence.github.io #48](https://github.com/thorpelawrence/thorpelawrence.github.io/pull/48) | svelte 3.49.0 → 5.53.5 | no CI | 🔴 blocked at build | Svelte 5 compile error: the `errorMode` option was removed. |

@@ -47,7 +47,7 @@
       <h1 class="display">Verified<br>Dependency Upgrades</h1>
       <p class="lede">Bumpgate replays your app's critical journeys on every Dependabot and Renovate PR. It merges what still works, and fixes what broke.</p>
       <div class="cmd" role="group" aria-label="Install">
-        <code><span class="mut">uses:</span> Maheswar-Sah00/bumpgate@v1</code>
+        <code><span class="mut">uses:</span> Maheswar-Sah00/bumpgate@v1.1</code>
         <button class="btn btn-sm" id="copy-hero">Copy workflow <span class="arr">→</span></button>
       </div>
       <a class="proof-link" href="https://github.com/Maheswar-Sah00/bumpgatedemo/pulls?q=is%3Apr"><i class="lt g"></i>Live on real Dependabot PRs · 3 merged, 2 fixed by Claude Code <span>↗</span></a>
@@ -337,7 +337,7 @@ guardrails({ files, journeysDir, bumps, headPkg, newPkg, headLock, newLock });</
         <div class="sf reveal">
           <div class="sf-top"><span class="sf-ic">⚙</span><code>.github/workflows/bumpgate.yml</code></div>
           <div class="sf-body term">
-            <div><span class="mut">- uses:</span> Maheswar-Sah00/bumpgate@v1</div>
+            <div><span class="mut">- uses:</span> Maheswar-Sah00/bumpgate@v1.1</div>
             <div><span class="mut">  with:</span></div>
             <div><span class="mut">    lt-username:</span> ${{ secrets… }}</div>
             <div><span class="mut">    agent:</span> claude</div>
@@ -376,7 +376,7 @@ jobs:
         with: { fetch-depth: 0 }
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
-      - uses: Maheswar-Sah00/bumpgate@v1
+      - uses: Maheswar-Sah00/bumpgate@v1.1
         with:
           lt-username: ${{ secrets.LT_USERNAME }}
           lt-access-key: ${{ secrets.LT_ACCESS_KEY }}
