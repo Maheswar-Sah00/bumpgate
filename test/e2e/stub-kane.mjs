@@ -5,6 +5,7 @@
 // demo journeys and prints the same NDJSON event types `kane-cli testmd run --agent` prints,
 // plus a sealed-pack-shaped zip with console logs, so every parser path is exercised.
 //
+//   Needs playwright-core (not a Bumpgate dependency): npm i --no-save playwright-core
 //   BUMPGATE_KANE_CLI_BIN=test/e2e/stub-kane.mjs STUB_FLOWS=test/e2e/demo-flows.mjs bumpgate check ...
 import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
