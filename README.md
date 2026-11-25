@@ -12,7 +12,7 @@
 [![Node](https://img.shields.io/badge/node-%E2%89%A520-343a40?style=flat-square&logo=nodedotjs&logoColor=white)](package.json)
 [![License](https://img.shields.io/badge/license-MIT-868e96?style=flat-square)](#license)
 
-[**Demo video (2:51)**](https://youtu.be/DokOgngtECc) ·
+[**Demo video (3:11)**](https://youtu.be/4M6fN9S-Zgw) ·
 [**Site**](https://maheswar-sah00.github.io/bumpgate/) ·
 [**Live demo PRs**](https://github.com/Maheswar-Sah00/bumpgatedemo/pulls?q=is%3Apr) ·
 [**Radar results**](radar/RESULTS.md) ·
@@ -74,7 +74,7 @@ Built for the [Kane CLI Hackathon](https://www.kaneclihack.sh/) by TestMu AI. Ag
 
 | What | Where | Time |
 |---|---|:---:|
-| The demo film: the problem, the gate on real PRs, and what breaks without Kane CLI | [YouTube](https://youtu.be/DokOgngtECc) | 3 min |
+| The demo film: the problem, the gate on real PRs, and what breaks without Kane CLI | [YouTube](https://youtu.be/4M6fN9S-Zgw) | 3 min |
 | Real Dependabot PRs going through the gate: two blocked, migrated by Claude Code and merged; one green auto-merge | [bumpgatedemo pull requests](https://github.com/Maheswar-Sah00/bumpgatedemo/pulls?q=is%3Apr) | 2 min |
 | Backtest on 6 real upgrades public repos had to undo: each React PR passed CI, merged, and the deployed app went blank. Kane blocks all 6 at step 1, each failure confirmed by a second run | [`backtest/blank-page/RESULTS.md`](backtest/blank-page/RESULTS.md) (5) and [`backtest/RESULTS.md`](backtest/RESULTS.md) (1) | 1 min |
 | **Radar:** Bumpgate on 10 *open* Dependabot PRs in other people's repos. 2 blank pages caught (both PRs' own CI was red from npm peer conflicts, so the claim is "a forced install ships a blank page"), 1 UI drift flagged amber, 7 green. 0 false alarms on 4 bumps that were merged and never reverted | [`radar/RESULTS.md`](radar/RESULTS.md) | 2 min |
